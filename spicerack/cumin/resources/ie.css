@@ -1,0 +1,27 @@
+#context li a {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  border-left: 1px solid #FFFFFF;
+}
+
+#context li:first-child a {
+  padding-left: 0;
+  border-left: 0;
+}
+
+/* force ie to honor mouse events on empty div */
+div#slot_glass {
+   background-color: white;
+   filter:alpha(opacity=0);
+}
+
+div.loading {
+    filter:alpha(opacity=75);
+}
+
+/* objects in IE are windowed controls.
+   they overlay all non-windowed control */
+object.BackgroundInclude {
+    display: none;
+}
+

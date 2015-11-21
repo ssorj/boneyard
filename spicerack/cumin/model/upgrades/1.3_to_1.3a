@@ -1,0 +1,29 @@
+#!/usr/bin/python
+import subprocess
+import os
+import re
+
+# The cumin db auth changes can be missed if users
+# have a schema version already > 1.1 when they run
+# cumin-amdin upgrade-schema since the auth changes were
+# injected in the change from 1.1 to 1.1a.
+
+# Therefore, we scan for the pg_hba.conf changes here.
+# If everything is right, there will be no action.
+# Otherwise, the 1.1_to_1.1a script will be run
+# (it touches only db config data for auth).
+# With the subsequent version change 1.3a, everyone
+# should be on the same page regardess of path
+
+PG_HBA_CONF = "/var/lib/pgsql/data/pg_hba.conf"
+
+home = os.environ.get("CUMIN_HOME", os.path.normpath("/usr/share/cumin"))
+
+old = re.compile("^\s*(local|host|hostssl|hostnossl)\s*cumin\s*cumin.*trust\s*$")
+lines = file(PG_HBA_CONF).readlines()
+for l in lines:
+    if old.match(l):
+        # Okay, we have old config lines to get rid of.
+        subprocess.Popen(os.path.join(home, "model/upgrades/1.1_to_1.1a"), 
+                         shell=True).wait()
+        break

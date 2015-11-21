@@ -1,0 +1,9 @@
+#!/bin/bash
+
+exec find "${DEVEL_HOME}/" \
+    -regextype posix-awk \
+    -regex '.*\.(py|strings|sql|xml|js|css)$' \
+    -or -regex '.*/bin/[^/]+$' -executable -type f \
+    -or -name Makefile\* -type f
+
+#    -path "**/.svn/**" -prune  \

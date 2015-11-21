@@ -1,0 +1,48 @@
+<model>
+  <package name="com.redhat.cumin.messaging">
+    <class name="BrokerGroup">
+      <property name="name" type="sstr"/>
+      <property name="description" type="lstr" optional="y"/>
+    </class>
+
+    <class name="BrokerGroupMapping">
+      <property name="broker" type="objId" references="org.apache.qpid.broker:Broker"/>
+      <property name="group" type="objId" references="BrokerGroup"/>
+    </class>
+  </package>
+
+  <package name="com.redhat.cumin.grid">
+    <class name="JobSummary" storage="none">
+      <property name="ProcId" type="sstr"/>
+      <property name="Args" type="sstr"/>
+      <property name="QDate" type="absTime"/>
+      <property name="Cmd" type="sstr"/>
+      <property name="ClusterId" type="sstr"/>
+      <property name="JobStatus" type="sstr"/>
+      <property name="EnteredCurrentStatus" type="absTime"/>
+      <property name="GlobalJobId" type="sstr"/>
+      <property name="JobId" type="sstr"/>
+    </class>
+
+    <class name="Quota" storage="none">
+      <property name="id" type="sstr"/>
+      <property name="Name" type="sstr"/>
+      <property name="Quota" type="sstr"/>
+    </class>
+
+    <class name="Limit" storage="none">
+      <property name="Name" type="sstr"/>
+      <property name="Usage" type="sstr"/>
+      <property name="Allowance" type="sstr"/>
+    </class>
+    
+    <class name="Node" storage="none">
+      <property name="Host" type="sstr"/>
+      <property name="Tags" type="sstr"/>
+      <property name="Checkin" type="sstr"/>
+      <property name="Features" type="sstr"/>
+      <property name="NumHosts" type="sstr"/>
+    </class>    
+    
+  </package>
+</model>

@@ -1,0 +1,10 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid-stable.bash
+
+script-init
+
+svn-update "http://svn.apache.org/repos/asf/qpid/branches/0.5-release/qpid" "$SOURCE_PATH"
+
+svn-save-revision "$SOURCE_PATH"

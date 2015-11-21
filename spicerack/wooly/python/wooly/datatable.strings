@@ -1,0 +1,40 @@
+[DataTable.css]
+table.DataTable th.controls {
+    text-align: left;
+}
+
+table.DataTable th.controls > div.right {
+    float: right;
+    text-align: right;
+    margin: 0 0 0 2em;
+}
+
+table.DataTable th.controls div.paginator {
+    /* allow page numbers to wrap to next line */
+    white-space: normal;
+}
+
+[DataTableHeader.html]
+<thead>
+  <tr>
+    <th colspan="{colspan}" class="controls">
+      <div class="right">{limit}</div>
+      <div class="right">{font}</div>
+      <div class="paginator">{page}</div>
+    </th>
+  </tr>
+  <tr>{headers}</tr>
+</thead>
+
+[DataTableFooter.html]
+<tfoot><tr><td colspan="{colspan}">{options}{summary}</td></tr></tfoot>
+
+[DataTableSelector.css]
+ul.DataTableSelector {
+    display: inline;
+    padding: 0;
+}
+
+[DataTableSelector.html]
+<span>{title}</span>
+<span>{options}</span>

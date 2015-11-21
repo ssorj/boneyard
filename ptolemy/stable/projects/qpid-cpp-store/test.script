@@ -1,0 +1,21 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid.bash
+
+script-init
+
+export CXXFLAGS="-I${INSTALL_PATH}/include -I${INSTALL_PATH}/include/qpid-boost"
+export LDFLAGS="-L${INSTALL_PATH}/lib"
+
+export PATH="${INSTALL_PATH}/bin:${INSTALL_PATH}/sbin:${PATH}"
+export PATH="${INSTALL_PATH}/libexec/qpid/tests:${PATH}"
+export PYTHONPATH=$(python-path)
+
+# Interface to run_cluster_tests
+export QPID_PREFIX="${INSTALL_PATH}"
+export TMP_DATA_DIR="/tmp/ptol/qpid-cpp-store"
+
+cd "$SOURCE_PATH"
+
+make check

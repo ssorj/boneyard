@@ -1,0 +1,24 @@
+[ExchangeInputSet.item_html]
+<div class="field">
+  <input type="radio" name="{name}" value="{item_value}" tabindex="{tab_index}" {item_checked_attr}/>
+  {item_content}
+</div>
+
+[ExchangeOverview.html]
+<table class="twocol">
+  <tbody>
+  <tr>
+    <td>
+      <h2>Input/Output</h2>
+      {io}
+
+      <h2>General</h2>
+      {general}
+    </td>
+    <td>
+      {recvroutedrop}
+      {producers}
+    </td>
+  </tr>
+  </tbody>
+</table>

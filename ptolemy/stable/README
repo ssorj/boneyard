@@ -1,0 +1,16 @@
+Set up the devel environment
+
+  Source the devel environment settings
+
+     $ cd ptolemy                  # <--- The directory where this README is
+     $ source Profile
+
+  Make sure you have the necessary packages installed.
+
+Run the ptolemy server
+
+  $ ptolemy
+
+Run a cycle for a single project (and its dependencies)
+
+  $ ptolemy-project PROJECT-NAME

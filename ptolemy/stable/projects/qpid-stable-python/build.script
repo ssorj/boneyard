@@ -1,0 +1,15 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid-stable.bash
+
+script-init
+
+path="${INSTALL_PATH}/lib/python"
+
+cd "${SOURCE_PATH}/python"
+
+install -d "${path}/qpid"
+install -m 644 qpid/*.py "${path}/qpid"
+install -d "${path}/mllib"
+install -m 644 mllib/*.py "${path}/mllib"

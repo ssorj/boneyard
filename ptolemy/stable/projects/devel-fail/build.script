@@ -1,0 +1,7 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+
+script-init
+
+expr "$RANDOM" % 4 = 0

@@ -1,0 +1,14 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid.bash
+
+script-init
+
+function handle-abnormal-exit {
+    cp "$SOURCE_PATH"/cpp/src/tests/*.log "$CYCLE_PATH" || :
+}
+
+cd "${SOURCE_PATH}/cpp/src/tests"
+
+make check-long

@@ -1,0 +1,19 @@
+.PHONY: clean-python-files
+
+PREFIX := /usr/local
+PYTHON_LIB_DIR := ${PREFIX}/lib/python
+BIN_DIR := ${PREFIX}/bin
+ETC_DIR := ${PREFIX}/etc
+SHARE_DIR := ${PREFIX}/share
+DOC_DIR := ${SHARE_DIR}/doc
+
+ifeq (${PREFIX}, /usr/local)
+    VAR_DIR := /var/local
+else
+    VAR_DIR := ${PREFIX}/var
+endif
+
+LOG_DIR := ${VAR_DIR}/log
+
+clean-python-files:
+	find python -type f -name \*.py[co] -delete

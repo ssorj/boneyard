@@ -1,0 +1,105 @@
+This is the development environment for the Red Hat Messaging
+management suite (in this document, "mgmt" for short).
+
+These instructions assume you have sudo installed.  If not, you can
+install it (as shown below) or you can instead su to root.
+
+To install sudo (on a yum-driven distro):
+
+  $ su -
+  $ yum install sudo
+  $ visudo                            # Add your user
+
+DEPENDENCIES
+------------
+
+To run the management code, you need the following packages (on top of
+what you get in a typical Fedora install):
+
+  postgresql-server
+  python-psycopg2
+
+  $ sudo yum install postgresql-server python-psycopg2
+
+It also depends on the qpid python code.  You can satisfy these
+dependencies either by installing the python-qpid package, or by
+checking out the qpid python code.  The latter is currently the better
+option, because of mgmt depending on newer features of the qpid python
+code.
+
+Check out qpid python from source and put it in the PYTHONPATH.  The
+method below links to the qpid code via symlinks in ~/lib/python,
+which is in the mgmt devel environment's PYTHONPATH:
+
+  $ svn co http://svn.apache.org/repos/asf/qpid/trunk/qpid ~/qpid
+  $ cd ~/qpid/python
+  $ python setup.py build
+  $ cd ~/qpid/extras/qmf
+  $ python setup.py build
+  $ mkdir -p ~/lib/python
+  $ cd ~/lib/python
+  $ ln -s ~/qpid/python/build/lib/qpid
+  $ ln -s ~/qpid/python/build/lib/mllib
+  $ ln -s ~/qpid/extras/qmf/build/lib/qmf
+
+*Alternatively*, install python-qpid:
+
+  $ sudo yum install python-qpid
+
+PREPARING THE DEVEL ENVIRONMENT
+-------------------------------
+
+Change to the mgmt directory (the one containing this README file),
+and source the devel environment settings:
+
+  $ cd mgmt
+  $ source etc/devel.profile          # Or use etc/devel.profile.tcsh
+
+Check that everything is set up properly:
+
+  $ which cumin
+  ~/mgmt/cumin/bin/cumin
+  $ echo $DEVEL_HOME
+  /home/youruser/mgmt
+
+PREPARING THE DATABASE
+----------------------
+
+You will also need to create a database and load the schema.  If you
+haven't already done it, you'll need to initialize the postgres
+service, edit permissions, and start it up.
+
+  $ sudo cumin-database stop           # If necessary
+  $ sudo cumin-database configure
+  $ sudo cumin-database start
+  $ su -c "cumin-database create"      # 'su -c' so the env inherits
+
+At this point you should have a working database.  Test it:
+
+  $ sudo cumin-database check
+
+At this point you should have a working database and schema that you
+can connect to with 'psql -d cumin -U cumin -h localhost'.  All that
+remains is to add a cumin user:
+
+Add a cumin user:
+
+  $ cumin-admin add-user guest
+  Enter new password:                 # Enter a password for guest
+  Confirm new password:               # Re-type the password
+  User 'guest' is added
+
+
+USING THE DEVEL ENVIRONMENT
+---------------------------
+
+For your convenience, there is a script, bin/devel, which you can use
+to start up the devel environment.  I recommend putting a small
+wrapper script like that below somewhere in your path:
+
+  $ cat ~/bin/mgmt
+  #!/bin/bash
+
+  export DEVEL_HOME="${HOME}/mgmt"
+
+  exec "${DEVEL_HOME}/bin/devel"

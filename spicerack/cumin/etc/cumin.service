@@ -1,0 +1,10 @@
+[Unit]
+Description=MRG Management console
+After=postgresql.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/cumin --syslog
+
+[Install]
+WantedBy=multi-user.target

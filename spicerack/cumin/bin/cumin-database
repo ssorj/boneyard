@@ -1,0 +1,386 @@
+#!/bin/bash -e
+
+if [[ "$EUID" != "0" ]]; then
+    echo "This script must be run as root"
+    exit 2
+fi
+
+# A workaround for running this script from the devel environment
+
+if [[ -d cumin && -f etc/devel.profile ]]; then
+    source etc/devel.profile &> /dev/null
+fi
+
+pgdata="/var/lib/pgsql/data"
+pglog="${pgdata}/pg_log"
+pghbaconf="${pgdata}/pg_hba.conf"
+dbname="cumin"
+
+function format-output {
+    while read line; do
+        if [ -n "$line" ]; then
+            echo " | $line"
+        fi
+    done
+}
+
+function run {
+    echo " | \$ $1"
+
+    if [[ "$2" ]]; then
+        su - postgres -c "$1" | format-output 2>&1
+    else
+        $1 | format-output 2>&1
+    fi
+
+    return ${PIPESTATUS[0]}
+}
+
+function retry {
+    completed=1
+    for ((c=0; c<=$2; c++))
+    do
+        echo $1
+        $1 && completed=0
+        if [ $completed -eq 0 ]; then
+            break
+        fi
+        sleep 1
+        echo "retrying..."
+    done
+    return $completed
+}
+
+# check for existence of systemctl function...
+if [[ -f "/bin/systemctl" ]]; then
+    have_systemd=1
+else
+    have_systemd=0
+fi
+
+function postgresql_str {
+    # There is no supported OS version that has a valid
+    # initdb option for the postgresql.service systemd script.
+
+    # el6 and Fedora F15 support sevice postresql initdb, however
+    if [ $have_systemd -eq 1 ] && [ "$1" != "initdb" ]; then
+        echo systemctl $1 postgresql.service
+    else
+        echo /sbin/service postgresql $1                      
+    fi
+}
+
+function check-environment {
+    which rpm > /dev/null
+
+    rpm -q postgresql-server &> /dev/null || {
+        echo "Error: postgresql-server is not installed"
+        if [ "$1" != noadvice ]; then
+            echo "Hint: Run 'yum install postgresql-server'"
+        fi
+        return 1
+    }
+}
+
+function check-started {
+    $(postgresql_str status) &> /dev/null || {
+        echo "Error: The database is not running"
+        if [ "$1" != noadvice ]; then
+            echo "Hint: Run 'cumin-database start'"
+        fi
+        return 1
+    }
+}
+
+function check-initialized {
+    if [[ ! -f "$pghbaconf" ]]; then
+        echo "Error: The database is not initialized"
+        if [ "$1" != noadvice ]; then
+            echo "Hint: Run 'cumin-database install'"
+        fi
+        return 1
+    fi
+}
+
+function check-created {
+    su - postgres -c 'echo \\q | psql -d cumin' &> /dev/null || {   
+        echo "Error: The database is not created"
+        if [ "$1" != noadvice ]; then
+            echo "Hint: Run 'cumin-database install'"
+        fi
+        return 1
+    }
+}
+
+function check-created-wait {
+    for ((c=0; c<=30; c++))
+    do
+        res="$(su - postgres -c 'echo \\q | psql -d cumin' 2>&1)" || true
+        case $res in
+            *"could not connect"* | *"database system is starting up"*)
+                if [ $c -eq 0 ] ; then
+                    echo
+                fi
+                echo "Error connecting to the database server, retry"
+                sleep 1 
+                ;;
+            "")  
+                return 0
+                ;;
+            *) 
+                logger -p daemon.error $res
+                echo "Error: Could not connect to the database server."
+                echo "Check /var/log/messages for the specific error."
+                echo "The database may not be created."
+                if [ "$1" != noadvice ]; then
+                    echo "Hint: Try 'cumin-database install'"
+                fi
+                return 1
+                ;;
+        esac
+    done
+    echo "Error: Could not connect to the database server"
+    return 1
+}
+
+function confirm-install {
+    cat <<EOF
+WARNING
+
+This script installs a cumin database into the system postgresql
+instance.  It will take the following actions as necessary.
+
+ * It will stop and start the postgresql service.
+
+ * It will initialize the postgresql database cluster if it isn't
+   already initialized.
+
+If you already have a custom-configured postgresql install, you may
+not want to proceed.
+
+If there are clients that depend on the running postgresql service,
+you probably don't want to proceed.
+
+If, however, none of these changes affect your existing deployment, it
+is safe to proceed.
+
+EOF
+
+    get-explicit-confirmation
+
+    install
+}
+
+function get-explicit-confirmation {
+    echo "Enter 'yes' to proceed or Ctrl-C to cancel:"
+
+    while read word; do
+        if [[ "$word" == "yes" ]]; then
+            break
+        fi
+
+        echo "Enter 'yes' to proceed or Ctrl-C to cancel:"
+    done
+}
+
+function install {
+    check-environment || exit 1
+
+    check-initialized &> /dev/null || initialize
+
+    check-started &> /dev/null || start > /dev/null
+
+    check-created-wait &> /dev/null || create
+}
+
+function start {
+    check-environment || exit 1
+    check-initialized || exit 1
+
+    $(postgresql_str start)
+}
+
+function stop {
+    check-environment || exit 1
+    check-initialized || exit 1
+
+    $(postgresql_str stop)
+}
+
+function restart {
+    check-environment || exit 1
+    check-initialized || exit 1
+
+    # The postgresql 8.1.22 init script violates LSB 3.1 Chapter 20.2,
+    # and returns 1 on a successful restart of a stopped service.
+    # Use condrestart to skip restart of stopped service.
+
+    # Apparently condstop sometimes fails.  Try up to 5 times.
+    retry "$(postgresql_str condrestart)" 5 || {
+        echo "postgres restart failed"
+        exit 1
+    }
+}
+
+function initialize {
+    check-environment || exit 1
+    
+    if check-initialized &> /dev/null; then
+        echo "Error: The database server is already initialized"
+        exit 1
+    fi
+
+    if check-started &> /dev/null; then
+        echo "Error: The database server is running"
+        echo "Hint: Run 'cumin-database stop'"
+        exit 1
+    fi
+
+    # Newer systems have a /usr/bin/postgresql-setup script, try to use it first.
+    if [[ -f "/usr/bin/postgresql-setup" ]]; then
+        echo -e "using postgresql-setup..."
+        run "/usr/bin/postgresql-setup initdb"
+    else
+        # On older versions of Postgres (before 8.4), initdb does not exist but
+        # using the start option will initialize the database, then start it.
+        # Try initdb first, and if it fails try start.
+        echo -e "\nAttempting to use initdb option..."
+        run "$(postgresql_str initdb)" || {
+            echo -e "\ninitdb option not supported, using start..."
+            run "$(postgresql_str start)"
+        }
+    fi
+
+    # now check again, to make sure one of the two methods worked
+    check-initialized &> /dev/null || {
+        echo "Error: Database initialization failed."
+        exit 1
+    }
+}
+
+function create {
+    check-environment || exit 1
+    check-started || exit 1
+
+    if check-created &> /dev/null; then
+        echo "Error: The database is already created"
+        exit 1
+    fi
+
+    run "createuser --superuser ${dbname}" postgres
+    run "createdb --owner=${dbname} ${dbname}" postgres
+
+    cumin-admin create-schema
+    # cumin-admin add-role user
+    # cumin-admin add-role admin
+}
+
+function drop {
+    check-environment || exit 1
+    check-started || exit 1
+
+    run "dropdb ${dbname}" postgres
+    run "dropuser ${dbname}" postgres
+}
+
+function confirm-drop {
+    cat <<EOF
+WARNING
+
+This operation will discard the contents of the cumin database.
+
+EOF
+
+    get-explicit-confirmation
+
+    drop
+}
+
+function confirm-annihilate {
+    check-environment || exit 1
+
+    echo "Really?"
+
+    while read line; do
+        if [[ "$line" == "really" ]]; then
+            break
+        fi
+
+        echo "Not good enough"
+    done
+
+    run "$(postgresql_str stop)" || :
+    run "rm -rf /var/lib/pgsql/data"
+}
+
+function usage {
+    cat <<EOF
+Control and configure the cumin database
+Usage: cumin-database COMMAND
+Commands:
+    check         Check the cumin database
+    install       Automated database install
+    start         Start the database server
+    stop          Stop the database server
+    initialize    Create the main database cluster
+    create        Create the user, database, and schema
+    drop          Discard the database user, database, and all data
+EOF
+    exit 1
+}
+
+case "$1" in
+    check)
+        echo -n "Checking environment ........ "
+        check-environment $2 || exit 1
+        echo "OK"
+
+        echo -n "Checking initialization ..... "
+        check-initialized $2 || exit 1
+        echo "OK"
+
+        echo -n "Checking server ............. "
+        check-started $2 || exit 1
+        echo "OK"
+
+        echo -n "Checking database 'cumin' ... "
+        check-created-wait $2 || exit 1
+        echo "OK"
+
+        echo "The database is ready"
+        ;;
+    check-started)
+        check-started || exit 1
+        ;;
+    install)
+        confirm-install
+        echo "The database is installed"
+        ;;
+    start)
+        start
+        echo "The database server is started"
+        ;;
+    stop)
+        stop
+        echo "The database server is stopped"
+        ;;
+    initialize)
+        initialize
+        echo "The database server is initialized"
+        ;;
+    create)
+        create
+        echo "The database is created"
+        ;;
+    drop)
+        confirm-drop
+        echo "The database is dropped"
+        ;;
+    annihilate)
+        confirm-annihilate
+        echo "You devastate me"
+        ;;
+    *)
+        usage
+        ;;
+esac

@@ -1,0 +1,338 @@
+[ObjectSelector.css]
+div.ObjectSelectorControl ul {
+    list-style: none;
+    display: inline;
+    padding: 0;
+}
+
+div.ObjectSelector label.overTxtLabel {
+    font-size: 12px;
+    color: #999;
+}
+
+div.ObjectSelectorFilters {
+    float: left;
+    padding-bottom: 0.25em;
+}
+
+div.ObjectSelectorFilters ul {
+    float: left;
+    margin: 0;
+}
+
+div.ObjectSelectorFilters input {
+    font-size: 0.75em;
+}
+
+div.ObjectSelectorSelectableFilters {
+    float: left;
+    padding-bottom: 0.25em;
+}
+
+div.ObjectSelectorSelectableFilters ul {
+    float: left;
+    margin: 0;
+}
+
+div.ObjectSelectorSelectableFilters input,select {
+    font-size: 0.75em;
+}
+
+div.ObjectSelectorButtons {
+    background-color: #e7e7f7;
+    padding: 0.35em 0.75em;
+}
+
+div.ObjectSelectorButtons span {
+    font-size: 0.9em;
+    margin: 0 0.5em 0 0;
+}
+
+div.ObjectSelectorButtons ul li {
+    margin: 0 0.4em 0 0;
+    display: inline;
+}
+
+div.ObjectSelectorLinks {
+    margin: 0 0 0.5em 0;
+}
+
+[ObjectSelector.html]
+<div id="{id}" class="{class}">
+  {links}
+  {switches}
+
+  <form id="{id}.form" method="post" action="?">
+    {filters}
+    {selectablefilters}
+    {buttons}
+
+    {table}
+
+    <div>{hidden_inputs}</div>
+  </form>
+  <script type="text/javascript">
+//<![CDATA[
+    $(document.forms[0]).getElements('[type=text]').each(function(el){ new OverText(el, {
+            positionOptions: {
+            offset: {
+                x: 5,
+                y: 3
+            }
+        }
+    
+    }); });
+    {script}
+//]]>
+  </script>
+</div>
+
+[ObjectSelectorTable.javascript]
+wooly.addPageUpdateListener(cumin.restoreTableCheckboxes);
+
+[ObjectSelectorTable.html]
+    <table id="{id}" class="{class}">
+      {columns}
+      <style type="text/css">
+        {css}
+      </style>
+      {header}
+      {footer}
+      <tbody>{rows}</tbody>
+    </table>
+  <script type="text/javascript">
+    cumin.restoreTableCheckboxes();
+  </script>
+
+[ObjectSelectorControl.html]
+<div class="{class}">
+  <ul>{widgets}</ul>
+</div>
+
+[ObjectSelectorButtons.html]
+<div class="{class}">
+  <span>Act on selection</span>
+
+  <ul>{widgets}</ul>
+</div>
+
+[ObjectSelectorFilters.javascript]
+function clearSearchInput(id) {
+    var parent = $(id);
+    if (parent) {
+        var searchInput = parent.getElement("input");
+        if (searchInput) {
+            searchInput.value = "";
+        }
+    }
+    return true;
+}
+
+function clearOffsetInput(id) {
+    if (id) {
+        var regex = new RegExp("\.offset$");
+        var inputs = id.getElements("input");
+        if(inputs) {
+            for (i = 0; i < inputs.length; i++) {
+                var input_name = inputs[i].name;
+                var match = regex.exec(input_name);
+                if(match != null) {
+                  inputs[i].value = 0;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+
+[ObjectSelectorFilters.html]
+<div id="{id}" class="{class}">
+  <ul>{widgets}</ul>
+  <input type="submit" value="Search" onclick="return clearOffsetInput(this.form)" tabindex="100"/><input type="submit" value="Clear" onclick="return clearSearchInput('{id}')" tabindex="100"/>
+</div><div style="margin-bottom: 0.5em; clear:both;"></div>
+
+[ObjectSelectorSelectableFilters.javascript]
+function clearSearchInput(id) {
+    var parent = $(id);
+    if (parent) {
+        var searchInput = parent.getElement("input");
+        if (searchInput) {
+            searchInput.value = "";
+        }
+    }
+    return true;
+}
+
+function clearOffsetInput(id) {
+    if (id) {
+        var regex = new RegExp("\.offset$");
+        var inputs = id.getElements("input");
+        if(inputs) {
+            for (i = 0; i < inputs.length; i++) {
+                var input_name = inputs[i].name;
+                var match = regex.exec(input_name);
+                if(match != null) {
+                  inputs[i].value = 0;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+
+[ObjectSelectorSelectableFilters.html]
+<div id="{id}" class="{class}">
+  <ul>{select_input}{search}</ul><input type="submit" value="Search" onclick="return clearOffsetInput(this.form)" tabindex="100"/><input type="submit" value="Clear" onclick="return clearSearchInput('{id}')" tabindex="100"/></div><div style="margin-bottom: 0.5em; clear:both;"></div>
+  
+[ExportButton.css]
+div.ExportButton {
+    float:right;
+}
+
+div.ExportButton span {
+    position: relative;
+    top: -2px;
+    padding-right: 4px;
+}
+
+[ExportButton.html]
+<div class="{class}"><span>Save to CSV file</span> <a href="{href}"><img src="resource?name=save.png" alt="save as csv" title="Save table as CSV file" valign="middle" border="0"/></a></div>
+
+[ObjectQmfSelector.css]
+div.NotificationSet ul {
+    list-style-type: none;
+}
+
+[ObjectQmfSelector.deferred_html]
+<div id="{id}">
+    <div class="deferredSpacer">Loading...</div>
+</div>
+<script type="text/javascript">
+//<![CDATA[
+(function() {
+
+    if (typeof window.reUpdated == "undefined") {
+        window.reUpdated = true;
+        window.addEvent("domready", function () { 
+            setInterval( function () { 
+                wooly.updateNow();
+            }, 5000 );
+        });
+    }
+
+}())
+//]]>
+</script>
+
+[ObjectQmfSelector.error_html]
+<div id="{id}">
+    <div class="NotificationSet">
+        <ul>
+            <li>{error_msg} {details}</li>
+        </ul>
+    </div>
+</div>
+
+[ObjectQmfSelectorScript.html]
+(function() {
+    // don't update the entire form anymore
+    // just update the table
+    var updateUrl = wooly.branchIntervalUpdate();
+
+    for (var i=0; i<updateUrl.widget.length; i++) {
+        if (updateUrl.widget[i] == "{selector_id}") {
+            updateUrl.widget[i] = "{table_id}";
+            wooly.restartIntervalUpdate(updateUrl.marshal());
+            break;
+        }
+    }
+}())
+
+[QmfDetails.css]
+div.QmfDetails span.DetailsLink {
+    font-size: 80%;
+}
+
+div.QmfDetails div.Details span {
+    font-style: italic;
+    font-weight: bold;
+}
+
+[QmfDetails.html]
+<div id="{id}" class="{class}">
+    <span class="DetailsLink"><a onclick="showDetails(); return false;">[<span id="{id}_link">{show}</span> details]</a></span>
+    <div id="{id}_details" class="Details" style="display: {style};">{details}</div>
+</div>
+<script type="text/javascript">
+//<![CDATA[
+    function showDetails() {
+        var updateUrl = wooly.branchIntervalUpdate();
+        var branch = updateUrl["session"];
+
+        var details = $("{id}_details");
+        var show_hide = $("{id}_link");
+        if (details.style.display == "block") {
+            show_hide.set('text', "show");
+            details.style.display = "none";
+            delete branch["{details_path}"];
+        } else {
+            show_hide.set('text', "hide");
+            details.style.display = "block";
+            branch["{details_path}"] = "1";
+        }
+        wooly.restartIntervalUpdate(updateUrl.marshal());
+    }
+//]]>
+</script>
+
+[ObjectTableColumn.css]
+/* allow room for arrow on selected column */
+th.selected a.TableColumnHeader > span {
+    padding-right: 14px;
+}
+
+a.TableColumnHeader span.up {
+    background: url(resource?name=sort-arrow-up.png) right 3px no-repeat;
+}
+a.TableColumnHeader span.down {
+    background: url(resource?name=sort-arrow-down.png) right 4px no-repeat;
+}
+
+[SearchFieldOptions.javascript]
+function change_input_text(select_box, text) {
+	operator_toggle(select_box);	
+	newText = "Search in " + select_box.options[select_box.selectedIndex].text + " column";
+	select_box.getParent().getElement("label").textContent = newText;
+}
+
+function operator_toggle(select_box) {
+	field_type = select_box[select_box.selectedIndex].getAttribute("type");
+	select_width = select_box.getWidth();
+	adjust_pixels_noops = 27 + select_width;
+	adjust_pixels_ops = 72 + select_width;
+	if (field_type != "int8" && field_type != "float8") {
+	  select_box.getNext().setAttribute("style", "display:none");
+	  select_box.getParent().getElement("label").setStyle("left", adjust_pixels_noops + "px")
+	} else {
+	  select_box.getNext().setAttribute("style", "display:inline");
+	  select_box.getParent().getElement("label").setStyle("left", adjust_pixels_ops + "px")
+    }
+}
+
+[SearchFieldOptions.html]
+  <script type="text/javascript">
+//<![CDATA[
+	window.addEvent('domready', function () {
+		select_box = $("{select_box}").getParent().getElement("select")
+		newText = "Search in " + select_box.options[select_box.selectedIndex].text + " column";
+		$("{select_box}").getParent().getElement("label").textContent = newText;
+		operator_toggle(select_box);
+	});
+//]]>
+  </script>
+<select id="{id}" name="{name}" tabindex="{tab_index}" {disabled_attr} onchange="{onchange}">{items}</select>{operator_input}
+
+[SearchFieldOptions.item_html]
+<option value="{item_value}" type="{item_type}" {item_selected_attr}>{item_content}</option>

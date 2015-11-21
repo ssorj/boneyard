@@ -1,0 +1,8 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid.bash
+
+script-init
+
+maybe-build-cpp

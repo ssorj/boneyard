@@ -1,0 +1,106 @@
+#!/usr/bin/python
+
+import os
+import sys
+
+home = os.environ.get("PTOLEMY_HOME", os.path.normpath("/usr/share/ptolemy"))
+sys.path.append(os.path.join(home, "lib", "python"))
+
+from ptolemy.common.config import *
+from ptolemy.harness import *
+from qpid.messaging import *
+
+def error(message):
+    print "Error: %s" % message
+
+    sys.exit(1)
+
+def main():
+    setup_initial_logging()
+
+    id = get_harness_id(home)
+
+    usage = "Usage: %prog [OPTIONS] PROJECT [TESTS]"
+    parser = PtolemyOptionParser(usage)
+
+    parser.add_option("--publish", "-p", action="store_true")
+
+    opts, args = parser.parse_args()
+
+    config = PtolemyConfig(home, "harness")
+    config.data.log_file = None
+    config.load()
+    config.update(opts)
+
+    setup_console_logging(config)
+
+    try:
+        branch_key = args[0]
+    except IndexError:
+        parser.print_usage()
+        sys.exit(1)
+
+    try:
+        test_names = args[1:]
+    except IndexError:
+        test_names = list()
+
+    harness = HarnessHarness(id, home)
+    harness.init()
+
+    if opts.init_only:
+        return
+
+    if "/" not in branch_key:
+        branch_key = "%s/trunk" % branch_key
+
+    try:
+        branch = harness.model.branches_by_key[branch_key]
+    except KeyError:
+        error("I don't know of a branch called %s" % branch_key)
+
+    if test_names:
+        tests = list()
+
+        for name in test_names:
+            try:
+                test = branch.project.tests_by_name[name]
+            except KeyError:
+                error("I don't know of a test called %s" % name)
+
+            tests.append(test)
+    else:
+        tests = branch.project.tests_by_name.values()
+
+    cycle = harness.run(branch, tests, force=True)
+    cycle.save()
+
+    data = harness.model.marshal(cycle)
+
+    pprint(data)
+
+    print "Path: %s" % cycle.path
+    print "Status: %s" % cycle.status_message
+
+    if opts.publish:
+        try:
+            notify(config.broker, data)
+        except ConnectionError:
+            log.warn("Failed to contact broker at %s", config.broker)
+
+def notify(broker, data):
+    conn = Connection(broker)
+    conn.open()
+
+    try:
+        session = conn.session()
+        sender = session.sender(ptolemy_model_update_address)
+        sender.send(Message(data))
+    finally:
+        conn.close()
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

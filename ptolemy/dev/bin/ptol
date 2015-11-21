@@ -1,0 +1,229 @@
+#!/usr/bin/python
+
+import os
+import sys
+
+from fnmatch import fnmatchcase
+from pprint import pprint
+
+home = os.environ.get("PTOLEMY_HOME", os.path.normpath("/usr/share/ptolemy"))
+sys.path.append(os.path.join(home, "lib", "python"))
+
+from ptolemy.common.config import *
+from ptolemy.common.messaging import *
+from ptolemy.common.model import *
+from ptolemy.common.util import *
+
+def vt100_attrs(*attrs):
+    return "\x1B[%sm" % ";".join(map(str, attrs))
+
+vt100_reset = vt100_attrs(0)
+
+def colorize(text, *attrs):
+    term = os.environ.get("TERM", "dumb")
+
+    if attrs and term != "dumb":
+        return "%s%s%s" % (vt100_attrs(*attrs), text, vt100_reset)
+    else:
+        return text
+
+vt100_colors_by_status = {
+    100: (34,),
+    200: (32,),
+    500: (31,),
+    }
+
+def colorize_by_status(text, status):
+    return colorize(text, *vt100_colors_by_status.get(status, ()))
+
+def format_cycle_header():
+    tokens = list()
+
+    tokens.append("%-8s" % "Cycle")
+    tokens.append("%-12s" % "Revision")
+    tokens.append("%-6s" % "Time")
+    tokens.append("%s" % "Status")
+
+    return "  ".join(tokens)
+
+def format_cycle_row(cycle):
+    tokens = list()
+
+    cycle_id = trunc(cycle.id, 8)
+
+    tokens.append("%8s" % cycle_id)
+
+    if cycle.revision is None:
+        revision = "-"
+    else:
+        revision = trunc(cycle.revision, 14)
+
+    tokens.append("%-12s" % revision)
+
+    time = cycle.end_time or cycle.start_time
+    time = fmt_local_unixtime_brief(time)
+
+    tokens.append("%-6s" % time)
+
+    status = colorize_by_status \
+        (cycle.status_message, cycle.status_code)
+
+    tokens.append(status)
+
+    return "  ".join(tokens)
+
+def format_attributes(attrs):
+    out_attrs = list()
+    max_len = max([len(x[0]) for x in attrs])
+
+    for name, value in attrs:
+        spaces = " " * (max_len - len(name))
+        args = trunc(name, max_len), spaces, value
+        out_attrs.append("%s%s  %s" % args)
+
+    return out_attrs
+
+def fetch_updated_model(config):
+    model = Model()
+
+    conn = Connection(config.broker)
+    conn.open()
+
+    try:
+        session = conn.session()
+        model.fetch_update(session)
+    finally:
+        conn.close()
+
+    return model
+
+def parse_branch_specifier(specifier):
+    try:
+        return specifier.split("/")
+    except ValueError:
+        return specifier, "*"
+
+def status(config, opts, args):
+    model = fetch_updated_model(config)
+
+    try:
+        branch_glob = args[1]
+    except IndexError:
+        branch_glob = "*"
+
+    for project in model.projects:
+        for branch in project.branches:
+            if not fnmatchcase(branch.id, branch_glob):
+                continue
+
+            env_keys = sorted(branch.latest_cycles_by_env_key)
+
+            if not env_keys:
+                continue
+
+            args = project.name, branch.name
+            print colorize("%s/%s" % args, 1)
+
+            for env_key in env_keys:
+                cycle = branch.latest_cycles_by_env_key[env_key]
+
+                env = " ".join(env_key)
+
+                args = env, format_cycle_row(cycle)
+                print "  %-18s  %s" % args
+
+                for result in cycle.test_results:
+                    if result.exit_code != 0:
+                        args = cycle.url, result.output_file
+                        print colorize("    %s/%s" % args, 2)
+
+def log(config, opts, args):
+    try:
+        branch_glob = args[1]
+    except IndexError:
+        raise
+
+    model = fetch_updated_model(config)
+
+    print format_cycle_header()
+
+    for cycle in model.cycles:
+        if not fnmatchcase(cycle.branch.id, branch_glob):
+            continue
+
+        print format_cycle_row(cycle)
+
+def harness(config, opts, args):
+    print "Harness!"
+
+def project(config, opts, args):
+    print "Project!"
+
+def branch(config, opts, args):
+    print "Branch!"
+
+def cycle(config, opts, args):
+    model = fetch_updated_model(config)
+
+    try:
+        cycle_id = args[1]
+    except IndexError:
+        raise
+
+    cycle = model.cycles_by_short_id[cycle_id]
+
+    attrs = (
+        ("ID", cycle.id),
+        ("Harness", cycle.harness.id),
+        ("Branch", cycle.branch.id),
+        ("URL", cycle.url),
+        ("Revision", cycle.revision),
+        ("Start time", fmt_local_unixtime(cycle.start_time)),
+        ("End time", fmt_local_unixtime(cycle.end_time)),
+        ("Status", "%i [%s]" % (cycle.status_code, cycle.status_message)),
+        )
+
+    print "\n".join(format_attributes(attrs))
+
+    #pprint(cycle.marshal())
+
+commands_by_name = {
+    "status": status,
+    "stat": status,
+    "st": status,
+    "harness": harness,
+    "project": project,
+    "branch": branch,
+    "cycle": cycle,
+    }
+
+def main():
+    setup_initial_logging()
+
+    usage = "Usage: %prog [OPTIONS] COMMAND"
+    parser = OptionParser(usage)
+    opts, args = parser.parse_args()
+
+    config = PtolemyConfig(home, "console")
+    config.load()
+    config.update(opts)
+
+    setup_console_logging(config)
+
+    try:
+        name = args[0]
+    except IndexError:
+        raise Exception("No command given")
+
+    try:
+        command = commands_by_name[name]
+    except KeyError:
+        raise Exception("Command '%s' is unknown" % name)
+
+    command(config, opts, args)
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

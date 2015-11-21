@@ -1,0 +1,6 @@
+Source the file 'Profile' in your shell to get started.  This is
+required for the Makefile to function.
+
+ $ cd /path/to/this/project
+ $ source Profile
+ $ make help

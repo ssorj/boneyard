@@ -1,0 +1,28 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid-java.bash
+
+script-init
+
+cd "${SOURCE_PATH}/java"
+
+tmpdir=$(mktemp -d)
+datadir="${tmpdir}/data"
+out="${tmpdir}/default.out"
+
+ant test -Dbuild.data="$datadir" 2>&1 | tee "$out"
+
+code="${PIPESTATUS[0]}"
+
+if [[ "$code" != 0 ]]; then
+    save-results default
+
+    echo "== profile 'default' =="
+
+    print-failures "$out"
+fi
+
+rm -rf "$tmpdir"
+
+exit "$code"

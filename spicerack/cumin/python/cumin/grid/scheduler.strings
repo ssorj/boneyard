@@ -1,0 +1,40 @@
+[SchedulerOverviewGeneral.html]
+<table class="twocol">
+  <tbody>
+  <tr>
+    <td>
+      {general}
+    </td>
+    <td>
+      {users}
+      {jobs}
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+[SchedulerOverviewCycle.css]
+div.SchedulerOverviewCycle ul.WidgetSet {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+div.SchedulerOverviewCycle ul.WidgetSet li {
+  display: inline;
+  float: left;
+}
+
+div.statsnote {
+  font-style: italic;
+  font-size: 80%;
+}
+
+[SchedulerOverviewCycle.html]
+<div class="{class}">
+    {charts}
+</div>
+<div style="clear:both;"></div>
+<div class="statsnote">
+	*The non-cumulative stats on this page are averaged over a {statswindow} second sampling window
+</div>

@@ -1,0 +1,284 @@
+[EditDynamicQuotaForm.html]
+<form id="{id}" class="mform {form_class}" method="post" action="?">
+  <div class="head">
+        <h1>{title}</h1>
+  </div>
+  <div class="body">
+  <table class="PropertySet GroupPriorities">
+    <thead>
+    <tr>
+      <th>Group</th> <th>{data_col_header}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {groups}
+    </tbody>
+  </table>
+   <div><div id="holder" style="width:400px;height:250px;" class="StatValueChart"></div></div><div style="clear:left;"><!-- --></div>
+  </div>
+  <div class="foot">
+    {submit}
+    {cancel}
+  </div>
+  <div>{hidden_inputs}</div>
+</form>
+
+ <script type="text/javascript" charset="utf-8">
+ //<![CDATA[
+	updateQuotaPieChart = function (vals, legend) {
+	  var data = combineValsAndLegend(vals, legend);
+	  colors = ['#4572A7', '#AA4643', '#89A54E', '#80699B', '#3D96AE', '#000000', '#666600']
+      colors[vals.length-1]= "#B0B0B0";
+	  
+	  var plot1 = jQuery.jqplot ('holder', [data],
+	    {
+	      grid: {
+            drawBorder: false, 
+            drawGridlines: false,
+            background: '#ffffff',
+            shadow:false
+          },
+	      seriesDefaults: {
+	        // Make this a pie chart.
+	        renderer: jQuery.jqplot.PieRenderer,
+	        rendererOptions: {
+	          showDataLabels: false,
+	          dataLabels: 'value',
+	          dataLabelThreshold: 3,
+	          shadow:true,
+	          shadowOffset: 3,
+	          shadowAlpha: 0.06,
+	          shadowDepth: 5,
+	          hilightMouseOver: true
+	        }
+	      },
+	      legend: { show:true, location: 'e' },
+	      seriesColors: colors
+	    }
+	  );
+	}
+	
+ window.addEvent("domready", function () {
+     values = {all_group_values};
+     legend = {all_group_names};
+     updateQuotaPieChart(values, legend);
+ });     
+    
+            
+            
+//]]>
+</script>
+
+<script type="text/javascript">
+//<![CDATA[
+
+cumin.initializeGroupForm = function () {
+    cumin.init_sliders("{chart_id}");
+
+    var myFormValidator = new Form.Validator($('{id}'), {
+        onElementPass: function (el) { 
+            var val = el.value.toFloat();
+            var sliderDiv = el.getParent("tr").getElement(".slider");
+            if (sliderDiv) {
+                var myslider = sliderDiv.retrieve('myslider');
+                if (myslider)
+                    myslider.set(val * 100);
+            }
+          },
+        onElementFail: function (el, validators) { 
+            //alert('failed'); 
+        },
+        evaluateOnSubmit: false,
+        evaluateFieldsOnBlur: true
+    });
+    myFormValidator.add('IsPercent', {
+      errorMsg: 'Values must be between 0 and 100.',
+      test: function(element) { 
+        var val = element.get('value').toFloat();
+        return ((val >= 0) && (val <= 100))
+      }
+    });
+}
+
+window.addEvent("domready", 
+    function () { 
+        cumin.initializeGroupForm();
+        var elem = $("{id}").elements[0];
+        elem.focus();
+    });
+
+function ofc_resize(left, width, top, height, id)
+{
+    var jsonVals = cumin.get_quota_sum();
+    var chart = cumin.getChart(id);
+    if (chart) {
+        if (typeof chart.setpieslice != "undefined") {
+            var obj = {'values': jsonVals};
+            var myJson = JSON.encode(obj);
+            chart.setpieslice("", myJson);
+        }
+    }
+}
+//]]>
+</script>
+
+[EditDynamicQuotaForm.css]
+form.priorityForm {
+    width: 60em !important;
+}
+form.priorityForm table, form.priorityForm div.StatValueChart {
+    float: left;
+}
+form.priorityForm table.GroupPriorities {
+    width: 50%;
+}
+form.priorityForm div.priorityChart {
+    margin-left: 2em;
+}
+form.priorityForm input {
+    text-align: right;
+}
+table.GroupPriorities input.disabled {
+    background-color: #FFF;
+    color: #555;
+    border: 0px solid #FFF;
+}
+
+div.slider {
+    width: 200px;
+    height: 2px;
+    background: #eee;
+    position: relative;
+    top: 8px;
+    border: 1px solid #000;
+}
+div.slider div.knob {
+    background: #000;
+    width: 8px;
+    height: 16px;
+    top: -7px;
+}
+
+.validation-failed {
+    border: 1px solid #f00;
+}
+
+[EditDynamicQuotaForm.javascript]
+cumin.get_quota_sum = function () {
+    var elems = document.forms[0].elements;
+    var sum = 0.0;
+    var changedIndex = 0;
+    var new_values = new Array();
+    $$("div.slider").each(function(elem) {
+        var input = elem.getParent("tr").getElement("input");
+        var val = parseFloat(input.value);
+        sum += val;
+        new_values[new_values.length] = {'value': val, 'label': elem.id, 'on-show': false};
+    });
+    if (sum < 100.0) {
+        val = (100.0 - sum);
+        new_values[new_values.length] = {'value': val, 'label': 'Unclaimed', 'on-show': false };
+    }
+    return new_values;
+}
+
+cumin.init_sliders = function(priority_chart_id){
+    $$('div.slider').each(function(el, i){
+        var input = el.getParent("tr").getElement("input");
+        var val = input.value.toFloat();
+        var initial_knob = val * 100;
+        var slider = new Slider(el, el.getElement('.knob'), {
+            steps: 10000,  // Steps from 0 to 100
+            range: [0, 10000] // min and max value
+        }).set(initial_knob, false);
+        el.store('myslider', slider);
+        el.retrieve('myslider').addEvents({
+        	onChange: function (pos) {
+                var new_values = new Array();
+                var sum = 0.0;
+                var changedIndex = 0;
+                var changedEl = this.element;
+                var changedInp = changedEl.getParent("tr").getElement("input");
+                changedInp.value = (Math.round(pos) / 100) + "";
+                // get the new total percent
+                $$('div.slider').each(function (el, i) {
+                    var inp = el.getParent("tr").getElement("input");
+                    var val = parseFloat(inp.value);
+                    sum += val;
+                    new_values[new_values.length] = {'value': val, 'label': el.id, 'on-show': false };
+                    if (el == changedEl)
+                        changedIndex = new_values.length - 1;
+                });
+                if (sum > 100) {
+                    var mySlider = changedEl.retrieve("myslider");
+                    var val = pos - (sum - 100) * 100;
+                    mySlider.set(val);
+                    changedInp.value = (Math.round(val) / 100) + "";
+                    new_values[changedIndex] = {'value': val / 100, 'label': changedEl.id, 'on-show': false };
+                }
+                var unclaimed = document.getElementById('Unclaimed');
+                if (unclaimed) {
+                    if (sum < 100.0) {
+                        var val = (100.0 - sum);
+                        unclaimed.value = (Math.round(val * 100) / 100) + "";
+                        new_values[new_values.length] = {'value': val, 'label': 'Unclaimed', 'on-show': false };
+                    } else {
+                        unclaimed.value = "0";
+                        new_values[new_values.length] = {'value': unclaimed.value, 'label': 'Unclaimed', 'on-show': false };
+                    }
+                }
+                var values_array = new Array();
+                var legend_array = new Array();
+                for(i=0; i < new_values.length; i++) {
+                    values_array[i] = new_values[i]['value'];
+                    legend_array[i] = new_values[i]['label'];
+                }
+                updateQuotaPieChart(values_array, legend_array);
+                        
+            }//end onchange
+        }) //end addEvents
+    }); //end div.slider each function
+}
+
+
+[EditDynamicQuotaForm.field_html]
+<tr>
+  <td>
+    {group_name}
+  </td>
+  <td>
+    <input class="validate-numeric IsPercent" type="text" name="{quota_name}" value="{quota_value}"
+           size="6" tabindex="100"/>
+    <!-- these are here so we don't need to reget the groups and values after a submit -->
+    <input type="hidden" name="{group_name_path}" value="{group_name}" />
+    <input type="hidden" name="{original_value_path}" value="{quota_value}" />
+  </td>
+  <td>
+    <div id="{group_name}" class="slider"><div class="knob"></div></div>
+  </td>
+</tr>
+
+[EditDynamicQuotaForm.unclaimed_html]
+<tr>
+  <td>
+    {group_name}
+  </td>
+  <td>
+    <input id="{group_name}" class="disabled" disabled="disabled" type="text" name="{quota_name}" value="{unclaimed_value}"
+           size="6" tabindex="100"/>
+    <!-- these are here so we don't need to reget the groups and values after a submit -->
+    <input type="hidden" name="{group_name_path}" value="{group_name}" />
+    <input type="hidden" name="{original_value_path}" value="{unclaimed_value}" />
+  </td>
+</tr>
+
+[EditDynamicQuotaForm.deferred_html]
+<form id="{id}" class="mform priorityForm" method="post" action="?">
+  <div class="head">
+        <h1>{title}</h1>
+  </div>
+  <div class="body">
+    <div class="deferredSpacer">Loading...</div>
+  </div>
+</form>
+ 

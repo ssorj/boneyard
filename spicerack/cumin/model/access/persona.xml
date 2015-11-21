@@ -1,0 +1,54 @@
+<PersonaMap>
+  <Persona name="default" auth="True">
+    <Module name="account"/>
+    <Module name="configuration"/>
+    <Module name="messaging"/>
+    <Module name="grid"/>
+    <Module name="inventory"/>
+    <Module name="usergrid"/>
+
+    <GroupAccess name="nogroup">
+      <MainPage name="login.html"/>
+    </GroupAccess>
+
+    <GroupAccess name="user">
+      <MainPage name="usergrid.html"/>
+      <ModuleAccess name="account"/>
+      <ModuleAccess name="usergrid"/>
+    </GroupAccess>
+
+    <GroupAccess name="admin">
+      <MainPage name="index.html"/>
+      <ModuleAccess name="*"/>
+    </GroupAccess>
+  </Persona>
+
+  <Persona name="grid" auth="True">
+    <Module name="account"/>
+    <Module name="configuration"/>
+    <Module name="grid"/>
+    <Module name="inventory"/>
+    <Module name="usergrid"/>
+
+    <GroupAccess name="nogroup">
+      <MainPage name="login.html"/>
+    </GroupAccess>
+
+    <GroupAccess name="user">
+      <MainPage name="usergrid.html"/>
+      <ModuleAccess name="account"/>
+      <ModuleAccess name="usergrid"/>
+    </GroupAccess>
+
+    <GroupAccess name="admin">
+      <MainPage name="index.html"/>
+      <ModuleAccess name="*"/>
+    </GroupAccess>
+  </Persona>
+
+  <Persona name="messaging" auth="False">
+    <Module name="account"/>
+    <Module name="messaging"/>
+    <Module name="inventory"/>
+  </Persona>
+</PersonaMap>

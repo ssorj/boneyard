@@ -1,0 +1,5 @@
+[BrokerGroupInputSet.item_html]
+<div class="field">
+  <input type="checkbox" id="{id}.{item_value}" name="{name}" value="{item_value}" tabindex="{tab_index}" {item_checked_attr}/>
+  <label for="{id}.{item_value}">{item_content}</label>
+</div>

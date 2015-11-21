@@ -1,0 +1,10 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid.bash
+
+script-init
+
+which nant || disable
+which mono || disable
+mono --version 2>&1 | grep -E '^Mono JIT compiler version "?(1\.2\.|2\.)' || disable

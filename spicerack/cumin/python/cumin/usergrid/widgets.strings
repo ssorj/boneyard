@@ -1,0 +1,45 @@
+[OverviewView.css]
+table.OverviewView h2 > img {
+    margin: 0 0.2em 0 0;
+    vertical-align: bottom;
+}
+
+div.usergrid.heading {
+    border-top: 1px dotted #ccc;
+    padding: 0.5em 0 0 0;
+    width: 40em;
+}
+
+div.usergrid.heading > h2 {
+    display: inline;
+}
+
+div.usergrid.heading > h2 > img {
+    vertical-align: middle;
+}
+
+div.usergrid.heading > ul {
+    float: right;
+    list-style-type: none;
+}
+
+[OverviewView.html]
+<table class="twocol OverviewView">
+  <tbody>
+    <tr>
+      <td>
+        <h2>Job statistics</h2>
+        {jobs}
+      </td>
+      <td>
+        <h2>Tasks</h2>
+        
+        <ul style="list-style-type: none; margin: 1 0; padding: 0;">
+          <li>{job_submit}</li>
+          <li>{dag_job_submit}</li>
+          <li>{vm_job_submit}</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>

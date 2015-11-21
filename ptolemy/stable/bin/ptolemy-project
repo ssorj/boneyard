@@ -1,0 +1,58 @@
+#!/usr/bin/python
+
+import sys
+import os
+
+from time import sleep
+
+from ptolemy.server import *
+
+def main():
+    if len(sys.argv) < 2 or "--help" in sys.argv or "-h" in sys.argv:
+        print "Runs a single ptolemy project and exits"
+        print "Usage: ptolemy-project PROJECT-NAME [COUNT]"
+        sys.exit(1)
+
+    count = 1
+
+    if len(sys.argv) > 2:
+        try:
+            count = int(sys.argv[2])
+        except ValueError:
+            print "Error: COUNT must be an integer"
+            sys.exit(1)
+
+    home = os.environ.get("PTOLEMY_HOME", "/var/lib/ptolemy")
+
+    config = ServerConfig(home)
+    config.load()
+
+    try:
+        config.check()
+    except:
+        log.exception("Configuration is invalid")
+        sys.exit(1)
+
+    server = Server(config)
+    server.init()
+
+    name = sys.argv[1]
+
+    try:
+        project = server.projects_by_name[name]
+    except KeyError:
+        print "I don't know of a project called %s" % name
+        sys.exit(1)
+
+    server.cycle_thread.start()
+    server.mail_thread.start()
+
+    for i in range(count):
+        request = CycleRequest([project], force=True, deps=True)
+        request.process()
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

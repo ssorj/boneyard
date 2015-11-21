@@ -1,0 +1,90 @@
+## Try 1 ##
+
++ popd
+~/manhole
++ cp qpid-0.10-alpha/java/release/qpid-0.9-java.tar.gz artifacts/qpid-java-0.10-alpha.tar.gz
++ cp qpid-0.10-alpha/java/broker/release/qpid-broker-0.9.tar.gz artifacts/qpid-java-broker-0.10-alpha.tar.gz
++ cp qpid-0.10-alpha/java/client/release/qpid-client-0.9.tar.gz artifacts/qpid-java-client-0.10-alpha.tar.gz
++ cp qpid-0.10-alpha/java/management/eclipse-plugin/release/qpid-jmx-management-console-0.9-linux-gtk-x86_64.tar.gz qpid-0.10-alpha/java/management/eclipse-plugin/release/qpid-jmx-management-console-0.9-linux-gtk-x86.tar.gz qpid-0.10-alpha/java/management/eclipse-plugin/release/qpid-jmx-management-console-0.9-solaris-gtk-sparc.tar.gz qpid-0.10-alpha/java/management/eclipse-plugin/release/qpid-jmx-management-console-0.9-macosx.zip qpid-0.10-alpha/java/management/eclipse-plugin/release/qpid-jmx-management-console-0.9-win32-win32-x86.zip artifacts/
++ cp qpid-0.10-alpha/java/client/release/maven artifacts/
+cp: omitting directory `qpid-0.10-alpha/java/client/release/maven'
+[jross@nicaea manhole]$ echo $?
+1
+
+if [ "JAVA" == "$JAVA" ] ; then
+  pushd qpid-${VER}/java
+  ant build release release-bin release-mvn -Dsvnversion.output=${REV} -Dmaven.snapshot=false
+  popd
+
+  cp qpid-${VER}/java/release/*.tar.gz  artifacts/qpid-java-${VER}.tar.gz
+  cp qpid-${VER}/java/broker/release/*.tar.gz artifacts/qpid-java-broker-${VER}.tar.gz
+  cp qpid-${VER}/java/client/release/*.tar.gz artifacts/qpid-java-client-${VER}.tar.gz
+  #cp qpid-${VER}/java/client/example/release/*.tar.gz 
+  cp qpid-${VER}/java/management/eclipse-plugin/release/*.tar.gz qpid-${VER}/java/management/eclipse-plugin/release/*.zip artifacts/
+
+  # copy the Maven artifacts
+  cp qpid-${VER}/java/client/release/maven artifacts/  # <---- XXX
+  cp qpid-${VER}/java/common/release/maven artifacts/
+fi
+
+---> Added -a to cps
+
+## Try 2 ##
+
+BUILD SUCCESSFUL
+Total time: 2 seconds
++ cd ..
++ ./build-nant-release mono-2.0
+./build-nant-release: line 55: nant: command not found
+[jross@nicaea manhole]$ sudo yum install nant
+
+## Try 3 ##
+
+Total time: 2 seconds
++ cd ..
++ ./build-nant-release mono-2.0
+NAnt 0.85 (Build 0.85.2478.0; release; 10/14/2006)
+Copyright (C) 2001-2006 Gerry Shaw
+http://nant.sourceforge.net
+
+
+BUILD FAILED
+
+The current runtime framework 'mono-2.0' is not correctly configured in the NAnt configuration file.
+    Unable to locate 'mono' module using pkg-config. Download the Mono development packages from http://www.mono-project.com/downloads/.
+
+For more information regarding the cause of the build failure, run the build again in debug mode.
+
+Try 'nant -help' for more information
+
+--> yum install mono-devel
+
+## Try 4 ##
+
++ popd
+~/manhole
++ cp qpid-0.10-alpha/dotnet/bin/mono-2.0/release/Qpid.NET-mono-2.0-2011217.zip artifacts/qpid-dotnet-0-8-0.10-alpha.zip
++ cp qpid-0.10-alpha/dotnet/client-010/bin/mono-2.0/debug/Qpid.NET-mono-2.0-2011217.zip artifacts/qpid-dotnet-0-10-0.10-alpha.zip
++ '[' SIGN == SIGN ']'
++ pushd artifacts
+~/manhole/artifacts ~/manhole
++ sha1sum qpid-dotnet-0-10-0.10-alpha.zip qpid-dotnet-0-8-0.10-alpha.zip qpid-jmx-management-console-0.9-macosx.zip qpid-jmx-management-console-0.9-win32-win32-x86.zip qpid-wcf-0.10-alpha.zip qpid-0.10-alpha.tar.gz qpid-cpp-0.10-alpha.tar.gz qpid-java-0.10-alpha.tar.gz qpid-java-broker-0.10-alpha.tar.gz qpid-java-client-0.10-alpha.tar.gz qpid-jmx-management-console-0.9-linux-gtk-x86_64.tar.gz qpid-jmx-management-console-0.9-linux-gtk-x86.tar.gz qpid-jmx-management-console-0.9-solaris-gtk-sparc.tar.gz qpid-python-0.10-alpha.tar.gz qpid-ruby-0.10-alpha.tar.gz qpid-0.10-alpha.svnversion
++ '[' '!' -z ']'
+++ find .
+++ egrep 'jar$|pom$|gz$|zip$|svnversion$|SHA1SUM'
++ for i in '`find . | egrep '\''jar$|pom$|gz$|zip$|svnversion$|SHA1SUM'\''`'
++ gpg --sign --armor --detach ./qpid-0.10-alpha.svnversion
+gpg: directory `/home/boston/jross/.gnupg' created
+gpg: new configuration file `/home/boston/jross/.gnupg/gpg.conf' created
+gpg: WARNING: options in `/home/boston/jross/.gnupg/gpg.conf' are not yet active during this run
+gpg: keyring `/home/boston/jross/.gnupg/secring.gpg' created
+gpg: keyring `/home/boston/jross/.gnupg/pubring.gpg' created
+gpg: no default secret key: secret key not available
+gpg: signing failed: secret key not available
+[jross@nicaea manhole]$ 
+
+--> generate a gpg key
+
+## Try 5 ##
+
+Success

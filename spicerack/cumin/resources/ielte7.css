@@ -1,0 +1,10 @@
+ul.radiotabs li a {
+  background-image: url(resource?name=radio-button.png);
+  background-repeat: no-repeat;
+  background-position: 0 1px;
+  padding-left: 1.4em;
+}
+
+ul.radiotabs li a.selected {
+  background-image: url(resource?name=radio-button-checked.png);
+}

@@ -1,0 +1,16 @@
+sesame - A System agent for the Qpid Management Framework
+
+Pre-requisites:
+
+  Apache Qpid - You will need either the source tree for Qpid or and
+  installed copy of Qpid.  The version must be M4 or later.
+
+    http://svn.apache.org/repos/asf/qpid/trunk/qpid
+
+  Alternatively, you can install the qmf-devel RPM and its dependencies.
+
+
+To use a checkout ./configure --with-qpid-checkout=<path_to_qpid>
+
+* 'make' will build the module
+

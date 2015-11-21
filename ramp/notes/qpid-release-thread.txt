@@ -1,0 +1,560 @@
+Proposed Qpid 0.10 release plan
+
+Schedule
+
+  12 Jan
+
+    - Deadline for QIPs
+
+  19 Jan, 1 week later
+
+    - Decide on QIPs for upcoming release
+    - Approved QIPs assigned to jiras targeted for the release
+    - Trunk is open
+    - Feature integration begins
+
+  16 Feb, 4 weeks later
+
+    - Alpha
+    - Trunk remains open
+    - Feature integration ends
+    - The alpha release tests the release process after the
+      introduction of major features
+
+  2 Mar, 2 weeks later
+
+    - Beta
+    - Branch for release (trunk remains open)
+    - Release branch commits require approval
+    - Release manager produces outstanding bug report, triages bugs
+
+  16 Mar, 2 weeks later
+
+    - RC1
+
+  23 Mar, 1 week later
+
+    - RC2
+
+  30 Mar, 1 week later
+
+    - RC3
+    - Targeted release date
+
+General notes
+
+  - Major feature work is gated via QIP approval and the feature
+    integration window
+
+  - Minor features and bug fixes are restricted only by release
+    branching
+
+  - A frequent release schedule requires the use of branches for at
+    least some major features; as I see it, there is a real tradeoff
+    between release frequency and branch management overhead
+
+QIP - Qpid Improvement Proposal
+
+  - In the spirit of a Python Enhancement Proposal
+  - Describes major work proposed for inclusion in a qpid release
+  - Starts from a template containing questions
+  - Gets us some useful release documentation
+  - Lives on the qpid wiki
+  - If a qip is not approved, it has to wait for the next release
+  - The approval process is an open question
+
+More
+
+  - Lenience
+  - Commit to 2 cycles
+
+  - Producer-side flow control
+  - Release artifacts
+  - 1.0 transport
+  - Priority queue
+
+  - In the QIPs, outline areas that will need testing, and during beta
+    solicit help from users of those areas
+
+  - Produce fedora packages from alpha, to enable testing
+
+------
+
+3 Feb 2011
+
+Hi, everyone, and happy Chinese new year!  It's time for an update on
+the qpid 0.10 release.
+
+The schedule:
+
+  16 Feb
+
+    - Alpha
+    - Trunk remains open
+    - Feature integration ends
+    - The alpha release tests the release process after the
+      introduction of major features
+
+  2 Mar, 2 weeks later
+
+    - Beta
+    - Branch for release (trunk remains open)
+    - Release branch commits require approval
+    - Release manager produces outstanding bug report, triages bugs
+
+  16 Mar, 2 weeks later
+
+    - RC1
+
+  23 Mar, 1 week later
+
+    - RC2
+
+  30 Mar, 1 week later
+
+    - RC3
+    - Targeted release date
+
+I'm using the following jira query (fix version 0.9, issue type either
+new feature or improvement):
+
+  https://issues.apache.org/jira/secure/IssueNavigator.jspa?reset=true&jqlQuery=project+%3D+QPID+AND+issuetype+in+%28%22New+Feature%22%2C+Improvement%29+AND+fixVersion+%3D+%220.9%22+ORDER+BY+status+DESC%2C+priority+DESC
+
+About two weeks remain before the feature integration window closes,
+and I'd like to start getting feedback about the items in that list.
+
+To begin, however, the list itself needs some maintenance:
+
+  - There may be some things here that don't rise to the level of
+    "major release trackable"; if so, I can adjust the query I use
+
+  - If you are developing a feature or improvement, it should be
+    represented by a jira on this list
+
+  - There are three unassigned items; if nobody adopts them, I suggest
+    we set their fix version to 'future'
+
+  - In general these should have their due date set to 16 Feb; we
+    should discuss exceptions for items that don't threaten to
+    destabilize the codebase
+
+    ("Hey, dude.  Why 16 Feb, in the middle of the week?"  My thinking
+    there is to to leave the latter half of the week to absorb any
+    minor delays, and--one hopes--avoid extending any work into the
+    weekend.)
+
+At the same time, I'd like to request that the assignees begin to
+provide some feedback in the jira comments.  Specifically, I'm looking
+for:
+
+  - Will it be feature-complete (and ready to land if it's on a
+    branch) by Feb 16?
+
+  - Characterize its degree of completion right now
+
+If you don't think it will be ready in time, we need to hold a brief
+discussion about it on the mailing list.
+
+I plan to do another release update next week, and every week after as
+we approach the release dates.  (I need to research alternative
+calendars, to see if I can't hit another new-year boundary.)
+
+Finally, if anyone has comments for me, especially concerning anything
+I should be keeping track of that I'm not, please raise them.
+
+Thanks,
+Justin
+
+---
+
+Date: Mon, 14 Feb 2011 10:08:53 -0500 (EST)
+From: Justin Ross <jross@redhat.com>
+Reply-To: dev@qpid.apache.org
+To: dev@qpid.apache.org
+Subject: 0.10 release update - feature integration week
+
+Hi, folks.  Our schedule (appended below) calls for all major features
+to be functionally complete and on trunk by the 16th, this Wednesday.
+
+This means we are rapidly approaching the point where we make choices.
+If something won't be ready in time, we need to kick it to the next
+release.
+
+We can make exceptions for changes that don't threaten to destabilize
+the release.  If you'd like an exception, it's quite important that we
+discuss it now.
+
+I'll begin running the release scripts tomorrow in order to discover
+any new issues for the alpha release.
+
+Thanks,
+Justin
+
+---
+
+0.10 feature and improvement jiras:
+
+  http://bit.ly/h3Q7Sk
+
+0.10 schedule:
+
+  16 Feb
+
+    - Alpha
+    - Trunk remains open
+    - Feature integration ends
+    - The alpha release tests the release process after the
+      introduction of major features
+
+  2 Mar, 2 weeks later
+
+    - Beta
+    - Branch for release (trunk remains open)
+    - Release branch commits require approval
+    - Release manager produces outstanding bug report, triages bugs
+
+  16 Mar, 2 weeks later
+
+    - RC1
+
+  23 Mar, 1 week later
+
+    - RC2
+
+  30 Mar, 1 week later
+
+    - RC3
+    - Targeted release date
+
+
+---
+
+Alpha inclusion criteria:
+
+  - Functionally complete
+  - Integrated with build system (always? still a question.)
+
+---
+
+Trial query for 0.9 potential issues:
+
+https://issues.apache.org/jira/secure/IssueNavigator.jspa?reset=true&jqlQuery=project+%3D+QPID+AND+issuetype+%3D+Bug+AND+status+in+%28Reopened%2C+Open%2C+%22In+Progress%22%29+AND+created+%3E+%222009%2F12%2F31%22+ORDER+BY+assignee+DESC
+
+---
+
+svn copy \
+    https://svn.apache.org/repos/asf/qpid/trunk \
+    https://svn.apache.org/repos/asf/qpid/branches/0.10 \
+    -m "NO-JIRA: Branch for the 0.10 release"
+
+svn copy \
+    https://svn.apache.org/repos/asf/qpid/trunk@1141493 \
+    https://svn.apache.org/repos/asf/qpid/branches/0.12 \
+    -m "NO-JIRA: Branch for the 0.12 release"
+
+svn copy \
+    https://svn.apache.org/repos/asf/qpid/trunk@1197218 \
+    https://svn.apache.org/repos/asf/qpid/branches/0.14 \
+    -m "QPID-3583: Branch for the 0.14 release"
+
+svn copy \
+    https://svn.apache.org/repos/asf/qpid/branches/0.14@1209041 \
+    https://svn.apache.org/repos/asf/qpid/tags/0.14 \
+    -m "QPID-3583: Tag the 0.14 release"
+
+svn copy \
+    https://svn.apache.org/repos/asf/qpid/trunk@1297794 \
+    https://svn.apache.org/repos/asf/qpid/branches/0.16 \
+    -m "QPID-3864: Branch for the 0.16 release"
+
+svn copy \
+    https://svn.apache.org/repos/asf/qpid/trunk@1359099 \
+    https://svn.apache.org/repos/asf/qpid/branches/0.18 \
+    -m "QPID-4111: Branch for the 0.18 release"
+
+svn copy \
+    https://svn.apache.org/repos/asf/qpid/branches/0.18@1373004 \
+    https://svn.apache.org/repos/asf/qpid/tags/0.18 \
+    -m "QPID-4111: Tag the 0.18 release"
+
+svn copy \
+    https://svn.apache.org/repos/asf/qpid/trunk@1411210 \
+    https://svn.apache.org/repos/asf/qpid/branches/0.20 \
+    -m "QPID-4377: Branch for the 0.20 release"
+
+svn copy \
+    https://svn.apache.org/repos/asf/qpid/trunk@1460198 \
+    https://svn.apache.org/repos/asf/qpid/branches/0.22 \
+    -m "QPID-4637: Branch for the 0.22 release"
+
+---
+
+candidate checklist items:
+
+  - once we branch for release, update version numbers on trunk and
+    the branch
+  - test beta release artifacts the way gordon did
+  - invite broader testing from qpid users with beta release
+  - call for changes requiring user attention
+    - deprecations
+    - api changes
+    - major behavior changes
+  - run rat tool
+
+---
+
+Hi, folks.
+
+Our schedule calls for us to create our release branch this Wednesday,
+3 March.  Trunk will remain open for forward development, but all
+changes to the release branch will require approval.
+
+I'd like to enlist your help with the approval process.  When a
+potential fix comes in, it needs two forms of review:
+
+ 1. Review by someone who focuses on the release goals and schedule
+
+ 2. Review by someone (other than the author) who knows the code being
+    patched and can speak to the change's significance and safety
+
+My job is item 1.  For item 2, I need experts in the various components of qpid.
+
+So here's my proposal: approval of kinds 1 (from me) and 2 (from
+someone familiar with the code being changed) must be indicated in
+jira comments before a change may be committed to the release branch.
+
+In order to this efficiently, we need clear lines of responsibility.
+I'd like to use the (still emerging) list of component owners to map
+incoming changes to reviewers.
+
+In cases where the patch submitter is also the component owner, I'd
+ask that he or she find someone else with equivalent experience in
+that code to evaluate the change.
+
+The purpose of requiring approval is to ensure that, as we approach
+release, each change is *discussed*.  I am continually impressed with
+how simple questions can lay bare important deficits.
+
+I don't expect this to be a big burden, though I am conscious of the
+extra coordination involved.  I'll do my best to respond to change
+requests promptly.
+
+Here's what I have so far for component owners:
+
+ C++ clustering                Alan
+ C++ client and broker         Gordon
+ Java client                   Rajith
+ Java broker                   Robbie
+ QMF                           Ted
+
+I just scanned that out of the "Default assignees" thread.  Please
+reply on this thread if you'd like to volunteer to review changes for
+a particular component.
+
+Thanks,
+Justin
+
+---
+
+https://cwiki.apache.org/qpid/010-release.html
+
+---
+
+Date: Tue, 1 Mar 2011 16:06:48 -0500 (EST)
+From: Justin Ross <jross@redhat.com>
+To: dev@qpid.apache.org
+Subject: 0.10 bugs
+
+Hello.  I've updated the 0.10 release page [1] with two new links for
+jiras:
+
+  * Bug jiras: issues that I'm relatively confident are updated and
+    targeted correctly.  There are currently 31 of these.
+
+    http://bit.ly/e7tcBc
+
+  * Candidate bug jiras: casting a wider net now, jiras that ought to be
+    reviewed and considered for 0.10, of which there are 100.
+
+    http://bit.ly/h8JiF2
+
+    Note that this query is easier to use if you use Tools -> Configure
+    Columns to add component to your view.
+
+The second query is not perfect.  It reflects my attempt to winnow
+down to a reasonable set to draw from.  I selected unresolved bugs
+with fixVersion unset and updated in 2010 or later.  Please feel free
+to adjust the query parameters (and tell me if you make improvements).
+
+There is a large set of jiras that are unresolved and haven't been
+updated in more than a year.  I'm cooking up a plan to clean those up,
+so more on that later.
+
+For the purposes of 0.10, I'd like contributors to take a look at bugs
+in the second list and consider promoting them to the first list by
+setting fixVersion to 0.9.
+
+Thanks,
+Justin
+
+-----
+[1] https://cwiki.apache.org/confluence/display/qpid/0.10+release
+
+---
+
+Date: Wed, 2 Mar 2011 10:13:04 -0500 (EST)
+From: Justin Ross <jross@redhat.com>
+To: dev@qpid.apache.org
+Subject: Re: 0.10 bugs
+
+One more thing on this topic.
+
+If in the course of scanning the candidate bug list you discover a bug
+that should be addressed, but not for 0.10, please set its fixVersion
+to Future.  That way we know the bug has been triaged.  When we
+prepare for 0.12, we'll selectively retarget Future bugs for the
+current release.
+
+And of course, conversely, if the bug no longer has any merit, close
+it!
+
+Thanks,
+Justin
+
+---
+
+Hi.  I've updated the release page[1] with a link to our beta
+distribution, taken at revision 107887 from the 0.10 branch:
+
+   http://people.apache.org/~gsim/qpid-0.10-beta/
+
+This one also includes the qmf and tools source tarballs, which were
+missing from the alpha.
+
+The current patch for the release script is in
+https://issues.apache.org/jira/browse/QPID-3124 .
+
+Thanks,
+Justin
+
+---
+
+Subject: 0.10 release update - RC1 and status
+
+Hi, everyone.  Using revision 1082154 from Wednesday, I have generated
+our RC1 release artifacts:
+
+  http://people.apache.org/~nsantos/qpid-0.10-rc1/
+
+As Gordon suggested we do, with this release I've removed the orphaned
+dotnet and ruby tarballs from the artifacts.  I've also verified that
+the versions in the qmf and tools modules have been updated to 0.10.
+
+The corresponding release script changes are here:
+
+  https://issues.apache.org/jira/browse/QPID-3151
+
+Test results.  I'm keen to get feedback about the quality of our
+newest release.  Gordon indicated at least some test failures, and in
+my own testing the default java test profile is failing in acl tests.
+I haven't yet been able to determine if that's something in my
+environment.
+
+In any case, I know that various contributors have CI setups, and I
+invite you to give a brief report on what you're seeing on the 0.10
+branch.  Indeed, I still need to gather the test results I have and
+report them here.
+
+Bugs.  There are 14 bugs in the 0.10 bug list:
+
+  http://bit.ly/gXkak9
+
+Seven of them are unassigned.  If you are either a component owner or
+the bug's reporter, please see what you can do to assign those bugs
+and also reevaluate the fix version.  I've added a new link to the
+release page[1] for unassigned bugs.
+
+In my analysis, none of the bugs listed there are regressions, so they
+would not block the upcoming release.  If you have a different reading
+of the facts, I'm eager to hear it.
+
+On the other hand, the test failures that Gordon found are release
+blockers.  So from "go" we can say that this first release candidate
+is not ready for release.
+
+Finally, I've added a section to the release page for ad-hoc "changes
+requiring user attention".  This is a place where anyone can freely
+add to the notes I will use (in addition to jiras) to compile the
+release notes.  It's a great place to describe API, configuration, or
+behavior changes that deserve mention.
+
+Thanks,
+Justin
+
+---
+[1] http://cwiki.apache.org/confluence/display/qpid/0.10+release
+
+------
+
+[jross@nicaea qpid-0.12]$ fgrep -re "0.11" . | fgrep -v .svn
+./tools/setup.py:      version="0.11",
+./packaging/windows/installer.proj:    DefineConstants="qpidc_version=0.11"
+./packaging/windows/installer.proj:    OutputFile="qpidc-0.11-x64.msi" />
+./packaging/windows/installer.proj:    Command="candle -dqpidc_version=0.11 -dProgramFiles=$(ProgramFiles) -dstaging_dir=$(staging_dir) -dqpid_headers_dir=$(staging_dir)\
+\include\qpid -dboost_headers_dir=$(staging_dir)\include\boost -dboost_dll_dir=$(staging_dir)\bin\boost -dexamples_dir=$(staging_dir)\examples -dapi_docs_dir=$(staging_d\
+ir)\docs\api  -ext WiXNetFxExtension qpidc.wxs qpid_headers.wxs boost_headers.wxs boost_dlls.wxs examples.wxs api_docs.wxs -arch $(Architecture)" />
+./packaging/windows/installer.proj:    Command="light -ext WiXNetFxExtension -ext WixUtilExtension -ext WixUIExtension -cultures:en-us -out qpidc-0.11-$(Architecture).ms\
+i qpidc.wixobj qpid_headers.wixobj boost_headers.wixobj boost_dlls.wixobj examples_README.wixobj examples_examples.wixobj examples_messaging.wixobj examples_qmf-console.\
+wixobj api_docs.wixobj" />
+./extras/qmf/setup.py:      version="0.11",
+./java/management/eclipse-plugin/META-INF/MANIFEST.MF:Bundle-Version: 0.11.0
+./java/management/common/src/main/java/management-common.bnd:ver: 0.11.0
+./java/broker/src/main/java/org/apache/qpid/server/plugins/PluginManager.java:    private static final String QPID_VER_SUFFIX = "version=0.11,";                          
+./java/client/src/main/java/client.bnd:ver: 0.11.0
+./java/common/src/main/java/common.bnd:ver: 0.11.0
+./java/common/src/main/java/org/apache/qpid/transport/ClientDelegate.java:    private static final String KRB5_OID_STR = "1.2.840.113554.1.2.2";                          
+./java/broker-plugins/experimental/shutdown/src/main/java/shutdown.bnd:ver: 0.11.0
+./java/common.xml:  <property name="project.version"       value="0.11"/>
+./QPID_VERSION.txt:0.11
+./tests/setup.py:      version="0.11",
+./python/setup.py:      version="0.11",
+./cpp/docs/man/qpidd.1:.TH QPIDD "1" "March 2011" "qpidd (qpidc) version 0.11" "User Commands"
+
+people.apache.org:/var/www.apache.org/dist/qpid
+
+[justin@localhost qpid-0.14]$ fgrep -re "0.13" . | fgrep -v .svn
+./qpid/java/bdbstore/bin/backup.sh:VERSION=0.13
+./qpid/java/bdbstore/bin/storeUpgrade.sh:VERSION=0.13
+./qpid/java/client/src/main/java/client.bnd:ver: 0.13.0
+./qpid/java/common.xml:  <property name="project.version"       value="0.13"/>
+./qpid/java/broker-plugins/experimental/shutdown/src/main/java/shutdown.bnd:ver: 0.13.0
+./qpid/java/management/common/src/main/java/management-common.bnd:ver: 0.13.0
+./qpid/java/management/eclipse-plugin/META-INF/MANIFEST.MF:Bundle-Version: 0.13.0
+./qpid/java/common/src/main/java/common.bnd:ver: 0.13.0
+./qpid/java/broker/src/test/java/org/apache/qpid/server/plugins/OsgiSystemPackageUtilTest.java:        _util = new OsgiSystemPackageUtil(new Version("0.13"), _map);
+./qpid/java/broker/src/test/java/org/apache/qpid/server/plugins/OsgiSystemPackageUtilTest.java:        assertEquals("org.abc; version=1.2.3, org.apache.qpid.xyz; version=0.13.0", systemPackageString);   
+./qpid/java/broker/src/main/java/broker.bnd:ver: 0.13.0
+./qpid/java/ivy.xml:  <info organisation="org/apache" module="qpid" revision="0.13"/>
+./qpid/extras/qmf/setup.py:      version="0.13",
+./qpid/tests/setup.py:      version="0.13",
+./qpid/tools/setup.py:      version="0.13",
+./qpid/QPID_VERSION.txt:0.13
+./qpid/packaging/windows/installer.proj:            DefineConstants="qpidc_version=0.13"
+./qpid/packaging/windows/installer.proj:                OutputFile="qpidc-0.13-x64.msi" />
+./qpid/packaging/windows/installer.proj:                    Command="candle -dqpidc_version=0.13 -dProgramFiles=$(ProgramFiles) -dstaging_dir=$(staging_dir) -dqpid_headers_dir=$(staging_dir)\include\qpid -dboost_headers_dir=$(staging_dir)\include\boost -dboost_dll_dir=$(staging_dir)\bin\boost -dexamples_dir=$(staging_dir)\examples -dapi_docs_dir=$(staging_dir)\docs\api  -ext WiXNetFxExtension qpidc.wxs qpid_headers.wxs boost_headers.wxs boost_dlls.wxs examples.wxs api_docs.wxs -arch $(Architecture)" />
+./qpid/packaging/windows/installer.proj:                        Command="light -ext WiXNetFxExtension -ext WixUtilExtension -ext WixUIExtension -cultures:en-us -out qpidc-0.13-$(Architecture).msi qpidc.wixobj qpid_headers.wixobj boost_headers.wixobj boost_dlls.wixobj examples_README.wixobj examples_examples.wixobj examples_messaging.wixobj examples_qmf-console.wixobj api_docs.wixobj" />
+./qpid/python/setup.py:      version="0.13",
+
+---
+
+find -name .svn -prune -o -type f -print0 | xargs -0 -i perl -pi.backup -e 's/0\.15/0\.17/g' \{}
+find -name .svn -prune -o -type f -print0 | xargs -0 -i perl -pi.backup -e 's/0\.15/0\.16/g' \{}
+
+find -name .svn -prune -o -type f -print0 | xargs -0 -i perl -pi.backup -e 's/0\.17/0\.19/g' \{}
+find -name .svn -prune -o -type f -print0 | xargs -0 -i perl -pi.backup -e 's/0\.17/0\.18/g' \{}
+
+find -name .svn -prune -o -type f -print0 | xargs -0 -i perl -pi.backup -e 's/0\.19/0\.21/g' \{}
+find -name .svn -prune -o -type f -print0 | xargs -0 -i perl -pi.backup -e 's/0\.19/0\.20/g' \{}
+
+find -name .svn -prune -o -type f -print0 | xargs -0 -i perl -pi.backup -e 's/0\.21/0\.23/g' \{}
+find -name .svn -prune -o -type f -print0 | xargs -0 -i perl -pi.backup -e 's/0\.21/0\.22/g' \{}

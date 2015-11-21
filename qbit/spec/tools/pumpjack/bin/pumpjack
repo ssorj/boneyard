@@ -1,0 +1,45 @@
+#!/usr/bin/python
+
+import os
+import sys
+
+if "PUMPJACK_HOME" not in os.environ:
+    sys.exit("PUMPJACK_HOME is not set")
+
+home = os.environ["PUMPJACK_HOME"]
+sys.path.append(os.path.join(home, "python"))
+
+import argparse
+from pumpjack import *
+
+def main():
+    parser = argparse.ArgumentParser \
+        (description="Generate API documentation and code")
+
+    parser.add_argument("-r", "--renderer",
+                        metavar="RENDERER",
+                        required=True,
+                        help="Output mode; one of 'html', 'python', 'java', 'c'")
+
+    parser.add_argument("-i", "--input-dir",
+                        metavar="DIR",
+                        required=True,
+                        help="Source directory containing the XML metadata")
+
+    parser.add_argument("-o", "--output-dir",
+                        metavar="DIR",
+                        required=True,
+                        help="Target directory for the rendered output")
+
+    args = parser.parse_args()
+
+    pump = Pumpjack(args.input_dir)
+
+    try:
+        pump.load()
+        pump.render(args.output_dir, args.renderer)
+    except PumpjackException, e:
+        sys.exit(str(e))
+
+if __name__ == "__main__":
+    main()

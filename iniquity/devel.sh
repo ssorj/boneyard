@@ -1,0 +1,3 @@
+PYTHONPATH=$PWD/python
+
+export PYTHONPATH

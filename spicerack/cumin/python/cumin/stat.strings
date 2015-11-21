@@ -1,0 +1,448 @@
+[StatSet.css]
+table.StatSet {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+}
+
+table.StatSet tr {
+    border-top: 1px dotted #ccc;
+}
+
+table.StatSet td, table.StatSet th {
+    padding: 0.35em 0.5em;
+    font-weight: normal;
+}
+
+table.StatSet th {
+    color: #444;
+}
+
+table.StatSet thead th {
+    font-style: italic;
+    font-size: 0.9em;
+    text-align: right;
+}
+
+table.StatSet tbody th {
+    text-align: left;
+}
+
+table.StatSet td {
+    text-align: right;
+}
+
+[StatSet.html]
+<table id="{id}" class="StatSet">
+  <thead>
+    <tr>
+      <th style="width: 50%; text-align: left;">Statistic</th>
+      <th style="width: 50%;">Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    {items}
+  </tbody>
+</table>
+
+[StatSet.item_html]
+<tr class="item" title="{html_title}">
+  <th>{item_title}</th>
+  <td class="ralign"> {item_value}</td>
+</tr>
+
+[NewStatSet.css]
+table.NewStatSet {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+}
+
+table.NewStatSet tr {
+    border-top: 1px dotted #ccc;
+}
+
+table.NewStatSet td, table.NewStatSet th {
+    padding: 0.35em 0.5em;
+    font-weight: normal;
+}
+
+table.NewStatSet th {
+    color: #444;
+}
+
+table.NewStatSet thead th {
+    font-style: italic;
+    font-size: 0.9em;
+    text-align: right;
+}
+
+table.NewStatSet tbody th {
+    text-align: left;
+}
+
+table.NewStatSet td {
+    text-align: right;
+}
+
+[NewStatSet.html]
+<table id="{id}" class="NewStatSet">
+  <col style="width: 50%; text-align: left"/>
+  <col style="width: 50%"/>
+  <thead>
+    <tr>
+      <th style="text-align: left">Statistic</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    {items}
+  </tbody>
+</table>
+
+[NewStatSet.item_html]
+<tr class="item">
+  <th>{item_title}</th>
+  <td class="ralign"> {item_value}</td>
+</tr>
+
+[ReportingStatValueChart.css]
+div.ReportingStatValueChart {
+    font-size: 0.9em;
+    margin: 0 0 1.5em 0;
+    position: relative;
+    width: 33em;
+}
+
+div.ReportingStatValueChart div.duration {
+    margin: 1em 0 0.5em 1em;
+    width:410px;
+}
+
+div.ReportingStatValueChart ul.radiotabs {
+    margin: 0;
+}
+
+div.ReportingStatValueChart img,
+div.ReportingStatValueChart object {
+    margin: 0 0 0 1em;
+}
+
+div.ReportingStatValueChart>p.fullpageIcon {
+	top:49px;
+}
+
+div.chartFilter {
+	margin-top:10px;
+}
+
+[StatValueChart.css]
+div.StatValueChart {
+    font-size: 0.9em;
+    margin: 0 0 1.5em 0;
+    position: relative;
+    width: 33em;
+}
+
+div.StatValueChart div.duration {
+    margin: 1em 0 0.5em 1em;
+    width:250px;
+}
+
+div.StatValueChart ul.radiotabs {
+    margin: 0;
+}
+
+div.StatValueChart img,
+div.StatValueChart object {
+    margin: 0 0 0 1em;
+}
+
+div.StatValueChart img.Loading {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+div.loading {
+    background-color: #EEE;
+    border: 1px solid #CCC;
+    -moz-border-radius: 0.2em;
+
+    top: 40%;
+    left: 25%;
+
+    cursor: wait;
+    font-weight: bold;
+    text-align: center;
+    padding: 0.75em;
+
+    opacity: 0.75;
+    position: absolute;
+    visibility: hidden;
+    z-index: 10;
+}
+
+div.loading span {
+    background-position: 0% 40%;
+    background-repeat: no-repeat;
+    background-image: url("resource?name=loading.gif");
+    padding-left: 26px;
+    padding-right: 1em;
+    vertical-align: bottom;
+}
+
+[JSDurationSwitch.javascript]
+function showLoading(id) {
+    var container = $(id);
+    var loading = container.getElement(".loading");
+    var img = container.getElement("img");
+    if (loading && (loading.loading)) {
+        loading.style.visibility = "hidden";
+        loading.style.display = "block";
+        var left = (img.getSize().x - loading.getSize().x) / 2;
+        if (left < 0) {
+            left = '25%';
+        }
+        loading.setStyles({
+            left: left,
+            display: 'block',
+            visibility: 'visible'
+        });
+    }
+}
+function hideLoading(id) {
+    var loading = $(id).getElement(".loading");
+    if (loading)
+        loading.setStyles({
+        display: 'none',
+        visibility: 'hidden'
+    });
+}
+
+function changeDuration(state, a, id, attempt) {
+    var li = a.parentNode;
+    var ul = li.parentNode;
+    var as = ul.getElementsByTagName('a');
+    for (var i=0; i < as.length; i++) {
+        as[i].className = (as[i] == a) ?  "selected" : "";
+    }
+    var hash = wooly.session.hash();
+    hash[id] = state;
+    wooly.session.setHash(hash);
+
+    var oImg = document.images[id];
+    if (oImg) {
+        var src = oImg.src;
+        var branch = wooly.session.branch(src);
+        branch.duration = state;
+        src = branch.marshal();
+        src = cumin.refreshTime(src);
+        oImg.src = src;
+
+        $(oImg).onerror = $(oImg).onload = function () {this.className = ""};
+        oImg.className = "Loading";
+
+        var loading = $(id).getElement(".loading");
+        if (loading) {
+            loading.loading = true;
+            setTimeout("showLoading('"+id+"')", 1000);
+            setTimeout("hideLoading('"+id+"')", 1000 * 60);
+        }
+
+        wooly.cancelIntervalUpdate();
+        wooly.resumeIntervalUpdate();
+        cumin.expireIntervalUpdate();
+        return false;
+    } else {
+        var chart = cumin.getChart(id);
+        if ((chart == null) || (typeof $(chart).getParent().getElements('a')[chart_href] == "undefined")) {
+            if (typeof attempt == "undefined")
+                attempt = 1;
+            if (attempt < 10)
+                setTimeout(function () {changeDuration(state, a, id, attempt+1);}, 100);
+            return false;
+        }        
+        newurl = get_chart_url(id, $(chart).getParent().getElements('a')[chart_href].get('href'), state);
+        $(chart).getParent().getElements('a')[chart_href].set('href', newurl);
+        drawSingleChart(chart, true);
+    }
+    return false;
+}
+// called by open-flash-chart.swf in response to chart.geturl()
+function get_chart_url(id, url, state) {
+    var chart = cumin.getChart(id);
+    if (chart == null)
+        return false;
+
+    var branch = wooly.session.branch(url);
+    var now = new Date().getTime();
+    branch['elapsed'] = now; // force an entire update
+    branch['duration'] = state;
+    url = branch.marshal();
+
+    return url;
+}
+
+function gotChartPoints(text, oImg) {
+    var mImg = $(oImg);
+    mImg.store('points', eval("("+text+")"));
+    var e = {'client': {'x': mImg.retrieve("lastX")}};
+    cumin.chartMove(mImg, e);
+}
+
+function get_chart_points(oImg) {
+    $(oImg).store('points', null);
+    var branch = wooly.session.branch(oImg.src);
+    branch.samples = 't';
+    var req = branch.marshal();
+    wooly.setIntervalUpdate(req, gotChartPoints, 0, oImg, true);
+}
+
+[StatValueChart.html]
+<div>
+<div class="StatValueChart{fullpageable}" id="{id}">
+  <h2>{title}</h2>
+
+  <div class="duration">{duration}</div>
+
+  <img id="{id}" src="{href}" height="{height}" width="{width}" alt="stats" />
+  <div class="loading" style="display:none;"><span>Loading...</span></div>
+</div></div>
+<script type="text/javascript">
+//<![CDATA[
+(function() {
+    wooly.addPageUpdateListener(function () {if (document.images["{id}"].className == "Loading") return; cumin.updateChart("{id}");});
+    cumin.setupChart('{id}', {width});
+}())
+//]]>
+</script>
+
+[StatValueChart.stat_html]
+<li>
+  <span class="swatch" style="background-color: {stat_color}">&nbsp;</span>
+  &nbsp; <span class="ph" statname="{stat_name}" statmode="{mode}">{stat_value}</span>
+</li>
+
+[StatFlashChart.html]
+<div>
+    <div class="StatValueChart{fullpageable}" id="{id}">
+      <h2>{title}</h2>
+      <div class="duration" style="float:left;">{duration}</div>
+      <div style="clear:both;"></div>
+      <div>
+      	  <!-- don't put this data url inside the holder div, jqplot will kill it on a zoom -->
+      	  <a rel="api" type="application/json" href="{href}" style="display:none">Data</a>
+	      <div id="{id_nodots}_chart" class="jqplotgraph leftlegend" style="height:150px;width:400px;">          
+	          <div class="loading" style="display:none;"><span>Loading...</span></div>
+	      </div>
+	  </div>
+    </div>
+    
+</div>
+
+[ReportingChart.html]
+<div>
+    <div class="ReportingStatValueChart{fullpageable}" id="{id}">
+      <h2>{title}</h2>
+      <div class="duration" style="float:left;">{duration}</div>
+      <div style="clear:both;"></div>
+      <div>
+      	  <!-- don't put this data url inside the holder div, jqplot will kill it on a zoom -->
+      	  <a rel="api" type="application/json" href="{href}" style="display:none">Data</a>
+	      <div id="{id_nodots}_chart" class="jqplotgraph leftlegend" style="height:150px;width:400px;">          
+	          <div class="loading" style="display:none;"><span>Loading...</span></div>
+	      </div>
+	  </div>
+	  <div class="chartFilter">
+		{filters}
+	  </div>
+    </div>
+</div>
+
+
+[ReportingChart.javascript]
+function updateFilter(filter, a, id, param, attempt) {
+    var li = a.parentNode;
+    var ul = li.parentNode;
+    var as = ul.getElementsByTagName('a');
+    var hash = wooly.session.hash();
+    hash[id] = filter;
+    wooly.session.setHash(hash);
+
+    var oImg = document.images[id];
+    if (oImg) {
+        var src = oImg.src;
+        var branch = wooly.session.branch(src);
+        branch.userc = filter;
+        src = branch.marshal();
+        src = cumin.refreshTime(src);
+        oImg.src = src;
+
+        $(oImg).onerror = $(oImg).onload = function () {this.className = ""};
+        oImg.className = "Loading";
+
+        var loading = $(id).getElement(".loading");
+        if (loading) {
+            loading.loading = true;
+            setTimeout("showLoading('"+id+"')", 1000);
+            setTimeout("hideLoading('"+id+"')", 1000 * 60);
+        }
+
+        wooly.cancelIntervalUpdate();
+        wooly.resumeIntervalUpdate();
+        cumin.expireIntervalUpdate();
+        return false;
+    } else {
+        var chart = cumin.getChart(id);
+        if ((chart == null) || (typeof $(chart).getParent().getElements('a')[chart_href] == "undefined")) {
+            if (typeof attempt == "undefined")
+                attempt = 1;
+            if (attempt < 10)
+                setTimeout(function () {updateFilter(filter, a, id, attempt+1);}, 100);
+            return false;
+        }        
+        newurl = get_new_chart_url(id, $(chart).getParent().getElements('a')[chart_href].get('href'), param, filter);
+        $(chart).getParent().getElements('a')[chart_href].set('href', newurl);
+        drawSingleChart(chart, true);
+    }
+    return false;
+}
+
+function get_new_chart_url(id, url, param, value) {
+    var chart = cumin.getChart(id);
+    if (chart == null)
+        return false;
+
+    var branch = wooly.session.branch(url);
+    var now = new Date().getTime();
+    branch['elapsed'] = now; // force an entire update
+    branch[param] = value;
+    url = branch.marshal();
+
+    return url;
+}
+
+[FilterInput.html]
+<!-- <input id="{id}" type="text" name="{name}"></input><input type="button" value="Update filter" {onclick}/> -->
+{title}: <select {onchange}>{user_list}</select>
+
+[GenericChart.css]
+div.FullpageChart {
+    margin: 1.5em;
+}
+
+[GenericChart.html]
+    <div class="FullpageChart" id="{id}">
+      <h2>{title}</h2>
+      <div id="{id}_chart">
+          <img id="{id}" src="{img_href}" height="{height}" width="{width}" alt="stats" />
+          <div class="loading" style="display:none;"><span>Loading...</span></div>
+      </div>
+    </div>
+
+[PieFlashChart.html]
+    <div class="StatValueChart" id="{id}">
+      <h2>{title}</h2>
+      <div id="{id}_chart">
+      </div>
+    </div>

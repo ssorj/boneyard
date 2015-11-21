@@ -1,0 +1,13 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid-stable.bash
+
+script-init
+
+cd "${SOURCE_PATH}/cpp"
+
+make check || {
+    cp src/tests/*.log "$CYCLE_PATH" || :
+    exit 1
+}

@@ -1,0 +1,114 @@
+[OverviewView.html]
+<div class="oblock OverviewView">
+  <table>
+    <tbody>
+      <tr>
+        <td>
+<div class="fullpageable oldfpiconlocation">
+          <h2><img src="{resource_prefix}/queue-20.png" alt="" /> Deepest Message Queues</h2>
+
+          <div class="iblock">{queues}</div>
+</div>
+        </td>
+        <td>
+<div class="fullpageable oldfpiconlocation">
+          <h2><img src="{resource_prefix}/job-20.png" alt="" /> Longest Running Grid Submissions</h2>
+          <div class="iblock">{submissions}</div>
+</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+<div class="fullpageable oldfpiconlocation">
+          <h2><img src="{resource_prefix}/system-20.png" alt=""/> Busiest Systems</h2>
+
+          <div class="iblock">{systems}</div>
+</div>
+        </td>
+        <td>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+[GridOverviewView.html]
+<div class="oblock OverviewView">
+  <table>
+    <tbody>
+       <tr>
+        <td>
+<div class="fullpageable">
+          <h2><img src="{resource_prefix}/job-20.png" alt="" /> Longest Running Grid Submissions</h2>
+          <div class="iblock">{submissions}</div>
+</div>
+        </td>
+        <td>
+<div class="fullpageable">
+          <h2><img src="{resource_prefix}/system-20.png" alt=""/> Busiest Systems</h2>
+
+          <div class="iblock">{systems}</div>
+</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+[MessagingOverviewView.html]
+<div class="oblock OverviewView">
+  <table>
+    <tbody>
+      <tr>
+        <td>
+<div class="fullpageable">
+          <h2><img src="{resource_prefix}/queue-20.png" alt="" /> Deepest Message Queues</h2>
+
+          <div class="iblock">{queues}</div>
+</div>
+        </td>
+        <td>
+<div class="fullpageable">
+          <h2><img src="{resource_prefix}/system-20.png" alt=""/> Busiest Systems</h2>
+
+          <div class="iblock">{systems}</div>
+</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+[ConfigurationNotice.css]
+div.ConfigurationNotice {
+    margin: 2em;
+    border: 1px dotted #cec;
+    padding: 0 1em;
+    background-color: #dfd;
+}
+
+div.ConfigurationNotice h1 > img {
+    vertical-align: -60%;
+    margin: 0 0.2em 0 0 ;
+}
+
+[ConfigurationNotice.html]
+<div class="ConfigurationNotice">
+  <h1><img src="{resource_prefix}/warning-36.png" alt=""/> Broker not found</h1>
+
+  <p>This console is not connected to any brokers and as a result
+  has no management data to display.</p>
+
+  <p>To connect, set the <code>brokers</code> configuration parameter in
+   the <code>[common]</code> section of the config file located at <code>/etc/cumin/cumin.conf</code>. or <code>~/.cumin.conf</code></p>
+
+  <blockquote><pre>[common]<br/>
+  <strong>brokers: broker1.server.com,broker2.server.com</strong>
+  </pre></blockquote>
+
+  <p>Without a user-specified setting, cumin looks for a broker
+  at <code>localhost:5672</code>.  If you wish to use this
+  configuration, make sure there is a broker with QMF enabled running
+  at this address.</p>
+</div>

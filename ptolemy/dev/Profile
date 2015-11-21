@@ -1,0 +1,8 @@
+export DEVEL_HOME="$PWD"
+
+export PTOLEMY_HOME="$DEVEL_HOME"/instance
+export PTOLEMY_DEBUG="hello, bugs"
+export PTOLEMY_BROKER="localhost:5672"
+
+export PATH="$DEVEL_HOME"/bin:"$PATH"
+export PYTHONPATH="$DEVEL_HOME"/python:"$HOME"/lib/python:"$PYTHONPATH"

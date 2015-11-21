@@ -1,0 +1,20 @@
+<schema package="com.redhat.mace">
+
+  <class name="GridSim">
+    <property name="execNodeCount" type="uint32" access="RO"/>
+    <property name="slotsPerNode"  type="uint32" access="RO"/>
+    <property name="slotCount"     type="uint32" access="RO"/>
+    <property name="jobCount"      type="uint32" access="RO"/>
+    <property name="activityLevel" type="uint8"  access="RO" desc="0 = none, 100 = all objects every interval"/>
+
+    <method name="reset" desc="Delete all grid objects"/>
+    <method name="start" desc="Set up simulated objects">
+      <arg name="execNodes"    type="uint32" dir="I"/>
+      <arg name="slotsPerNode" type="uint32" dir="I"/>
+      <arg name="jobs"         type="uint32" dir="I"/>
+      <arg name="activity"     type="uint8"  dir="I"/>
+    </method>
+  </class>
+
+</schema>
+

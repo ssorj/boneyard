@@ -1,0 +1,15 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+
+script-init
+
+expr "$RANDOM" % 2 = 0
+
+echo "$RANDOM" > "${CYCLE_PATH}/revision"
+
+echo "r1" "somedeveloper" >> "${CYCLE_PATH}/changes"
+echo "r2" "who2" >> "${CYCLE_PATH}/changes"
+echo "r3" "who3" >> "${CYCLE_PATH}/changes"
+echo "r2" "who2" >> "${CYCLE_PATH}/changes"
+echo "r4" "who1" >> "${CYCLE_PATH}/changes"

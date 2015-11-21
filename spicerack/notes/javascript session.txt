@@ -1,0 +1,87 @@
+To modify a cumin url, use the session javascript object under wooly.
+
+Usage follows this patern:
+
+    var branch = wooly.session.branch();
+    branch.parameter1 = value;
+    var newUrl = branch.marshal();
+    
+Example:
+
+    the current window location is "index.html?frame=main.broker.queue;main.m=broker;main.broker.m=queue;main.broker.id=1;main.broker.queue.id=3119";
+
+    // create a branch object 
+    var branch = wooly.session.branch();
+    
+    /* branch is a javascript object with the following properties:
+        {
+            __page:                 'index.html',
+            frame:                  'main.broker.queue',
+            main.m:                 'broker',
+            main.broker.m:          'queue',
+            main.broker.id:         '1',
+            main.broker.queue.id:   '3119'
+        }
+    */
+ 
+    // You can change any of the existing properties directly:
+    branch.frame = 'main.broker.exchange';
+    branch.main.broker.m = 'exchange';
+    
+    // You can remove properties
+    delete branch.main.broker.queue.id;
+    
+    // You can add new properties
+    branch['main.broker.exchange.id'] = 1;
+    // or 
+    branch.set('main.broker.exchange.id', 1);
+
+    branch.set('main.tabs.sel', 'mtab');
+    branch.set('main.broker.view.body.tabs.m', 'exchanges');    
+    
+    // generate a new url with the modified values
+    var newUrl = branch.marshal();
+    // index?frame=main.broker.exchange;main.m=broker;main.tabs.sel=mtab;main.view.m=msg;main.broker.m=exchange;main.broker.id=1;main.broker.view.body.tabs.m=exchanges;main.broker.exchange.id=1
+    
+Background update urls:
+
+    In cumin, background update urls contain an encoded session value and one or more widget paths.
+
+    For example, a typical background url is:
+    index.update?session=index.html%3Fframe%3Dmain.broker.queue%3Bmain.m%3Dbroker%3Bmain.broker.m%3Dqueue%3Bmain.broker.id%3D1%3Bmain.broker.queue.id%3D3119;widget=main.broker.queue.view.tabs.stats.gen.general;widget=main.broker.queue.view.tabs.stats.gen.io
+    
+    To create a branch from a specific url instead of window.location, use
+        var branch = wooly.session.branch(url);
+        
+    Creating a branch object from the above background update url will generate:
+    {
+        __page:  'index.update',
+        session: {
+                    __page:                 'index.html',
+                    frame:                  'main.broker.queue',
+                    main.m:                 'broker',
+                    main.broker.m:          'queue',
+                    main.broker.id:         '1',
+                    main.broker.queue.id:   '3119',
+                 },
+        widget: [
+                    main.broker.queue.view.tabs.stats.gen.general,
+                    main.broker.queue.view.tabs.stats.gen.io
+                ]
+    }
+
+    You can manipulate this object and then call branch.marshal() to generate a new url string.
+    For example, to add the page parameter that tells the widgets to render themselves in "fullpage" mode:
+
+        var branch = wooly.branchIntervalUpdate();
+
+        // add the fullpage parameter to a widget
+        branch.session[widgetPath + ".fullpage"] = 1;
+
+        // restart the background updates with the new branch
+        wooly.restartIntervalUpdate(branch.marshal());
+
+    
+    
+    
+    

@@ -1,0 +1,103 @@
+[Table.css]
+table.Table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table.Table tr {
+    vertical-align: top;
+}
+
+table.Table td, table.Table th {
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+table.Table th.controls {
+    text-align: left;
+}
+
+table.Table th.controls > div.right {
+    float: right;
+    text-align: right;
+    margin: 0 0 0 2em;
+}
+
+table.Table input {
+    margin: 0;
+    vertical-align: -10%;
+}
+
+[Table.html]
+<table id="{id}" class="{class}">
+  <style type="text/css">
+    {css}
+  </style>
+  {header}
+  {footer}
+  <tbody>{rows}</tbody>
+</table>
+
+[TableHeader.html]
+<thead><tr>{headers}</tr></thead>
+
+[TableColumn.html]
+<col class="{class}" width="{width}"/>
+
+[TableColumnCss.html]
+table.Table td.{class},
+table.Table th.{class} {
+    text-align: {text_align};
+    width: {width};
+}
+
+[TableColumnHeader.html]
+<th class="{class}"><a class="{link_class}" title="{title}" href="{href}"><span class="{sorted_dir}">{content}</span></a></th>
+
+[TableColumnHeader.static_html]
+<th class="{class}">{content}</th>
+
+[TableColumnCell.html]
+<td class="{class}" title="{cell_title}">{content}</td>
+
+[TableRow.html]
+<tr>{cells}</tr>
+
+[TableSelector.css]
+ul.TableSelector {
+    display: inline;
+    padding: 0;
+}
+
+[TableSelector.html]
+<span>{title}</span>
+<span>{options}</span>
+
+[LinkColumnCell.html]
+<td class="{class}"><a href="{href}">{content}</a></td>
+
+[CheckboxColumnHeader.javascript]
+(function() {
+    wooly.clickTableCheckboxes = function(control, inputName) {
+        var elems = $$("input[name=" + inputName + "]");
+
+        for (var i = 0; i < elems.length; i++) {
+            var elem = elems[i];
+
+            if (elem.checked != control.checked) {
+                elem.click();
+            }
+        }
+    };
+}())
+
+[CheckboxColumnHeader.static_html]
+<th class="{class}"><input id="{id}" type="checkbox"
+   onclick="wooly.clickTableCheckboxes(this, '{name}')"
+/></th>
+
+[CheckboxColumnHeader.html]
+<th class="{class}"><input id="{id}" type="checkbox"
+   onclick="wooly.clickTableCheckboxes(this, '{name}')"
+/></th>

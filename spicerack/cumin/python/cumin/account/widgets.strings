@@ -1,0 +1,83 @@
+[LoginPage.css]
+body.LoginPage {
+    background: #f7f7f7;
+    padding: 4em;
+}
+
+[LoginForm.css]
+form.LoginForm {
+    background: #fff;
+    width: 16em;
+    margin: 0 auto;
+    border: 1px solid #ddd;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    padding: 2em;
+}
+
+form.LoginForm > h1 {
+    margin: 0 0 1em 0;
+}
+
+form.LoginForm h1 img {
+    vertical-align: -60%;
+    margin: 0 0.25em 0 0;
+}
+
+form.LoginForm h2 {
+    font-size: 0.9em;
+}
+
+form.LoginForm input {
+    width: 12em;
+}
+
+form.LoginForm input.submit {
+    width: auto;
+}
+
+form.LoginForm > div.buttons {
+    margin: 1.5em 0 0 0;
+}
+
+form.LoginForm p.login_invalid {
+    color: red;
+}
+
+[LoginForm.html]
+<form id="{id}" class="LoginForm" method="post" action="?">
+  <h1><img src="resource?name=mrg-36.png" alt="mrg icon" /> MRG Management</h1>
+
+  <p>Enter your user name and password to log in.</p>
+
+  <p>If you do not have an account or have trouble logging in, contact
+  the {operator_link}.</p>
+
+  {login_invalid}
+
+  <h2>User Name</h2>
+
+  <div class="iblock">{user_name}</div>
+
+  <h2>Password</h2>
+
+  <div class="iblock">{password}</div>
+
+  <div class="buttons">{submit}</div>
+
+  <div>{hidden_inputs}</div>
+</form>
+<div style="display:none;visibility:hidden" id="loginpage_token"/>
+
+<script type="text/javascript">
+  $("{id}").elements[0].focus();
+</script>
+
+[LoginForm.login_invalid]
+<p class="login_invalid">The user name and password you entered do not
+match any account.</p>
+
+[LoginForm.roles_invalid]
+<p class="login_invalid">There are no valid roles
+configured for this account.</p>
+

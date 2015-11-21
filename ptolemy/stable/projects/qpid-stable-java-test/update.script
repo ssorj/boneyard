@@ -1,0 +1,11 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid-stable-java.bash
+
+script-init
+
+cd "$SOURCE_PATH"
+
+svn-save-revision java
+svn-save-changes java

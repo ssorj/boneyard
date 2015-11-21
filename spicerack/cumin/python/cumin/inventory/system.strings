@@ -1,0 +1,59 @@
+[TopSystemSet.sql]
+select
+  s.id,
+  s.node_name as name,
+  c.load_average1_min as load_avg
+from sysimage s
+join sysimage_stats as c on s.stats_curr_id = c.id
+order by load_avg desc
+limit 5
+
+[TopSystemSet.count_sql]
+--
+
+[SystemStats.html]
+<table class="twocol">
+  <tbody>
+    <tr>
+      <td>
+        <h2>Memory/Load</h2>
+        {stats}
+        <br/>
+      </td>
+      <td>
+	{freemem}
+	{loadavg}
+      </td>
+    </tr>
+  </tbody>
+</table>
+<script type="text/javascript">
+    // <![CDATA[
+    var show_slot_job_url = "{slot_job_url}";
+    // ]]>
+</script>
+
+[SystemServices.html]
+<h2>Services</h2>
+<table class="PropertySet">
+  <tbody>{items}</tbody>
+</table>
+
+[SystemServices.item_html]
+<tr><th>{item_type}</th><td>{item_content}</td></tr>
+
+[SystemTagSet.html]
+<table id="{id}" class="{class} PropertySet TagPropertySet">
+  <thead>
+  	<tr>
+  		<td>Property</td>
+  		<td>Value</td>  
+  	</tr>
+  </thead>
+  <tbody>
+    <tr class="item" title="">
+  		<th>Tags:</th>
+  		<td class="{class}">{tags}</td>
+	</tr>
+  </tbody>
+</table>

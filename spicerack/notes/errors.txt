@@ -1,0 +1,57 @@
+APPLICATION ERROR
+
+----- python trace -----
+Traceback (most recent call last):
+  File "/home/jross/mgmt/cumin/python/wooly/server.py", line 83, in service
+    response = page.render(session, None)
+  File "/home/jross/mgmt/cumin/python/wooly/__init__.py", line 255, in render
+    string = self.do_render(session, object)
+  File "/home/jross/mgmt/cumin/python/wooly/__init__.py", line 265, in do_render
+    self.__main_tmpl.render(session, object, writer)
+  File "/home/jross/mgmt/cumin/python/wooly/__init__.py", line 791, in render
+    result = elem(self.widget, session, object)
+  File "/home/jross/mgmt/cumin/python/wooly/widgets.py", line 45, in render_mode
+    return mode.render(session, object)
+  File "/home/jross/mgmt/cumin/python/wooly/__init__.py", line 255, in render
+    string = self.do_render(session, object)
+  File "/home/jross/mgmt/cumin/python/wooly/__init__.py", line 265, in do_render
+    self.__main_tmpl.render(session, object, writer)
+  File "/home/jross/mgmt/cumin/python/wooly/__init__.py", line 791, in render
+    result = elem(self.widget, session, object)
+  File "/home/jross/mgmt/cumin/python/cumin/broker.py", line 616, in render_fields
+    self.field_tmpl.render(session, i, writer)
+  File "/home/jross/mgmt/cumin/python/wooly/__init__.py", line 791, in render
+    result = elem(self.widget, session, object)
+  File "/home/jross/mgmt/cumin/python/cumin/broker.py", line 643, in render_groups
+    self.group_tmpl.render(session, (index, group), writer)
+  File "/home/jross/mgmt/cumin/python/wooly/__init__.py", line 791, in render
+    result = elem(self.widget, session, object)
+  File "/home/jross/mgmt/cumin/python/cumin/broker.py", line 658, in render_group_selected_attr
+    if len(groups) > index and group.id == groups[index].id:
+AttributeError: 'NoneType' object has no attribute 'id'
+
+When the db isn't set up:
+
+Traceback (most recent call last):
+  File "/usr/lib/python2.5/site-packages/wooly/wsgiserver.py", line 658, in communicate
+    req.respond()
+  File "/usr/lib/python2.5/site-packages/wooly/wsgiserver.py", line 383, in respond
+    response = self.wsgi_app(self.environ, self.start_response)
+  File "/usr/lib/python2.5/site-packages/wooly/server.py", line 45, in service
+    if not self.authorized(session):
+  File "/usr/lib/python2.5/site-packages/cumin/__init__.py", line 107, in authorized
+    user = ConsoleUser.selectBy(name=name)[0]
+  File "/usr/lib/python2.5/site-packages/sqlobject/sresults.py", line 156, in __getitem__
+    return list(self.clone(start=start, end=start+1))[0]
+  File "/usr/lib/python2.5/site-packages/sqlobject/sresults.py", line 162, in __iter__
+    return iter(list(self.lazyIter()))
+  File "/usr/lib/python2.5/site-packages/sqlobject/sresults.py", line 170, in lazyIter
+    return conn.iterSelect(self)
+  File "/usr/lib/python2.5/site-packages/sqlobject/dbconnection.py", line 399, in iterSelect
+    return select.IterationClass(self, self.getConnection(),
+  File "/usr/lib/python2.5/site-packages/sqlobject/dbconnection.py", line 264, in getConnection
+    conn = self.makeConnection()
+  File "/usr/lib/python2.5/site-packages/sqlobject/postgres/pgconnection.py", line 115, in makeConnection
+    raise self.module.OperationalError("%s; used connection string %r" % (e, self.dsn))
+OperationalError: FATAL:  Ident authentication failed for user "cumin"
+; used connection string 'dbname=cumin user=cumin host=localhost'

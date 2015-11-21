@@ -1,0 +1,343 @@
+#!/usr/bin/python
+import os
+import sys
+import traceback
+
+home = os.environ.get("CUMIN_HOME", os.path.normpath("/usr/share/cumin"))
+sys.path.append(os.path.join(home, "python"))
+
+from cumin.main import *
+from cumin.config import *
+from cumin.util import *
+from parsley.loggingex import PipeLogThread
+from psycopg2 import OperationalError
+from cumin.admin import SchemaVersion, SchemaMissing
+from cumin.errors import CuminErrors
+
+def restore_IO():
+    sys.stderr = sys.__stderr__
+    sys.stdout = sys.__stdout__
+
+def set_aviary_configs(cumin, values):
+    cumin.aviary_job_servers = values.aviary_job_servers
+    cumin.aviary_query_servers = values.aviary_query_servers
+    cumin.aviary_locator = values.aviary_locator
+    cumin.aviary_key = values.aviary_key
+    cumin.aviary_cert = values.aviary_cert
+    cumin.aviary_root_cert = values.aviary_root_cert
+    cumin.aviary_domain_verify = values.aviary_domain_verify
+
+    # For development use.  Default is False.  Undocumented.
+    cumin.aviary_suds_logs = values.aviary_suds_logs
+
+    # Defautl is True.  Undocumented.
+    cumin.aviary_prefer_condor = values.aviary_prefer_condor
+
+def set_wallaby_configs(cumin, values, brokers):
+    if values.wallaby_broker == "":
+        cumin.wallaby_broker = brokers[0]
+    else:
+        if values.wallaby_broker == "None":
+            values.wallaby_broker = None
+        cumin.wallaby_broker = values.wallaby_broker
+    # Let 0 indicate "no timeout", since the timeout
+    # value is an int in the config and None can't be
+    # specified
+    cumin.wallaby_refresh = values.wallaby_refresh
+    if cumin.wallaby_refresh == 0:
+        cumin.wallaby_refresh = None
+
+def set_authorize_config(cumin, values, access_root):
+
+    # Allow this to be turned on/off.
+    # Default will be off.
+    cumin.do_authorize = values.authorize
+
+    # This is the path to the xml file defining authorization.
+    # Allow this to be disabled via "None"
+    if values.auth_path == "None":
+        cumin.access_path = None
+    else:
+        # If there is no initial dir, prepend home
+        dir_name = os.path.split(values.auth_path)[0]
+        if len(dir_name) == 0:
+            cumin.access_path = os.path.join(access_root, values.auth_path)
+        else:
+            cumin.access_path = values.auth_path
+
+def set_ldap_configs(cumin, values):
+    cumin.ldap_timeout = values.ldap_timeout
+    cumin.ldap_tls_cacertdir = values.ldap_tls_cacertdir
+    cumin.ldap_tls_cacertfile = values.ldap_tls_cacertfile
+
+def check_cert_files(opts):
+    # If a certificate or key file has been specified,
+    # check to make sure that both exist and that the
+    # app has permission to read them.
+    if opts.server_cert or opts.server_key:
+        for attr in ("server_cert", "server_key"):
+            attr_name = attr.replace("_", "-")
+            f = getattr(opts, attr)
+            if f == "":                
+                log.error("parameter %s must have a value" % \
+                           attr_name)
+                return False
+
+            if not os.path.isfile(f):
+                log.error("%s is not a file." % f)
+                return False
+
+            try:
+                open(f, "r")
+            except Exception, e:
+                log.error("Exception reading %s, %s" % (attr_name, e))
+                return False
+    return True
+
+def adjust_return(passed_init, ret):
+    # Shift non-zer0 return codes left 1 bit
+    # and OR in whether or not init passed
+    if ret != 0:
+        ret = ret << 1 | passed_init
+    return ret
+
+def write_status_path(p, value):
+    try:
+        f = open(p, "w+")
+        if value:
+            f.write(value)
+        f.close()
+    except:
+        pass
+
+def main():
+    passed_init = 1
+    return_code = CuminErrors.NO_ERROR
+    wrote_status = False
+
+    # Do our own simple option check so we can redirect IO early
+    # without worrying about other options or the behavior of optParse
+    opts = check_for_options(["--section", "--daemon"], sys.argv[1:])
+    if type(opts["--section"]) is str:
+        section_name = opts["--section"]
+    else:
+        section_name = "web"
+
+    # If the --daemon option has been set, redirect stderr and stdio through
+    # pipes.  Launch a thread to read those pipes and direct the content to
+    # files with rollover control. 
+    pipeThread = None
+    if opts["--daemon"]:
+        try:
+            cumin_home = os.environ.get("CUMIN_HOME", os.path.normpath("/usr/share/cumin"))
+            err_file = os.path.join(cumin_home, "log", section_name+".stderr")
+            out_file = os.path.join(cumin_home, "log", section_name+".stdout")
+ 
+           # Open pipes and redirect
+            err_r, err_w = os.pipe()
+            out_r, out_w = os.pipe()
+            pipeThread = PipeLogThread(descriptors=[err_r, out_r],
+                                       paths=[err_file, out_file],
+                                       call_on_fail=restore_IO)
+            pipeThread.start()
+            sys.stderr = os.fdopen(err_w, "w", 0)
+            sys.stdout = os.fdopen(out_w, "w", 0)
+        except:
+            restore_IO()
+            traceback.print_exc()
+            pipeThread = None
+
+    # Use ArgError to jump to the finally block and exit 
+    class ArgError(Exception):
+        pass
+
+    class CertificateError(Exception):
+        pass
+
+    try:
+        cumin = None
+        config = None
+
+        setup_initial_logging()
+
+        parser = BrokeredOptionParser()
+
+        # Add additional parameters for web
+        parser.add_option("--host")
+        parser.add_option("--port", type=int)
+        parser.add_option("--server-cert")
+        parser.add_option("--server-key")
+        parser.add_option("--section", default="web")
+        parser.add_option("--daemon", action="store_true", default=False)
+
+        # Get options
+        opts, args = parser.parse_args()
+
+        # --section controls which section is read from the config file
+        # If a section other than "web" is specified, require it to exist
+        config = CuminWebConfig(opts.section, strict_section = opts.section != "web")
+
+        # There might be other sections returned from config.parse() but
+        # currently we don't care about them...
+        values = getattr(config.parse(), opts.section)
+
+        # Use the config values as defaults for unspecified options
+        apply_defaults(values, opts)
+
+        # If log_file is a relative path, base it from $CUMIN_HOME/log
+        opts.log_file = config.expand_log_file(opts.log_file)
+        setup_operational_logging(opts, 
+                                  values.log_max_mb,
+                                  values.log_max_archives)
+
+        if not check_cert_files(opts):
+            raise CertificateError
+
+        if len(args) != 0:
+            log.error("Extra arguments:" + "".join([" "+arg for arg in args]))
+            raise ArgError
+
+        broker_uris = [x.strip() for x in opts.brokers.split(",")]
+        authmech = [x.strip() for x in values.auth.split(";") if x != ""]
+        cumin = Cumin(config.get_home(), broker_uris, opts.database, 
+                      opts.host, opts.port,
+                      opts.server_cert, opts.server_key,
+                      values.force_secure_cookies,
+                      values.persona, authmech)
+
+        # If the mech_list was set explicitly, honor it.
+        # Otherwise Cumin will default based on whether or not
+        # a broker URL contains credentials.
+        if type(values.sasl_mech_list) == str:
+            cumin.sasl_mech_list = values.sasl_mech_list.upper()
+
+        set_aviary_configs(cumin, values)
+        set_wallaby_configs(cumin, values, broker_uris)
+        set_ldap_configs(cumin, values)
+
+        # Not used right now
+        #cumin.auth_create_ondemand = values.auth_create_ondemand
+        #cumin.auth_proxy = values.auth_proxy
+
+        # Someday we may let this be configurable, for now it will
+        # be hardwired
+        values.auth_path = "persona.xml"
+        set_authorize_config(cumin, values, config.get_access_root())
+
+        cumin.debug = opts.debug
+        cumin.user = values.user
+        cumin.update_interval = values.update_interval
+        cumin.max_qmf_table_sort = values.max_qmf_table_sort
+        
+        cumin.notification_timeout = values.notification_timeout
+
+        cumin.force_html_doctype = values.force_html_doctype
+
+        cumin.fast_view_attributes = [x.strip() for x in values.fast_view_attributes.split(',')]
+
+        # set default values for form inputs
+        cumin.set_form_defaults(values.request_memory,
+                                values.request_memory_vm,
+                                values.request_disk,
+                                values.request_disk_vm)
+
+        cumin.check()
+        cumin.init()
+
+        # Okay, record the init check status here
+        write_status_path(config.get_init_status_path(), str(return_code)+"\n")
+        wrote_status = True
+
+        if not opts.init_only and not return_code:
+            passed_init = 0
+
+            cumin.start()
+            while True:
+                # print_threads()
+                if opts.es:
+                    if poll_stdin(1, value=opts.es):
+                        log.debug("Exiting on termination string from master")
+                        break
+                else:
+                    sleep(1)
+
+                if not cumin.server_alive():
+                    log.info("Web server has stopped, exiting")
+                    print "web server has stopped, exiting..."
+                    log.error("Web server process has stopped")
+                    return_code = CuminErrors.WEB_SERVER_ERROR
+                    break
+
+    except KeyboardInterrupt:
+        log.info("Received shutdown signal")
+        pass
+
+    except SystemExit:
+        if "--help" not in sys.argv:
+            log.error("Error in options")
+            return_code = CuminErrors.PARSE_ERROR
+
+    except ArgError:
+        return_code = CuminErrors.PARSE_ERROR
+
+    except OperationalError:
+        # Failed to talk to the database on check()
+        log.info("Run 'cumin-database check' as root for more information.")
+        return_code = CuminErrors.DATABASE_ERROR
+
+    except SchemaMissing:
+        log.info("Run 'cumin-admin create-schema' as root")
+        return_code = CuminErrors.SCHEMA_ERROR
+
+    except SchemaVersion:
+        log.info("Run 'cumin-admin upgrade-schema' as root")
+        return_code = CuminErrors.SCHEMA_VER_ERROR
+
+    except CertificateError:
+        log.error("Server certificate or key file is not a valid file "\
+                   "or is unreadable")
+        return_code = CuminErrors.CERTIFICATE_ERROR
+
+    except:
+        traceback.print_exc()
+        return_code = CuminErrors.UNHANDLED_ERROR
+
+    # For parse errors, for example, we won't have a config object yet
+    # but the return code will indicate an init error anyway so a 
+    # parent can check the return code.
+    if not wrote_status and config:
+        write_status_path(config.get_init_status_path(), str(return_code)+"\n")
+
+    def shutdown():
+        if cumin:
+            cumin.stop()
+        log.info("about to call logging shutdown")
+        logging.shutdown()
+
+    # Run shutdown with a timeout in the main thread.
+    # This guarantees exit.
+    t = ShutdownThread(shutdown)
+    t.start()
+
+    # If we get some error before options are parsed opts.tm won't be set
+    try:
+        tm = opts.tm
+    except:
+        tm = 5
+    t.join(tm)
+    if t.isAlive():
+        log.info("Shutdown thread timed out, exiting")
+    if pipeThread:
+        pipeThread.stop(immediate=True)
+    return adjust_return(passed_init, return_code)
+
+def make_ctrl_c(sig, frame):
+    raise KeyboardInterrupt
+
+if __name__ == "__main__":
+    try:
+        import signal
+        signal.signal(signal.SIGTERM, make_ctrl_c)
+        sys.exit(main())
+    except KeyboardInterrupt:
+        sys.exit(0)

@@ -1,0 +1,5 @@
+#!/bin/bash -ex
+
+echo <<EOF > hello.py
+print "Hi!"
+EOF

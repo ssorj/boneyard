@@ -1,0 +1,45 @@
+[PropertySet.css]
+table.PropertySet {
+  width: 100%;
+  font-size: 0.9em;
+  text-align: left;
+  border-collapse; collapse;
+}
+
+table.PropertySet tbody td {
+  border-top: 1px dotted #ccc;
+}
+
+table.PropertySet thead a {
+  color: #666;
+  font-weight: normal;
+  font-style: italic;
+}
+
+[PropertySet.html]
+<table class="PropertySet">
+  <thead><tr>{headers}</tr></thead>
+  <tbody>{items}</tbody>
+</table>
+
+[PanningColumnSet.css]
+table.PanningColumnSet {
+  width: 100%;
+}
+
+table.PanningColumnSet tr td {
+  vertical-align: top;
+  width: 50%;
+}
+
+[PanningColumnSet.html]
+<table class="PanningColumnSet">
+  <tr>
+    <td><a href="{back_href}">&lt;&lt; Back</a></td>
+    <td></td>
+  </tr>
+  <tr>{columns}</tr>
+</table>
+
+[PanningColumnSet.column_html]
+<td>{column}</td>

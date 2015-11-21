@@ -1,0 +1,11 @@
+# Qpid Improvement Proposals
+
+A Qpid Improvement Proposal (QIP) is a document that describes an
+important change to the way Qpid works.
+
+ - A [QIP Template](qip-template.html) with an explanation of each field
+ - [Notes](notes.html) to answer questions and offer suggestions
+
+## Draft QIPs
+
+@draft_qips@

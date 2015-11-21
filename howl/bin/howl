@@ -1,0 +1,12 @@
+#!/bin/bash -eu
+
+test "$HOWL_HOME"
+test -f $HOWL_HOME/data/howl.mapping
+
+if [[ $1 = "--update" ]]; then
+    (cd $HOWL_HOME; make update)
+fi
+
+for arg in $@; do
+    awk "/^${arg} / {print \$2}" < $HOWL_HOME/data/howl.mapping
+done

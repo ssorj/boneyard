@@ -1,0 +1,163 @@
+[ServerBrowser.css]
+.ServerBrowser.groups {
+  float: left;
+  width: 20%;
+}
+
+.ServerBrowser.groups ul {
+  margin: 0 0 1em 0;
+}
+
+.ServerBrowser.groups ul.groups a:before {
+  content: url(resource?name=radio-button.png);
+  vertical-align: -10%;
+  margin: 0 0.5em 0 0;
+}
+
+.ServerBrowser.groups ul.groups a.selected:before {
+  content: url(resource?name=radio-button-checked.png);
+}
+
+.ServerBrowser.groups h2 {
+  color: #564979;
+  font-size: 0.9em;
+  border-bottom: 1px dotted #ddd;
+  width: 80%;
+  margin: 0 0 0.5em 0;
+}
+
+.ServerBrowser.servers {
+  width: 80%;
+}
+
+[ServerBrowser.html]
+<div class="ServerBrowser groups">
+  <ul class="groups"><li>{all_servers_link}</li></ul>
+
+  {groups}
+
+  <ul class="actions">
+    <li><a href="{add_group_href}">Add Group</a></li>
+    <li><a href="{edit_group_href}">Edit Group</a></li>
+    <li><a href="{remove_group_href}">Remove Group</a></li>
+  </ul>
+</div>
+<div class="ServerBrowser servers">
+  <ul class="actions">
+    <li><a href="">Register New Servers</a></li>
+  </ul>
+
+  {servers}
+</div>
+
+[BrowserGroups.html]
+{types}
+
+[BrowserGroups.type_html]
+<h2>{type_name}</h2>
+<ul class="groups">{groups}</ul>
+
+[BrowserGroups.group_html]
+<li>{group_link}</li>
+
+[ClusterBrowser.html]
+<table class="browser">
+  <tr>
+    <td class="nav">
+      <ul class="slist">{items}</ul>
+
+      <ul class="actions">
+        <li><a href="{add_cluster_href}">Add Cluster</a></li>
+        <li><a href="{edit_cluster_href}">Edit Cluster</a></li>
+        <li><a href="{remove_cluster_href}">Remove Cluster</a></li>
+      </ul>
+    </td>
+    <td class="view">
+      {view}
+    </td>
+  </tr>
+</div>
+
+[ClusterBrowser.item_html]
+<li>{item_link}</li>
+
+[BrokerConfigTab.css]
+.BrokerConfigTab.diff {
+  background-color: #ff9;
+}
+
+[BrokerSetGroupInput.html]
+<select name="{name}" tabindex="{tab_index}" {disabled_attr} onchange="getElementById('{submit_id}').click()">
+  <option value="">Choose Group...</option>
+  {items}
+</select>
+
+[BrokerConfigTab.html]
+<ul class="actions">
+  <li><a class="nav" href="{href}">Add Property</a></li>
+  <li><a href="{href}">Apply Configuration to Broker</a></li>
+</ul>
+
+<table class="mobjects">
+  <tr>
+    <th>Name</th>
+    <th>Configured Value</th>
+    <th>Broker Value</th>
+    <th>Profile Value</th>
+    <th></th>
+  </tr>
+
+  {items}
+</table>
+
+[BrokerConfigTab.item_html]
+<tr>
+  <td>{item_name}</td>
+  <td>{item_value}</td>
+  <td>{item_broker_value}</td>
+  <td>{item_profile_value}</td>
+  <td><a class="action" href="{item_edit_href}">Edit</a></td>
+</tr>
+
+[BrokerConfigPropertyForm.css]
+.BrokerConfigPropertyForm div.value {
+  margin: 1em 2em;
+}
+
+[BrokerConfigPropertyForm.html]
+<form id="{id}" class="BrokerConfigPropertyForm mform" method="post" action="?">
+  <div class="head">
+    <h1>{title}</h1>
+  </div>
+  <div class="body">
+    <span class="legend">Value</span>
+    <fieldset>
+      <div class="field">
+        {profile} Use the value from the broker profile
+        <div class="value">{profile_value}</div>
+      </div>
+      <div class="field">
+        {broker} Use the value currently set on the broker
+        <div class="value">{broker_value}</div>
+      </div>
+      <div class="field">
+        {local} Set a new value
+        <div class="value">{local_value}</div>
+      </div>
+    </fieldset>
+
+    {hidden_inputs}
+  </div>
+  <div class="foot">
+    <div style="float: left;"><button>Help</button></div>
+    {submit}
+    {cancel}
+  </div>
+</form>
+<script defer="defer">
+(function() {
+    var elem = wooly.doc().elembyid("{id}").node.elements[1];
+    elem.focus();
+    elem.select();
+}())
+</script>

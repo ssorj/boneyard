@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+opts="--debug --init-only"
+
+cumin-command-test <<EOF
+cumin-web $opts --help
+cumin-web $opts --host example.com
+cumin-web $opts --port 27654
+EOF

@@ -1,0 +1,83 @@
+From dev-return-30195-apmail-qpid-dev-archive=qpid.apache.org@qpid.apache.org  Wed Aug 24 18:39:03 2011
+Return-Path: <dev-return-30195-apmail-qpid-dev-archive=qpid.apache.org@qpid.apache.org>
+X-Original-To: apmail-qpid-dev-archive@www.apache.org
+Delivered-To: apmail-qpid-dev-archive@www.apache.org
+Received: from mail.apache.org (hermes.apache.org [140.211.11.3])
+          by minotaur.apache.org (Postfix) with SMTP id B07278083
+          for <apmail-qpid-dev-archive@www.apache.org>; Wed, 24 Aug 2011 18:39:03 +0000 (UTC)
+Received: (qmail 63548 invoked by uid 500); 24 Aug 2011 18:39:03 -0000
+Delivered-To: apmail-qpid-dev-archive@qpid.apache.org
+Received: (qmail 63469 invoked by uid 500); 24 Aug 2011 18:39:02 -0000
+Mailing-List: contact dev-help@qpid.apache.org; run by ezmlm
+Precedence: bulk
+List-Help: <mailto:dev-help@qpid.apache.org>
+List-Unsubscribe: <mailto:dev-unsubscribe@qpid.apache.org>
+List-Post: <mailto:dev@qpid.apache.org>
+List-Id: <dev.qpid.apache.org>
+Reply-To: dev@qpid.apache.org
+Delivered-To: mailing list dev@qpid.apache.org
+Delivered-To: moderator for dev@qpid.apache.org
+Received: (qmail 76361 invoked by uid 99); 24 Aug 2011 17:51:53 -0000
+MIME-Version: 1.0
+Date: Wed, 24 Aug 2011 13:51:52 -0400
+Message-ID: <CANVjZ_TBudXYj=x2hvvCkcnZuov+8mnQwvbsr4Zga_ZohgfdZA@mail.gmail.com>
+Subject: [ANNOUNCE] Qpid 0.12 released
+From: Justin Ross <jross@apache.org>
+To: announce@apache.org, dev@qpid.apache.org, users@qpid.apache.org
+Content-Type: text/plain; charset=ISO-8859-1
+
+The Apache Qpid community is pleased to announce the immediate
+availability of Apache Qpid 0.12.
+
+Apache Qpid (http://qpid.apache.org) is a cross-platform enterprise
+messaging solution which implements the Advanced Message Queuing
+Protocol (AMQP, http://www.amqp.org).  It provides brokers written in
+C++ and Java, along with clients for C++, Java JMS, .Net, and Python.
+
+Qpid 0.12 is available from our website:
+
+  http://qpid.apache.org/download.cgi
+
+The 0.12 release includes many bug fixes and improvements.  We
+recommend that all users upgrade.  A comprehensive list of changes in
+the 0.12 release is available here:
+
+  http://qpid.apache.org/release_notes_0.12.html
+
+Thanks to all the users and contributors who have helped to improve
+Apache Qpid.
+
+---------------------------------------------------------------------
+Apache Qpid - AMQP Messaging Implementation
+Project:      http://qpid.apache.org
+Use/Interact: mailto:dev-subscribe@qpid.apache.org
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+The Apache Qpid community is pleased to announce the immediate
+availability of Apache Qpid 0.14.
+
+Apache Qpid (http://qpid.apache.org) is a cross-platform enterprise
+messaging solution which implements the Advanced Message Queuing
+Protocol (AMQP, http://www.amqp.org).  It provides brokers written in
+C++ and Java, along with clients for C++, Java JMS, .Net, Python, and
+Ruby.
+
+Qpid 0.14 is available from our website:
+
+    http://qpid.apache.org/download.cgi
+
+The 0.14 release includes many bug fixes and improvements.  We
+recommend that all users upgrade.  A comprehensive list of changes in
+the 0.14 release is available here:
+
+    http://qpid.apache.org/release_notes_0.14.html
+
+Thanks to all the users and contributors who have helped to improve
+Apache Qpid.
+
+---------------------------------------------------------------------
+Apache Qpid - AMQP Messaging Implementation
+Project:      http://qpid.apache.org
+Use/Interact: mailto:dev-subscribe@qpid.apache.org
+

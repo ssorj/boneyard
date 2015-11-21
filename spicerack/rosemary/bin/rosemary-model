@@ -1,0 +1,95 @@
+#!/usr/bin/python
+
+from rosemary.model import *
+from rosemary.sqloperation import *
+
+def do_model(args):
+    for pkg in model._packages:
+        print "package %s" % pkg._name
+
+        for cls in pkg._classes:
+            print "  class %s \"%s\"" % (cls._name, cls._title)
+
+            for hdr in cls._headers:
+                print "    hdr %s \"%s\"" % (hdr.name, hdr.title)
+
+            for ref in cls._references:
+                print "    ref %s \"%s\"" % (ref.name, ref.title)
+
+            for prop in cls._properties:
+                print "    prop %s \"%s\"" % (prop.name, prop.title)
+
+            for stat in cls._statistics:
+                print "    stat %s \"%s\"" % (stat.name, stat.title)
+                
+            for meth in cls._methods:
+                print "    meth %s" % meth.name
+
+                for arg in meth.arguments:
+                    print "      arg %s" % arg.name
+
+            for idx in cls._indexes:
+                print "    idx %s" % idx.name
+
+def do_ddl(args):
+    model.sql_model.write_drop_ddl(sys.stdout)
+    model.sql_model.write_create_ddl(sys.stdout)
+
+def do_dml(args):
+    for schema in model.sql_model._schemas:
+       for table in schema._tables:
+           select = SqlSelectItem(table)
+           insert = SqlInsertItem(table)
+           update = SqlUpdateItem(table)
+           delete = SqlDeleteItem(table)
+
+           print "---", table._name, "---"
+           print
+           print insert.emit(table._columns)
+           print
+           print select.emit(table._columns)
+           print
+           print update.emit(table._columns)
+           print
+           print delete.emit(table._columns)
+           print
+
+def do_query(args):
+    schema = model.sql_model.schemas_by_name["org.apache.qpid.broker"]
+    table = schema.tables_by_name["Queue"]
+    stats_table = schema.tables_by_name["QueueStats"]
+    vhost_table = schema.tables_by_name["Vhost"]
+    broker_table = schema.tables_by_name["Broker"]
+
+    query = SqlQuery(table)
+
+    stats_col = stats_table.columns_by_name["_parent_id"]
+
+    SqlOuterJoin(query, table.key_column, stats_col)
+    SqlInnerJoin(query, table.key_column, vhost_table.key_column)
+
+    broker_col = vhost_table.columns_by_name["_brokerRef_id"]
+
+    SqlInnerJoin(query, broker_col, broker_table.key_column)
+
+    cols = table.columns + vhost_table.columns + broker_table.columns + \
+        stats_table.columns
+
+    print query.emit(cols)
+
+if __name__ == "__main__":
+    model = RosemaryModel()
+
+    if len(sys.argv) == 1:
+        print "rosemary-model (model | ddl | dml) [model dir under $ROSEMARY_HOME]"
+        sys.exit(1)
+
+    if len(sys.argv) > 2:
+        mdir = sys.argv[2]        
+    else:
+        mdir = "model"
+
+    model.load_model_dir(os.path.join(os.environ["ROSEMARY_HOME"], mdir))
+    model.init()
+
+    globals()["do_%s" % sys.argv[1]](sys.argv[3:])

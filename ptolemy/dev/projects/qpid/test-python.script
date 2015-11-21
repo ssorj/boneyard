@@ -1,0 +1,12 @@
+#!/bin/bash -eu
+
+source "${PTOLEMY_PROJECT}/project.bash"
+
+script-init
+
+start-broker
+trap stop-broker EXIT
+
+cd "${QPID_BUILD}/python"
+
+./qpid-python-test -b "localhost:${TEST_BROKER_PORT}"

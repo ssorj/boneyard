@@ -1,0 +1,14 @@
+#!/bin/bash -e
+
+id="test_${RANDOM}"
+opts="--debug"
+
+cumin-command-test <<EOF
+cumin-admin $opts --help
+cumin-admin $opts add-user "$id" changeme
+cumin-admin $opts add-assignment "$id" admin
+cumin-admin $opts list-users
+cumin-admin $opts list-roles
+cumin-admin $opts remove-assignment "$id" admin
+cumin-admin $opts remove-user "$id"
+EOF

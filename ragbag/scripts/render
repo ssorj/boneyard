@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+#   http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+from __future__ import print_function
+
+import re
+import sys
+
+from ragbag.script import *
+
+def main():
+    input_dir, output_dir = sys.argv[1:]
+
+    language_names = set()
+    api_names = set()
+    cases = dict()
+
+    for language_name in list_dir(input_dir):
+        language_names.add(language_name)
+
+        for name in list_dir(join(input_dir, language_name)):
+            api_name = file_stem(name)
+            api_names.add(api_name)
+
+            file = join(input_dir, language_name, name)
+
+            with open(file) as f:
+                for case_name, value in parse_cases(f).items():
+                    key = language_name, api_name, case_name
+                    cases[key] = value
+
+    out = list()
+
+    for language_name in language_names:
+        out.append("<h2>{}</h2>".format(language_name))
+
+        out.append("<table>")
+
+        out.append("</table>")
+
+    make_dir(output_dir)
+
+    output_file = join(output_dir, "index.html")
+
+    with open(output_file, "w") as f:
+        f.write("".join(out))
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

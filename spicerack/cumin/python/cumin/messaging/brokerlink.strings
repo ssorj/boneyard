@@ -1,0 +1,77 @@
+[LinkSet.sql]
+select
+  l.id,
+  l.host,
+  l.port,
+  l.durable,
+  c.state,
+  c.last_error
+from link as l
+join vhost as v on v.id = l.vhost_id
+left outer join link_stats as c on c.id = l.stats_curr_id
+left outer join link_stats as p on p.id = l.stats_prev_id
+{sql_where}
+{sql_orderby}
+{sql_limit}
+
+[LinkSet.count_sql]
+select count(*)
+from link as l
+join vhost as v on v.id = l.vhost_id
+{sql_where}
+
+[RouteSet.sql]
+select
+  b.id,
+  b.src,
+  b.dest as exchange,
+  b.key,
+  b.tag,
+  b.excludes,
+  l.host,
+  l.port
+from bridge as b
+join link as l on l.id = b.link_id
+left outer join bridge_stats as c on c.id = b.stats_curr_id
+left outer join bridge_stats as p on p.id = b.stats_prev_id
+{sql_where}
+{sql_orderby}
+{sql_limit}
+
+[RouteSet.count_sql]
+select count(*)
+from bridge as b
+join link as l on l.id = b.link_id
+{sql_where}
+
+[ExchangeRadioField.html]
+<div class="{form_field_class}">
+  <div class="rfloat">{phase}</div>
+  <div class="title">{title}</div> <div class="field_help">{field_help}</div><div class="clear_left"></div>
+  {errors}
+  <div class="inputs">{inputs}</div><div style="clear:left;"><!-- --></div>
+</div>
+
+[BridgeAddHelpField.css]
+div#bridge_add_help span.tag1 {
+        color:red;
+}
+div#bridge_add_help span.tag2 {
+        color:green;
+}
+div#bridge_add_help p.example {
+        font-size: 0.9em;
+        color: #444444;
+}
+
+[BridgeAddHelpField.html]
+<div id="bridge_add_help">
+  <p>The <strong>Tag</strong> and <strong>Excludes</strong> are used to prevent a message from routing back
+    to the source broker and causing an infinite loop.</p>
+  <p>Enter a short <strong>tag</strong> that will be associated with the source exchange.
+    Then <strong>exclude</strong> any tags that were used for the destination exchanges.</p>
+  <p class="example">
+    <em>broker1</em> &lt;==&gt; <em>broker2</em> tag: <span class="tag2">tag2</span> excludes: <span class="tag1">tag1</span><br/>
+    <em>broker2</em> &lt;==&gt; <em>broker1</em> tag: <span class="tag1">tag1</span> excludes: <span class="tag2">tag2</span>
+  </p>
+</div>

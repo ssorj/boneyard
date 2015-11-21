@@ -1,0 +1,48 @@
+#!/bin/bash
+
+function run {
+    su - postgres -c "echo $1 | psql -d cumin"
+}
+
+run 'create schema \"com.redhat.grid.plumage\"'
+run 'create sequence \"com.redhat.grid.plumage\".\"OSUtil_id_seq\"'
+run 'create table \"com.redhat.grid.plumage\".\"OSUtil\" \(\"_id\" int8 not null,\"host\" text not null,\"ts\" timestamp not null,\"total\" int8 not null,\"used\" int8 not null,\"unused\" int8 not null,\"owner\" int8 not null,\"efficiency\" float4 not null,constraint \"OSUtil_pk\" primary key \(\"_id\"\)\)'
+run 'create table \"com.redhat.grid.plumage\".\"OSUtil_samples\" \(\"ts\" timestamp not null,\"total\" int8 not null,\"used\" int8 not null,\"unused\" int8 not null,\"owner\" int8 not null,\"efficiency\" float4 not null\)'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil\" ADD COLUMN freemem int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil\" ADD COLUMN usedmem int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil\" ADD COLUMN availmem int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil\" ADD COLUMN totalmem int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil\" ADD COLUMN freecpu int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil\" ADD COLUMN usedcpu int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil\" ADD COLUMN availcpu int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil\" ADD COLUMN totalcpu int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil_samples\" ADD COLUMN freemem int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil_samples\" ADD COLUMN usedmem int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil_samples\" ADD COLUMN availmem int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil_samples\" ADD COLUMN totalmem int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil_samples\" ADD COLUMN freecpu int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil_samples\" ADD COLUMN usedcpu int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil_samples\" ADD COLUMN availcpu int8 NOT NULL DEFAULT 0'
+run 'ALTER TABLE \"com.redhat.grid.plumage\".\"OSUtil_samples\" ADD COLUMN totalcpu int8 NOT NULL DEFAULT 0'
+run 'DROP TABLE \"com.redhat.cumin\".\"BrokerGroup\" cascade'
+run 'DROP TABLE \"com.redhat.cumin\".\"BrokerGroup_samples\" cascade'
+run 'DROP TABLE \"com.redhat.cumin\".\"BrokerGroupMapping\" cascade'
+run 'DROP TABLE \"com.redhat.cumin\".\"BrokerGroupMapping_samples\" cascade'
+run 'DROP SEQUENCE \"com.redhat.cumin\".\"BrokerGroup_id_seq\"'
+run 'DROP SEQUENCE \"com.redhat.cumin\".\"BrokerGroupMapping_id_seq\"'
+run 'create schema \"com.redhat.cumin.messaging\"'
+run 'create sequence \"com.redhat.cumin.messaging\".\"BrokerGroup_id_seq\"'
+run 'create sequence \"com.redhat.cumin.messaging\".\"BrokerGroupMapping_id_seq\"'
+
+run 'create table \"com.redhat.cumin.messaging\".\"BrokerGroup\" \(\"_id\" int8 not null,\"_qmf_agent_id\" text not null,\"_qmf_object_id\" text not null,\"_qmf_create_time\" timestamp not null,\"_qmf_update_time\" timestamp not null,\"_qmf_delete_time\" timestamp,\"name\" text not null,\"description\" text,constraint \"BrokerGroup_pk\" primary key \(\"_id\"\),constraint \"BrokerGroup_qmf_id_uq\" unique \(\"_qmf_agent_id\", \"_qmf_object_id\"\)\)'
+
+run 'create table \"com.redhat.cumin.messaging\".\"BrokerGroup_samples\" \(\"_qmf_agent_id\" text not null,\"_qmf_object_id\" text not null,\"_qmf_update_time\" timestamp not null\)'
+
+run 'create table \"com.redhat.cumin.messaging\".\"BrokerGroupMapping\" \(\"_id\" int8 not null,\"_qmf_agent_id\" text not null,\"_qmf_object_id\" text not null,\"_qmf_create_time\" timestamp not null,\"_qmf_update_time\" timestamp not null,\"_qmf_delete_time\" timestamp,\"_broker_id\" int8,\"_group_id\" int8,constraint \"BrokerGroupMapping_pk\" primary key \(\"_id\"\),constraint \"BrokerGroupMapping_qmf_id_uq\" unique \(\"_qmf_agent_id\", \"_qmf_object_id\"\)\)'
+
+run 'create table \"com.redhat.cumin.messaging\".\"BrokerGroupMapping_samples\" \(\"_qmf_agent_id\" text not null,\"_qmf_object_id\" text not null,\"_qmf_update_time\" timestamp not null\)'
+
+run 'create index \"BrokerGroup_samples_qmf_id_idx\" on \"com.redhat.cumin.messaging\".\"BrokerGroup_samples\" \(\"_qmf_agent_id\", \"_qmf_object_id\"\)'
+run 'create index \"BrokerGroupMapping_samples_qmf_id_idx\" on \"com.redhat.cumin.messaging\".\"BrokerGroupMapping_samples\" \(\"_qmf_agent_id\", \"_qmf_object_id\"\)'
+
+run 'alter table \"com.redhat.cumin.messaging\".\"BrokerGroupMapping\" add constraint \"_broker_id_fk\" foreign key \(\"_broker_id\"\) references \"org.apache.qpid.broker\".\"Broker\" \(\"_id\"\) on update cascade on delete set null, add constraint \"_group_id_fk\" foreign key \(\"_group_id\"\) references \"com.redhat.cumin.messaging\".\"BrokerGroup\" \(\"_id\"\) on update cascade on delete set null'

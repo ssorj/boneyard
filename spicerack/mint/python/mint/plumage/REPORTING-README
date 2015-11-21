@@ -1,0 +1,43 @@
+Technology Preview feature CuminReporting
+
+Description:
+
+This feature allows Cumin to use data from the condor-plumage (ODS) database to generate long-duration visualizations of grid system behavior.
+In order for cumin-report to be able to access the condor-plumage ODS, the Grid installation must include the condor-plumage package and it must be turned on.  
+
+The only configuration necessary to enable CuminReporting is in /etc/cumin/cumin.conf
+Find the section that looks like the commented lines below and uncomment the  "# reports: report" line
+# Reporting is off by default.
+# To enable reporting features, uncomment the following line.
+# reports: report 
+
+Also, by default, cumin will expire data samples in the database after 1 day.  In order to allow the reporting feature to store data for a longer period of time, the following can be added to the [report] section of cumin.conf.
+expire-threshold: 1y  #for 1 year of data retention, 30d would give 30 days, and so on. 
+
+cumin-report pulls data from the ODS (mongoDB) in the background.  A full data load can be millions and millions of records and could take a considerable amount of time.
+Any data that has been loaded will immediately show up in the charts in the cumin UI.  There are threads that maintain an archive load (starting with current records and moving back in time) and another thread that loads current records every 5 min.
+
+Note:  If you want to quickly purge all of the reporting data, you can run the following command:
+cumin-report --delete-on-start --init-only
+
+Dependencies:
+
+The CuminReporting feature has a dependency on 
+RHEL 6 or newer.
+pymongo version 1.9-8 or newer.  To install you can run the following:  # yum install pymongo
+
+Feedback: 
+
+Bug reports or requests for enhancement can be made through http://bugzilla.redhat.com.  General questions about this feature can be handled through the email list 
+cumin-users@lists.fedorahosted.org
+
+Full support:
+
+This feature is intended to be fully supported in an upcoming minor release.
+Where to find this information:  
+Content similar to this Release Note may be found in the file /usr/share/doc/cumin-*/REPORTING-README after the software is installed.  However, the Release Note should be considered more up to date and where there are any discrepancies the Release Note supersedes the readme file.
+
+Technology Preview Policy:
+Technology Preview features are not currently supported under Red Hat Enterprise Linux subscription services, may not be functionally complete, and are generally not suitable for production use. However, these features are included as a customer convenience and to provide the technologies with wider exposure.
+Customers may find these features useful in non-production environments, and can provide feedback and functionality suggestions prior to their transition to fully supported status. Erratas will be provided for high-priority security issues.
+During its development additional components of a Technology Preview feature may become available to the public for testing. It is the intention of Red Hat to fully support Technology Preview features in a future release.

@@ -1,0 +1,40 @@
+Widget
+ - A display object
+ - Usually bound to a Template
+ - May have state represented in Parameters
+ - Lives in a tree of widgets
+ - Has a process method
+   - Manipulates state, both ui state and model state
+   - Called in the process phase, before rendering
+ - Has a render method
+   - Produces HTML
+   - Called after all processing is done
+
+Template
+ - A string with placeholders such as {foo}
+ - A placeholder {foo} resolves to: widget.render_foo(...)
+ - Or it resolves to: widget.get_child("foo").render(...)
+
+Application
+ - The static state of the app
+ - Holds Pages
+
+Page
+ - A top-level widget with some extra methods for producing HTTP
+   responses
+ - The root widget of all widget trees is a page
+
+Parameter
+ - Represents state for the life of the request/response
+ - Attached to a widget
+ - Stores its session-level state on a Session
+ - Marshals and unmarshals itself to url params
+
+Session
+ - The main source of state
+ - Can be "branched" for producing "future states", URLs
+
+ModeSet
+ - A widget that shows only one of its children
+ - Used for producing various UI behaviors, tabs for instance
+ - Generally useful for controlling visibility

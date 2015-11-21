@@ -1,0 +1,61 @@
+#!/bin/bash -eu
+
+source "${PTOLEMY_PROJECT}/project.bash"
+
+script-init
+
+initial_checkout=0
+
+if [[ ! -d "$STORE_BRANCH" ]]; then
+    $SVN checkout "$STORE_BRANCH_URL" "$STORE_BRANCH"
+    initial_checkout=1
+fi
+
+last_store_rev=$(svn-revision "$STORE_BRANCH")
+
+svn-clean "$STORE_BRANCH"
+$SVN update "$STORE_BRANCH"
+
+store_rev=$(svn-revision "$STORE_BRANCH")
+
+$SVN log --revision "${last_store_rev}:${store_rev}" "$STORE_BRANCH" >> ptolemy/changes
+
+if [[ "${PTOLEMY_BRANCH_URL%%:*}" == git ]]; then
+    if [[ ! -d "$QPID_BRANCH" ]]; then
+        git-checkout "$QPID_BRANCH_URL" "$QPID_BRANCH"
+        initial_checkout=1
+    fi
+
+    last_qpid_rev=$(git-revision "$QPID_BRANCH")
+
+    git-clean "$QPID_BRANCH"
+    (cd "$QPID_BRANCH" && $GIT pull)
+
+    qpid_rev=$(git-revision "$QPID_BRANCH")
+
+    (cd "$QPID_BRANCH" && $GIT log "${last_qpid_rev}..${qpid_rev}") >> ptolemy/changes
+else
+    if [[ ! -d "$QPID_BRANCH" ]]; then
+        $SVN checkout "$QPID_BRANCH_URL" "$QPID_BRANCH"
+        initial_checkout=1
+    fi
+
+    last_qpid_rev=$(svn-revision "$QPID_BRANCH")
+
+    svn-clean "$QPID_BRANCH"
+    $SVN update "$QPID_BRANCH"
+
+    qpid_rev=$(svn-revision "$QPID_BRANCH")
+
+    $SVN log --revision "${last_qpid_rev}:${qpid_rev}" "$QPID_BRANCH" >> ptolemy/changes
+fi
+
+last_rev="${last_qpid_rev}-${last_store_rev}"
+rev="${qpid_rev}-${store_rev}"
+
+echo "$rev" > ptolemy/revision
+
+if [[ "$last_rev" == "$rev" && "$initial_checkout" == 0 ]]; then
+    echo "unchanged" > ptolemy/status
+    exit
+fi

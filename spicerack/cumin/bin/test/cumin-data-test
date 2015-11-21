@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+opts="--debug --init-only"
+
+cumin-command-test <<EOF
+cumin-data $opts --help
+cumin-data $opts
+EOF

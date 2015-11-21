@@ -1,0 +1,213 @@
+[JobAdsViewer.html]
+<div id="{id}">
+{edit_button}
+<table class="CuminDetails">
+  <tbody>
+    <tr>
+      <td>
+        {groups}
+      </td>
+    </tr>
+  </tbody>
+</table>
+{edit_button}
+</div>
+
+[JobAdsViewer.deferred_html]
+<div id="{id}">
+    {wait}
+</div>
+
+[JobAdsEditButton.html]
+<ul class="actions">
+  <li><a class="nav" href="{edit_ads_url}">Edit attributes</a></li>
+</ul>
+
+[JobAdsGroups.css]
+div.ads_error {
+    margin: 1em;
+    padding: 1em;
+    background-color: #FFEEEE;
+    border: 1px solid red;
+    color: #660000;
+}
+    
+[JobAdsGroups.html]
+<div id="{id}" style="position:relative;">
+    {groups}
+</div>
+
+[JobAdsGroups.group_html]
+<div class="sactions">
+    <h2>{group_name}</h2>
+</div>
+<table class="PropertySet">
+  <thead>
+    <tr>
+      <th style="width: 33%;">Name</th>
+      <th style="width: 33%;">Value</th>
+      <th style="width: 33%;">&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+  {properties}
+  </tbody>
+</table>
+
+[JobAdsGroups.error_html]
+<div class="NotificationSet">
+    <ul>
+        <li>{error_msg}</li>
+    </ul>
+</div>
+
+[JobAdsViewer.property_html]
+<tr>
+  <th>{title}</th><td>{value}</td><td>{inline_help}</td>
+</tr>
+
+[JobAdsEditor.css]
+div.inline_help {
+        float: right;
+}
+
+div.inline_help h2 {
+        display: inline;
+}
+
+[JobAdsEditor.css]
+table.Editable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+[JobAdsEditor.html]
+<form id="{id}" class="mform editform" method="post" action="?">
+  <div style="float:left;">{submit} {cancel}</div><div style="clear:both;"></div>
+  <table class="CuminDetails Editable">
+    <tbody>
+      <tr>
+        <td>
+          {groups}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="float:left;">{submit} {cancel}</div><div style="clear:both;"></div>
+  <div>{hidden_inputs}</div>
+</form>
+
+[JobOutput.css]
+textarea.job_output {
+    height: 25em;
+    width: 100%;
+    border: 1px solid #EAEAEA;
+    font-family: Fixed, monospace;
+    line-height: 1.15em;
+    background-color: #FFF;
+    color: #333;
+}
+
+div.out_actions {
+    padding:1em 1em 0 1em;
+}
+
+div.refresh_info h2 {
+    position: relative;
+    top: -0.5em;
+}
+
+[JobOutput.javascript]
+function scrollToEnd (element) {
+    if (typeof element.scrollTop != 'undefined'
+        && typeof element.scrollHeight != 'undefined') {
+        element.scrollTop = element.scrollHeight;
+    }
+}
+
+function outputEnd(id) {
+    var tarea = $(id).getElement("textarea");
+
+    if (tarea) {
+        scrollToEnd(tarea);
+    }
+}
+
+[JobOutput.html]
+<form id="{id}" style="width:100%; border:0px;" class="mform" method="post" action="?">
+  <div class="out_actions">
+    <div class="rfloat">{first_last}</div>
+    {file}
+  </div>
+
+  <div class="sactions refresh_info">{refresh} <h2>Last refresh was at {out_time}</h2></div>
+
+  <div>
+    {job_output}
+    {hidden_inputs}
+  </div>
+</form>
+<script type="text/javascript">
+//<![CDATA[
+(function() {
+    var scrolled = false;
+    if ({is_tail}) {
+        wooly.addPageUpdateListener( function () {
+            if (!scrolled) {
+                outputEnd('{id}');
+                scrolled = true;
+            }
+        } );
+    }
+}())
+//]]>
+</script>
+
+[OutputFile.html]
+<textarea id="{id}" name="job_output" class="job_output" rows="20" cols="80">{content}</textarea>
+
+[OutputFile.deferred_html]
+<textarea id="{id}" name="job_output" class="job_output" rows="20" cols="80">{loading}</textarea>
+
+[JobSelectorTable.error_html]
+<div id="{id}">
+    <div class="NotificationSet">
+        <ul>
+            <li>{error_msg}</li>
+        </ul>
+    </div>
+</div>
+
+[FastViewJobAdsViewer.html]
+<div id="{id}">
+<table style='width:100%' class="CuminDetails">
+  <tbody>
+    <tr>
+      <td>
+        <table class="PropertySet FastViewPropertySet">
+          <thead>
+    		<tr>
+      		  <th style="width: 33%;">Name</th>
+      		  <th style="width: 33%;">Value</th>
+      		  <th style="width: 33%;">&nbsp;</th>
+    		</tr>
+  		  </thead>
+  		  <tbody id="properties">
+  			 {all_ordered_properties}
+  		  </tbody>
+		</table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+[FastViewJobAdsViewer.deferred_html]
+<div id="{id}">
+    {wait}
+</div>
+
+[FastViewJobAdsViewer.property_html]
+<tr id='{id}'>
+  <th style="width:33%;">{title}</th><td style="width:33%;">{value}</td><td style="width:33%;">{inline_help}</td> 
+</tr>

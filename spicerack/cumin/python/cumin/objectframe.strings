@@ -1,0 +1,221 @@
+[ObjectAttributes.css]
+div.ObjectAttributes tbody th {
+    width: 40%;
+    font-weight: normal;
+    color: #666;
+}
+
+div.ObjectAttributes tbody td {
+    width: 60%;
+}
+
+div.ObjectAttributes th, div.ObjectAttributes td {
+    text-align: left;
+    vertical-align: top;
+}
+
+[ObjectAttributes.html]
+<div id="{id}" class="{class}">
+  <h2>{title}</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>{attributes}</tbody>
+  </table>
+</div>
+
+[ObjectAttributesEntry.html]
+<tr><th title="{html_title}">{name}</th><td>{value}</td></tr>
+
+[ObjectTasks.css]
+table.ObjectTasks {
+    float:right;
+}
+table.ObjectTasks td {
+    vertical-align: top;
+}
+
+[ObjectTasks.html]
+<ul class="{class}">
+  {links}
+</ul>
+
+[ObjectTasks.table_html]
+<table class="{class}">
+    <tbody>
+    <tr><td><ul class="{class}">{links1}</ul></td>
+        <td><ul class="{class}">{links2}</ul></td>
+    </tr>
+    </tbody>
+</table>
+
+[ObjectTasksLink.html]
+<li><a class="{class}" href="{href}">{content}</a></li>
+
+[ObjectTasksLink.css]
+a.ObjectTaskLink {
+    font-size: 0.9em;
+}
+
+a.ObjectTasksLink:before {
+    content: "\00BB \0020";
+    font-weight: bold;
+    color: #dc9f2e;
+}
+
+[SummaryTasks.css]
+ul.SummaryTasks {
+    width: 15em;
+    list-style: none;
+    margin: 0.5em 0 0 0;
+}
+
+[ObjectView.css]
+div.ObjectViewChild {
+    margin: 0 0 0.5em 0;
+}
+
+div.ObjectViewContext {
+    color: #666;
+    font-size: 0.9em;
+}
+
+div.ObjectViewContext a.selected {
+    color: #666;
+}
+
+div.ObjectViewHeading h1 {
+    margin: 0;
+    display: inline;
+}
+
+div.ObjectViewHeading img {
+    vertical-align: -70%;
+    margin: 0 0.25em 0 0;
+}
+
+div.ObjectViewSummary {
+    /* border-top: 1px dotted #ccc; */
+    /* padding: 0.5em 0 0 0; */
+    width: 40em;    
+    font-size: 0.9em;
+}
+div.ObjectViewSummary.wide {
+    width: 55em;
+}
+
+div.ObjectViewHeader {
+    margin-bottom: 1em;
+}
+
+[ObjectView.html]
+<div id="{id}" class="{class}">
+    <div class="ObjectViewHeader">
+        {context}
+        {heading}
+        {summary}
+    </div>
+{body}
+</div>
+
+[ObjectViewHeading.html]
+<div class="{class}">
+  <img src="{icon_href}" alt="icon"/>
+  <h1>{title}</h1>
+</div>
+
+[ObjectViewSummary.html]
+<div class="{class} {wide}">
+  {tasks}
+  <a href="{auxlink}">{auxtitle}</a>
+</div>
+
+[ObjectViewContext.html]
+<div class="{class}">{links}</div>
+
+[DetailsAttributes.css]
+div.DetailsAttributes h2 {
+    margin: 0 0 1em 0;
+    font-size: 0.9em;
+}
+
+div.DetailsAttributes table {
+    width: 100%;
+    margin: 0 0 1em 0;
+    border-collapse: collapse;
+    font-size: 0.9em;
+}
+
+div.DetailsAttributes th, div.DetailsAttributes td {
+    padding: 0.35em 0.5em 0.35em 0;
+    text-align: left;
+    vertical-align: top;
+}
+
+div.DetailsAttributes thead th {
+    font-weight: normal;
+    font-style: italic;
+    color: #666;
+}
+
+div.DetailsAttributes tbody tr {
+    border-top: 1px dotted #ccc;
+}
+
+[ObjectDetails.html]
+{headers}
+
+{refs}
+
+{props}
+
+{stats}
+
+[SubmitFeedbackButton.css]
+div.FeedBackGlass {
+    visibility: visible;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 200;
+    cursor: wait;
+    top: 0;
+    margin: auto;
+}
+
+div.FeedBackPopup {
+    visibility: visible;
+    position: relative;
+    width: 9em;
+    z-index: 201;
+    cursor: wait;
+    top: 15em;
+    margin: auto;
+    padding: 2em 1em;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    background-color: #FFFFFF;
+    border: 2px solid black;
+}
+
+[SubmitFeedbackButton.javascript]
+function feedback_click_button(name, value) {
+    var mbody = $(document.body);
+    var glass = new Element('div');
+    glass.addClass("FeedBackGlass");
+
+    var popup = new Element('div');
+    popup.addClass("FeedBackPopup");
+    popup.set('text', "Sending request.");
+    popup.inject(glass, "top");
+
+    $(document.forms[0]).setStyle('opacity', 0.9) 
+    glass.inject(mbody, "top");
+
+    return click_button(name, value);
+}

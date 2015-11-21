@@ -1,0 +1,30 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid-java.bash
+
+script-init
+
+(cd "${SOURCE_PATH}/gentools" && ant)
+
+cd "${SOURCE_PATH}/java"
+
+# Double build to work around java 1.5 problem
+ant || ant
+
+# bin
+install -d "${INSTALL_PATH}/bin"
+install -pm 755 build/bin/qpid* "${INSTALL_PATH}/bin"
+
+# jars
+install -d "${INSTALL_PATH}/share/java"
+install -pm 644 build/lib/qpid-*.jar "${INSTALL_PATH}/share/java"
+
+# additional dependencies
+install -d "${INSTALL_PATH}/share/java/qpid-deps"
+install -pm 755 $(find build/lib/ -name '*.jar' -a ! -name 'qpid*.jar') \
+    "${INSTALL_PATH}/share/java/qpid-deps"
+
+# config
+#install -d "${INSTALL_PATH}/etc"
+#install -pm 755 build/etc/* "${INSTALL_PATH}/etc"

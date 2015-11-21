@@ -1,0 +1,148 @@
+Current
+
+ * Don't let anyone close mgmt clients
+
+ * Bulk register is failing to forget state on cancel
+
+ * client.py:159 calls add_error, which no longer exists
+
+ * Avoid constructing literal sql at broker.py:378
+
+ * An invalid id for a QueueParameter produces an ugly error
+
+ * Enforce one reg per broker, to avoid confusion
+
+ * Fix obnoxious HTML resizing bug
+
+Deferred
+
+ * Put some kind of status on broker
+
+ * Make it possible to navigate from broker to system
+
+ * Blow up if someone adds a child with an existing name
+
+ * Check for per-row querying in BrokerSet
+
+ * stat.py:222 min_value is None somehow
+
+ * Talk about AMQP_SPEC in the readme
+
+ * Tables: Make null values in tables dashes, not zeroes
+
+ * Get rid of single object confirms
+
+ * Change the way CuminAction.invoke works
+
+ * Resolve design questions around view navigation
+
+ * Blow up if we try to call set_redirect_url twice in a session
+
+ * Need to add cherrypy bsd license to binary dist?
+
+ * See if we can't avoid the app.add_parameter in Parameter; adding to
+   page somehow would make a lot more sense
+
+ * In validate methods, instead of using an error var, add an error to
+   the form indicating that the form has member widgets with errors.
+
+ * Unregistering a broker doesn't disconnect it
+
+ * Validate paginator current page and reset as necessary
+
+ * Tables: Make column sort disableable
+
+ * Tables: Change first-click sort to desc for number fields
+
+ * Disable actions when they can't be valid
+
+ * Move single object add frames to live under object frames
+
+ * Make "act on" and item count in tables line up
+
+ * Document what "localhost" is relative to when adding brokers
+
+ * Add ability to clear action history
+
+ * Duration formatter has problems with very short durations
+
+ * Add "slowest views" tracking to cumin-bench
+
+ * Only perform js updates if there's new data
+
+ * Avoid dirtying js namespace with updateFoo methods
+
+ * So that list params can embed an item param, find a way to avoid
+   the need to attach params to widgets in every instance
+
+ * Consider making CuminForm (or Form) also have Frame behavior
+
+ * Sortify broker groups
+
+ * Add [None] to groups field in broker view
+
+ * Indicate how old stats are
+
+ * Add inactive state to some status lights
+
+ * Ask tross to take some prints out of ManagedBroker.start
+
+ * Add a do_get_item_count, and cache result for use by get_item_count
+
+ * Add a ~3 second (or use broker update interval, if we can get that)
+   cache to *XmlPage
+
+ * Add said cache to ChartPages as well, perhaps
+
+ * Better demo data
+
+ * Make mini status tables a little prettier
+
+ * Add queue journal stats
+
+ * Queue: Add a msg enq rate msg deq rate chart
+
+ * Restore the consumer, producer, and bindings stat links
+
+ * Add ability to send a test message to a queue
+
+ * Restore high-low
+
+ * "remove broker groups"
+
+ * "shutdown broker groups"
+
+ * "shutdown broker"
+
+ * "start cluster"
+
+ * "stop cluster"
+
+ * Add a wooly.focus(id) method to replace the ad-hoc javascript I'm
+   using
+
+ * Make the status lights also be links to an appropriate view
+
+   - Defer until we know what we're going to link to
+
+ * Add a parameter that takes a modelclass
+
+ * Make it a little simpler to express hrefs
+
+ * More form inputs, non scalar ones too
+
+ * Add an error banner to form
+
+ * Separate wooly stuff into its own devel subdir
+
+ * Consider having a cssclass set on widgets
+
+ * See if we can eliminate the attr/param distinction, and use whether
+   or not a param is added to a widget via add_param to do that
+
+ * Add group type to group add,edit
+
+ * Broker browser: Add an ungrouped radio button
+
+ * Add a sanity check traversal to the widget tree and to the
+   registered sets of widgets and parameters

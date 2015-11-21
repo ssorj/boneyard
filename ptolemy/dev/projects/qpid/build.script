@@ -1,0 +1,45 @@
+#!/bin/bash -eux
+
+source "${PTOLEMY_PROJECT}/project.bash"
+
+script-init
+
+(
+    cd "${QPID_BRANCH}/qpid"
+    find . -path \*/.svn -prune -o -type f -print0 | cpio --null --pass-through --make-directories "$QPID_BUILD"
+)
+
+(
+    cd "${STORE_BRANCH}"
+    find . -path \*/.svn -prune -o -type f -print0 | cpio --null --pass-through --make-directories "$STORE_BUILD"
+)
+
+cd "${QPID_BUILD}/cpp"
+./bootstrap
+./configure
+make -j $CPU_CORES
+
+cd "$STORE_BUILD"
+./bootstrap
+./configure --with-qpid-checkout="$QPID_BUILD"
+make -j $CPU_CORES
+
+cd "${QPID_BUILD}/java"
+# The /dev/null input is necessary because ant, on execing a
+# subprocess, will stall trying to read input
+ant < /dev/null
+
+cd "${QPID_BUILD}/python"
+python setup.py build
+
+cd "${QPID_BUILD}/tools"
+python setup.py build
+
+cd "${QPID_BUILD}/extras/qmf"
+python setup.py build
+
+# XXX disabled until I can make it work on fedora 11
+# cd "${QPID_BUILD}/extras/sasl"
+# ./bootstrap
+# ./configure
+# make -j $CPU_CORES

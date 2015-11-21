@@ -1,0 +1,10 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid.bash
+
+script-init
+
+cd "${SOURCE_PATH}/dotnet"
+
+./build-mono

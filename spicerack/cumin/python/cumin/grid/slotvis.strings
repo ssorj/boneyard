@@ -1,0 +1,5 @@
+[SlotSelector.css]
+div.SlotSelector div.ObjectSelectorFilters {
+    padding-bottom: 0.5em;
+}
+

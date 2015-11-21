@@ -1,0 +1,9 @@
+# Iniquity
+
+Example code to add groups to Python config parsing
+
+## Try this
+
+% cd iniquity/       # You are probably already here
+% source devel.sh    # Set up the development environment
+% make devel         # Run the demonstration

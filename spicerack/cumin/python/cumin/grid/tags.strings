@@ -1,0 +1,43 @@
+[DisabledInput.css]
+input.disabled {
+    border: 0px;
+    background-color: white;
+    color: black;
+    cursor:default;
+}
+
+[DisabledInput.html]
+{value}
+<input type="hidden" name="{name}" id="{name}" value="{value}" tabindex="{tab_index}" size="{size}"/>
+
+
+[TagGeneral.css]
+table.TagPropertySet tbody th {
+  width:5%;
+}
+
+table.TagPropertySet thead td {
+  color: #666;
+  font-weight: normal;
+  font-style: italic;
+}
+
+[TagGeneral.html]
+<table id="{id}" class="PropertySet TagPropertySet">
+  <thead>
+  	<tr>
+  		<td>Property</td>
+  		<td>Value</td>  
+  	</tr>
+  </thead>
+  <tbody>
+    <tr class="item" title="">
+  		<th>{features_title}</th>
+  		<td class="{class}">{features}</td>
+	</tr>	
+    <tr class="item" title="">
+  		<th>{hosts_title}</th>
+  		<td class="{class}">{hosts}</td>
+	</tr>
+  </tbody>
+</table>

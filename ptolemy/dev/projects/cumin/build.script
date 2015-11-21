@@ -1,0 +1,11 @@
+#!/bin/bash -eu
+
+source "${PTOLEMY_PROJECT}/project.bash"
+
+script-init
+
+cp -a "$PTOLEMY_BRANCH" "$PROJECT_BUILD"
+
+cd "$PROJECT_BUILD"
+
+(cd cumin; make build)

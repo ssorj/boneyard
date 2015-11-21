@@ -1,0 +1,40 @@
+[BindingSet.sql]
+select
+  b.id,
+  b.exchange_id as e_id,
+  b.queue_id as q_id,
+  b.binding_key as key
+from binding as b
+left outer join binding_stats as c on c.id = b.stats_curr_id
+{sql_where}
+{sql_orderby}
+{sql_limit}
+
+[BindingSet.count_sql]
+select count(*)
+from binding as b
+left outer join binding_stats as c on c.id = b.stats_curr_id
+{sql_where}
+
+[ExchangeKeysField.css]
+table th.NameHeader {
+    color: red;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-align: left;
+}
+
+[ExchangeKeysField.input_container_html]
+<table>
+    <tr>
+        <th class="NameHeader">Name</th>
+        <th class="NameHeader">Value</th>
+    </tr>
+    {input_fields}
+</table>
+
+[ExchangeKeysField.inputs_html]
+<tr>
+    <td><input class="NameInput" type="text" size="15" name="{n_name}" value="{n_value}" tabindex="100"/>  = </td>
+    <td><input class="ValueInput" type="text" size="15" name="{v_name}" value="{v_value}" tabindex="100"/></td>
+</tr>

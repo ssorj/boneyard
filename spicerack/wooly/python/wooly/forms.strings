@@ -1,0 +1,336 @@
+[FormErrorSet.css]
+div.FormErrorSet {
+  margin: 1em auto;
+  border: none;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  padding: 1em;
+  width: 36em;
+  background-color: #fbb;
+  font-weight: bold;
+}
+
+div.FormErrorSet > p {
+  margin: 0;
+}
+
+div.FormErrorSet > p > img {
+  vertical-align: -75%;
+  margin: 0 0.5em 0 0;
+}
+
+div.FormErrorSet > ul {
+  list-style: disc;
+  margin: 0 0 0 36px;
+  padding: 0.66em 2em;
+  font-size: 0.9em;
+}
+
+[FormErrorSet.html]
+<div class="FormErrorSet">
+  <p>
+    <img src="resource?name=warning-36.png"/>
+    Errors
+  </p>
+
+  <ul>{items}</ul>
+</div>
+
+[FormErrorWidget.html]
+<li>{content}</li>
+
+[FormButton.javascript]
+// needed because IE will send the content instead of the value for form buttons
+function click_button(name, value) {
+    var oHidden = document.forms[0].elements[name];
+    // in case there is more than one submit or cancel button
+    if (oHidden.length > 1) {
+        for (var i=0; i<oHidden.length; i++) {
+            oHidden[i].value = value;
+        }
+    } else {
+        oHidden.value = value;
+    }
+    return true;
+}
+
+[FormButton.css]
+button.submit {
+    float:right;
+}
+button.submit:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: right;
+    visibility: hidden;
+}
+
+[FormButton.html]
+<button class="{class}" type="{type}" tabindex="{tab_index}" {disabled_attr} name="{name}" value="{value}" onclick="return {onclick}('{name}', '{value}')">{content}</button>
+
+[ScalarInput.html]
+<input type="text" id="{id}" name="{name}" value="{value}" tabindex="{tab_index}" {disabled_attr} size="{size}" {title}/>
+
+[MultilineStringInput.html]
+<textarea name="{name}" tabindex="{tab_index}" {disabled_attr} rows="{rows}" cols="{columns}">{value}</textarea>
+
+[PasswordInput.html]
+<input type="password" name="{name}" value="{value}" tabindex="{tab_index}" {disabled_attr} size="{size}"/>
+
+[CheckboxInput.html]
+<input type="checkbox" name="{name}" value="{value}" tabindex="{tab_index}" {checked_attr} {disabled_attr} {onclick_attr}/>
+
+[HiddenInput.html]
+<input type="hidden" name="{name}" value="{value}" tabindex="{tab_index}"/>
+
+[RadioInput.html]
+<input type="radio" id="{id}" name="{name}" value="{value}" tabindex="{tab_index}" {checked_attr} {disabled_attr}/>
+
+[RadioInputSet.html]
+<ul>{items}</ul>
+
+[Label.html]
+<span class="{class}">{value}</span>
+
+[RadioInputSet.item_html]
+<li>
+  <input type="radio" name="{name}" value="{item_value}" tabindex="{tab_index}" {item_checked_attr} {disabled_attr}/>
+  {item_content}
+</li>
+
+[CheckboxInputSet.html]
+<ul>{items}</ul>
+
+[CheckboxInputSet.item_html]
+<li>
+  <input type="checkbox" name="{name}" value="{item_value}" tabindex="{tab_index}" {item_checked_attr} {disabled_attr}/>
+  {item_content}
+</li>
+
+[FormInputItemSet.css]
+table.FormInputItemSet {
+    border-collapse: collapse;
+}
+
+table.FormInputItemSet > tbody > tr {
+    vertical-align: top;
+}
+
+table.FormInputItemSet > tbody > tr > td {
+    padding: 0 0.5em 0.5em 0;
+    font-size: 0.9em;
+}
+
+table.FormInputItemSet > tbody > tr > td > input {
+    margin: 0.25em 0 0 0;
+}
+
+table.FormInputItemSet > tbody > tr > td > label {
+    font-weight: bold;
+    display: block;
+}
+
+[FormInputItemSet.html]
+<table class="FormInputItemSet"><tbody>{items}</tbody></table>
+
+[FormInputItemSet.item_html]
+<tr>
+  <td>
+    <input id="{id}.{item_value}" type="{item_type}" name="{name}" value="{item_value}"
+    tabindex="{tab_index}" {item_checked_attr} {item_disabled_attr}/>
+  </td>
+  <td>
+    <label for="{id}.{item_value}">{item_title}</label>
+    {item_description}
+  </td>
+</tr>
+
+[OptionInputSet.html]
+<select id="{id}" name="{name}" tabindex="{tab_index}" {disabled_attr} onchange="{onchange}">{items}</select>
+
+[OptionInputSet.item_html]
+<option value="{item_value}" {item_selected_attr}>{item_content}</option>
+
+[FormField.html]
+<tr id="{id}">
+  <th>
+    <div class="title">{title}{required}</div>
+    <div class="help">{help}</div>
+  </th>
+  <td>{inputs}</td>
+</tr>
+
+[LabelFormField.css]
+.labeltext {
+	font-size:0.8em;
+}
+
+[LabelFormField.html]
+<tr id="{id}">
+  <td colspan="2">
+    <div class="labeltext">{title}</div>
+  </td>
+</tr>
+
+[FormFieldSet.css]
+table.FormFieldSet {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table.FormFieldSet > tbody > tr {
+    padding: 2em;
+    border-top: 1px dotted #ccc;
+    vertical-align: top;
+}
+
+table.FormFieldSet > tbody > tr > th,
+table.FormFieldSet > tbody > tr > td {
+    padding: 0.5em 0.5em 0.5em 0;
+    border-top: 1px dotted #ccc;
+    margin: 0.25em 0;
+}
+
+table.FormFieldSet > tbody > tr:first-child > th {
+    border-top: hidden;
+    width: 33%;
+}
+
+table.FormFieldSet > tbody > tr:first-child > td {
+    border-top: hidden;
+    width: 67%;
+}
+
+table.FormFieldSet > tbody > tr > th {
+    width: 33%;
+    text-align: left;
+}
+
+table.FormFieldSet > tbody > tr > th > div.title {
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+table.FormFieldSet > tbody > tr > th > div.help {
+    font-weight: normal;
+    font-size: 0.7em;
+}
+
+table.FormFieldSet > tbody > tr > td {
+    width: 67%;
+}
+
+[FormFieldSet.html]
+<table class="FormFieldSet">
+  <tbody>{fields}</tbody>
+</table>
+
+[ShowableFieldSet.css]
+div.ShowableFieldSet > a {
+    margin: 2em 0;
+}
+
+div.ShowableFieldSet > table {
+    display: none;
+}
+
+div.ShowableFieldSet div.heading {
+    margin: 1em 0;
+}
+
+div.ShowableFieldSet div.heading a {
+    cursor: default;
+}
+
+[ShowableFieldSet.javascript]
+(function() {
+    wooly.toggleFieldDisplay = function(id) {
+        elem = $(id);
+
+        div = elem.getFirst("div");
+        a = div.getFirst("a");
+
+        table = elem.getFirst("table");
+
+        if (table.getStyle("display") === "table") {
+             table.setStyle("display", "none");
+             a.set("text", "Show more >");
+        } else {
+             table.setStyle("display", "table");
+             a.set("text", "Show fewer <");
+        }
+    }
+}())
+
+[ShowableFieldSet.html]
+<div id="{id}" class="{class}">
+  <div class="heading">
+    <a onclick="wooly.toggleFieldDisplay('{id}');" class="action">Show more &gt;</a>
+  </div>
+
+  <table class="FormFieldSet">
+    <tbody>{fields}</tbody>
+  </table>
+</div>
+
+[RadioFieldOption.html]
+<div>
+  <input type="radio" name="{name}" id="{id}" value="{value}"
+         tabindex="{tab_index}" {checked_attr} {disabled_attr}/>
+  <label for="{id}">{title}</label>
+</div>
+
+[ButtonForm.css]
+form.ButtonForm {
+    background-color: #fafafa;
+    border: 2px solid #fff;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+}
+
+form.ButtonForm > div.title {
+    font-weight: bold;
+    font-size: 1.1em;
+    background-color: #e7e7f7;
+    padding: 0.5em 0.75em;
+    margin-bottom: 0.5em;
+    -moz-border-radius: 0.35em 0.35em 0 0;
+    -webkit-border-radius: 0.35em 0.35em 0 0;
+}
+
+form.ButtonForm > div.content {
+    margin: 0.5em 1em;
+}
+
+form.ButtonForm > div.buttons {
+    text-align: right;
+    background-color: #e7e7f7;
+    padding: 0.5em;
+    margin-top: 0.5em;
+    -moz-border-radius: 0 0 0.35em 0.35em;
+    -webkit-border-radius: 0 0 0.35em 0.35em;
+}
+
+form.ButtonForm > div.buttons > button {
+    margin: 0 0 0 0.5em;
+}
+
+[ButtonForm.html]
+<form id="{id}" class="{form_class}" method="post" action="?">
+  <div class="title">{title}</div>
+  <div class="content">
+    {errors}
+    {content}
+  </div>
+  <div class="buttons">{buttons}</div>
+  <div>{hidden_inputs}</div>
+</form>
+<script type="text/javascript">
+//<![CDATA[
+  var focusElement =  $("{id}").elements[0];
+  if( focusElement != "hidden" && focusElement.style.display != "none"  && !focusElement.disabled && focusElement.type != "hidden" ) {  
+  	focusElement.focus();
+  }
+//]]>
+</script>

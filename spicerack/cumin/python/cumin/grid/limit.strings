@@ -1,0 +1,44 @@
+[LimitCount.html]
+<span id="{id}">Limits <span class="count">({count})</span></span>
+
+[LimitCount.deferred_html]
+<span id="{id}">Limits <span class="count">(?)</span></span>
+
+[DisabledInput.css]
+input.disabled {
+    border: 0px;
+    background-color: white;
+    color: black;
+    cursor:default;
+}
+
+[DisabledInput.html]
+{value}
+<input type="hidden" name="{name}" id="{name}" value="{value}" tabindex="{tab_index}" size="{size}"/>
+
+
+[StringFieldWithCheckbox.input_with_checkbox_html]
+<tr id="{id}">
+  <th>
+    <div class="title">Max Allowance<span style="color: #c33">*</span></div>
+    <div class="help"></div>
+  </th>
+  <td>
+	<input type="text" name="{field_name}" id="{field_name}" value="{field_value}" tabindex="100"  size="30" {is_readonly}/>
+	<input type="checkbox" name="{checkbox_name}" id="{checkbox_name}" {onclick_attr} {is_checked}/><label for="{checkbox_name}">Unlimited</label>
+  </td>
+</tr>
+<script type="text/javascript">
+//<![CDATA[
+function toggleLimitInput(form, checkbox, textinput) {
+	if($(checkbox).checked) {
+	  $(textinput).value = "Unlimited";
+	  $(textinput).setProperty('readonly', 'readonly');
+	} else {
+	  $(textinput).value = "{field_value}";
+	  $(textinput).setProperty('readonly', null); 
+	}
+	return false;
+}
+//]]>
+</script>

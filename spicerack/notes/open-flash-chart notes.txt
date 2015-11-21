@@ -1,0 +1,53 @@
+﻿Open-Flash-Chart integration in Cumin.
+
+Source code location and compilation:
+
+The home page for the open-flash-chart library is http://teethgrinder.co.uk/open-flash-chart-2/ .  We are not using the stock library, but rather a Red Hat-modified version that has some customizations for use in cumin.
+
+The ActionScript 3 source code for our library is located in the <root>/cumin/open-flash-chart directory in the repository.  It should be noted that the actual compiled .swf file that gets used at runtime does NOT live in the same directory as the source.  The open-flash-chart.swf file lives in <root>/cumin/resources.
+
+Historically, we have used FlashDevelop to develop and compile the library.  The homepage for FlashDevelop is:  http://www.flashdevelop.org (currently only available on Windows).  It is possible, with a few tweaks to compile the source on linux using the build.xml file in the source tree (it will require you installing the Open Source version of the Flex SDK).  The required tweaks to build on Linux are:  1)  comment out references to the FlashConnect utilities and 2) change the reference to the Arial font to a font that exists on the system you're working on (Bitstream Charter is what I've used).  
+
+
+
+So, how does cumin use the charts?
+In the python code, when you have the need to draw a chart, you might use the code below.
+        chart = StatFlashChart(app, "submitted", scheduler)
+        chart.title = "Job totals"
+        chart.duration.param.default = "3600"
+        chart.stats = ("JobsSubmitted", "JobsStarted", "JobsCompleted")
+        charts.add_child(chart)
+This code sets up a StatFlashChart that will have the display title of “Job totals”, an initial duration off 1 hour (3600 seconds) and will be charting the stats (See rosemary.xml) JobsSubmitted, JobsStarted and JobsCompleted.
+
+When that page is rendered, you will see a block of JavaScript like the one below...
+
+    var flashversion = swfobject.getFlashPlayerVersion();
+    if (flashversion.major < 9) {
+        wooly.addPageUpdateListener(function () {if (document.images["main.grid.scheduler.view.body.overview.cycle.charts.submitted"].className == "Loading") return; cumin.updateChart("main.grid.scheduler.view.body.overview.cycle.charts.submitted");});
+        cumin.setupChart('main.grid.scheduler.view.body.overview.cycle.charts.submitted', 360);
+    } else {
+        swfobject.embedSWF("resource?name=open-flash-chart.swf", "main.grid.scheduler.view.body.overview.cycle.charts.submitted_chart", "360", "120", "9.0.0", "",
+            {"data-file":"chart.json?agent=com.redhat.grid|scheduler|croberts.redhat.com;object_id=croberts.redhat.com;chart_id=main.grid.scheduler.view.body.overview.cycle.charts.submitted;duration=3600;rpkg=com.redhat.grid;rcls=Scheduler;stat=JobsSubmitted;stat=JobsStarted;stat=JobsCompleted", "id":"main.grid.scheduler.view.body.overview.cycle.charts.submitted"}, {wmode: "opaque"});
+
+        wooly.addPageUpdateListener(function () { cumin.updateFlashChart('main.grid.scheduler.view.body.overview.cycle.charts.submitted'); });
+        window.addEvent('domready',function () {
+            cumin.setFullpageHandler('main.grid.scheduler.view.body.overview.cycle.charts.submitted', 'flashpage.html?agent=com.redhat.grid|scheduler|croberts.redhat.com;object_id=croberts.redhat.com;chart_id=main.grid.scheduler.view.body.overview.cycle.charts.submitted;duration=3600;rpkg=com.redhat.grid;rcls=Scheduler;stat=JobsSubmitted;stat=JobsStarted;stat=JobsCompleted');
+        });
+    }
+
+
+The code checks to be sure that the client has at least Flash 9 installed.  Assuming that the check passes, the swfobject.embedSWF call is made to embed the flash object on the screen.  You will also note that addPageUpdateListener gets called with the cumin.updateFlashChart (found in app.js) function with the chart id as the parameter.  When the pageUPdateListener fires, it results in the cumin.updateFlashChart being called, which will make a call to the chart.get_ymax function...this function is actually in the ActionScript code.  The mechanism for the callback is setup in main.as:  ExternalInterface.addCallback("get_ymax", getYmax);
+That maps the external name “get_ymax” to the internal function getYmax.  The getYmax() function eventually makes a call back to the JavaScript like this:  ExternalInterface.call("got_ymax", id, this.URL, String(yaxis_max), String(yvals_max), String(control_min), String(control_max));
+
+The “got_ymax” javaScript function will cause the chart to be reloaded via a call to “chart.reload()”, which is another callback defined in main.as.
+
+Here is the flow of what happens when the chart is initialized:
+main() calls find_data() which looks for the 'data-file' parameter that was passed to the chart when it was embedded.  In our case data-file is actually a URL that goes back into Cumin and fetches the JSON-formatted data.  It then calls load_external_file with the URL specified in the 'data-file' parameter.
+
+load_external_file gets the URL and gets the content.  It sets up a couple of eventListeners on the loader (IO_ERROR and COMPLETE) and then calls loader.load(). , when it completes, the COMPLETE eventListener will fire (the xmlLoaded function).  XmlLoaded() calls parse_json.
+
+parse_json takes all of the data and goes through all of the values, building the structure required for all of the data points and then calls “build_chart(json)” to generate the actual chart.
+
+build_chart, first determines whether we are appending values to the current data set or not.  If we are appending, it takes care of the appending and then calls resize().  If not either case, it continues on adding various Sprites as necessary depending on the chart type (radar, pie, “regular”).  It then calls “resize()”, which will trigger the redrawing of the chart.
+
+For additional notes and examples, please see the json.help.txt file in <root>cumin/resources.

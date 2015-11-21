@@ -1,0 +1,99 @@
+#!/usr/bin/python
+
+from plano import *
+
+lines = [
+    "proton/acceptor",
+    "proton/c_message",
+    "proton/connection",
+    "proton/container",
+    "proton/counted_ptr",
+    "proton/delivery",
+    "proton/duration",
+    "proton/endpoint",
+    "proton/error",
+    "proton/event",
+    "proton/handler",
+    "proton/link",
+    "proton/message",
+    "proton/reactor",
+    "proton/receiver",
+    "proton/sender",
+    "proton/session",
+    "proton/terminus",
+    "proton/timeout_error",
+    "proton/transport",
+    "proton/url",
+    "proton/url_error",
+    "proton/amqp/amqp_binary",
+    "proton/amqp/amqp_bool",
+    "proton/amqp/amqp_byte",
+    "proton/amqp/amqp_char",
+    "proton/amqp/amqp_decimal128",
+    "proton/amqp/amqp_decimal32",
+    "proton/amqp/amqp_decimal64",
+    "proton/amqp/amqp_double",
+    "proton/amqp/amqp_float",
+    "proton/amqp/amqp_int",
+    "proton/amqp/amqp_long",
+    "proton/amqp/amqp_null",
+    "proton/amqp/amqp_short",
+    "proton/amqp/amqp_string",
+    "proton/amqp/amqp_timestamp",
+    "proton/amqp/amqp_uint",
+    "proton/amqp/amqp_ulong",
+    "proton/amqp/amqp_ushort",
+    "proton/amqp/amqp_uuid",
+    "proton/amqp/data",
+    "proton/amqp/data_holder",
+    "proton/amqp/data_start",
+    "proton/amqp/data_value",
+    "proton/amqp/decode_error",
+    "proton/amqp/decoder",
+    "proton/amqp/encode_error",
+    "proton/amqp/encoder",
+    "proton/blocking/blocking_connection",
+    "proton/blocking/blocking_link",
+    "proton/blocking/blocking_receiver",
+    "proton/blocking/blocking_sender",
+    "proton/blocking/request_response",
+    "proton/internal/counted",
+    "proton/internal/counted_facade",
+    "proton/internal/facade",
+    "proton/internal/opaque",
+    "proton/internal/ptr_convertible",
+]
+
+include_dir = make_dir(join("output", "include"))
+
+for line in lines:
+    tokens = line.split("/")
+    namespaces = tokens[0:-1]
+    class_name = tokens[-1]
+
+    class_dir = make_dir(join(include_dir, *namespaces))
+    class_file = touch(join(class_dir, "{}.hpp".format(class_name)))
+    
+    content = list()
+
+    for namespace in namespaces:
+        content.append("namespace {} {{".format(namespace))
+
+    content.append("")
+    content.append("class {} {{".format(class_name))
+    content.append("  public:");
+    content.append("    {}() {{".format(class_name));
+    content.append("      number = new int;");
+    content.append("      *number = 0;");
+    content.append("    }");
+    content.append("  private:");
+    content.append("    int * number;");
+    content.append("};")
+    content.append("")
+
+    for namespace in namespaces:
+        content.append("}")
+
+    content = "\n".join(content)
+
+    write(class_file, content)

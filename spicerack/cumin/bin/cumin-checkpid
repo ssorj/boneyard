@@ -1,0 +1,95 @@
+#!/usr/bin/python
+import sys
+import os
+from datetime import datetime, timedelta
+from time import sleep
+from optparse import OptionParser
+
+home = os.environ.get("CUMIN_HOME", os.path.normpath("/usr/share/cumin"))
+sys.path.append(os.path.join(home, "python"))
+
+from cumin.config import CuminMasterConfig
+
+def read_exit(p, then, timeout):
+    while True:
+        try:
+            f = open(p, "r")
+            # Get the last line of the file
+            v = f.readlines()[-1:]
+            if len(v) and v[0][:-1] == "exit":
+               return 0
+            if datetime.now() - then > timedelta(seconds=timeout):
+               return -1
+            sleep(0.25)
+        except:
+            return -1
+
+def read_val(p, then, timeout):
+    while True:
+        try:
+            f = open(p, "r")
+            v = f.readline()
+            if v:
+               return int(v[:-1])
+            if datetime.now() - then > timedelta(seconds=timeout):
+               return None
+            sleep(0.25)
+        except:
+            return None
+
+def main():
+
+    parser = OptionParser()
+    parser.add_option("--exit", dest="exit", action="store_true", default=False,
+                      help="Wait for master init to indicate exit")
+
+    parser.add_option("--timeout", dest="timeout", default="5", type=int,
+                      help="Seconds to wait (default 5) before returning -1" \
+                          " when a pid or status file is missing. If both" \
+                          " have been read but there is still no status" \
+                          " value after timeout seconds, assume success" \
+                          "(but a slow master)")
+
+    (options, args) = parser.parse_args()
+
+    # Wait for the pidfile to exist.
+    # When called from service this should be immediate
+    then = datetime.now()
+    while not os.path.isfile("/var/run/cumin.pid"):
+        sleep(0.25)
+        if datetime.now() - then > timedelta(seconds=options.timeout):
+            return -1
+
+    # Wait for a value.  This also should happen very
+    # quickly, since the cumin master script write the
+    # pid very early.
+    if not read_val("/var/run/cumin.pid", then, options.timeout):
+        return -1
+
+    # Now wait for the status file.  It should have 
+    # been created before the pid value was written.
+    # Get the path from a config object for the master.
+    config = CuminMasterConfig()
+    p = config.get_init_status_path()
+    while not os.path.isfile(p):
+        sleep(0.25)
+        if datetime.now() - then > timedelta(seconds=options.timeout):
+            return -1
+
+    # We don't care about the status value here, we
+    # just want to see "exit" on the last line.
+    if options.exit:
+       return read_exit(p, then, options.timeout)
+
+    # Let's read the status.  If there is no
+    # value there, assume success.
+    status = read_val(p, then, options.timeout)
+    if status is None:
+        status = 0
+    return status
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        sys.exit(0)

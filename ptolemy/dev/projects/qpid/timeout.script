@@ -1,0 +1,7 @@
+#!/bin/bash -eu
+
+source "${PTOLEMY_PROJECT}/project.bash"
+
+print-process-stacks
+
+ps -fu "$USER" -Hww

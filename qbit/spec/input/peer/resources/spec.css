@@ -1,0 +1,45 @@
+body {
+    padding: 1em;
+    margin: 0;
+    background-color: #224;
+    color: #fff;
+}
+
+section {
+    padding: 0 0 0 1em;
+}
+
+section h1 {
+    position: relative;
+    left: -1em;
+}
+
+section h2 {
+    font-size: 0.9em;
+}
+
+table.toc {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table.toc tbody {
+}
+
+table.toc tbody th {
+    width: 33%;
+}
+
+table.toc tbody td {
+    width: 66%;
+}
+
+table.toc tbody td, table.toc tbody th {
+    text-align: left;
+    vertical-align: top;
+    padding: 0 1em 0.4em 0;
+}
+
+span.flag {
+    color: red;
+}

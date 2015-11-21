@@ -1,0 +1,31 @@
+#!/bin/bash -e
+
+code=0
+tmpdir=$(mktemp -d)
+
+trap "rm -rf ${tmpdir}" EXIT
+
+while read command; do
+    notice="Testing '$command' "
+
+    echo -n "$notice"
+
+    len=$((76 - ${#notice}))
+
+    for ((i = 0; i < $len; i += 1)); do
+        echo -n "."
+    done
+
+    if $command &> "${tmpdir}/output"; then
+        echo " OK"
+    else
+        echo
+        echo "Command failed:"
+
+        cat "${tmpdir}/output"
+
+        code=1
+    fi
+done
+
+exit "$code"

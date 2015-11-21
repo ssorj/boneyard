@@ -1,0 +1,7 @@
+[LoadUserJobStats.sql]
+select
+  sum(s."Running") as RunningJobs,
+  sum(s."Idle") as IdleJobs,
+  sum(s."Held") as held
+from "com.redhat.grid"."Submission" as s
+where s."Owner" = '{user_name}'

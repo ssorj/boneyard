@@ -1,0 +1,73 @@
+[HtmlPage.html]
+{xml_declaration}
+{doctype}
+{html_namespace}
+  <head>
+    <title>{title}</title>
+
+    <link rel="shortcut icon" href="resource?name=favicon.ico" type="image/x-icon"/>
+
+    <link rel="stylesheet" type="text/css" href="resource?name=wooly.css"/>
+    <link rel="stylesheet" type="text/css" href="resource?name=app.css"/>
+    <link rel="stylesheet" type="text/css" href="{base_name}.css"/>
+    <!--[if IE]><link rel="stylesheet" type="text/css" href="resource?name=ie.css"/><![endif]-->
+    <!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="resource?name=ielte7.css"/><![endif]-->
+    <link rel="stylesheet" type="text/css" href="resource?name=jquery.jqplot.css" />
+
+    <script type="text/javascript" src="resource?name=mootools.js"> </script>
+    <script type="text/javascript" src="resource?name=wooly.js"> </script>
+    <script type="text/javascript" src="resource?name=app.js"> </script>
+    <script type="text/javascript" src="{base_name}.js"> </script>
+    <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="resource?name=excanvas.js"></script><![endif]-->
+    <script type="text/javascript" src="resource?name=jquery.js"></script>
+    <script type="text/javascript" src="resource?name=jquery.jqplot.js"></script>
+    <script type="text/javascript" src="resource?name=jqplot.pieRenderer.min.js"></script>
+    <script type="text/javascript" src="resource?name=jqplot.donutRenderer.min.js"></script>
+    <script type="text/javascript" src="resource?name=jqplot.categoryAxisRenderer.js"></script>
+    <script type="text/javascript" src="resource?name=jqplot.enhancedLegendRenderer.js"></script>
+    <script type="text/javascript" src="resource?name=jqplot.highlighter.min.js"></script>
+    <script type="text/javascript" src="resource?name=jqplot.cursor.js"></script>    
+    <script type="text/javascript" src="resource?name=jqplot.dateAxisRenderer.js"></script>
+        
+    <script type="text/javascript">
+  	    $j = jQuery.noConflict();
+  		// Code that uses other library's $ can follow here.
+	</script>
+  {update_script}
+  </head>
+  <body class="{class}">
+    {content}
+    {messages}
+  </body>
+</html>
+
+[HtmlPageMessages.css]
+ul.HtmlPageMessages {
+  font-size: 0.9em;
+  color: red;
+}
+
+[AjaxScript.html]
+<script type="text/javascript">
+  // <![CDATA[
+  wooly.setIntervalUpdate('{url}', wooly.updatePage, {interval});
+  // ]]>
+</script>
+
+[UpdatePage.html]
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE widgets [
+  <!ELEMENT widgets (#PCDATA)>
+  <!ENTITY ndash "&#8211;">
+  <!ENTITY nbsp "&#160;">
+]>
+<widgets>{widgets}</widgets>
+
+[UpdatePage.widget_html]
+<widget id="{widget_id}">{widget}</widget>
+
+[PopupPage.html]
+{widgets}
+
+[PopupPage.widget_html]
+{widget}

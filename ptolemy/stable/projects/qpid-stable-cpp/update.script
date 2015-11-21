@@ -1,0 +1,15 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid-stable.bash
+
+script-init
+
+cd "$SOURCE_PATH"
+
+svn-save-revision cpp
+svn-save-changes cpp
+
+if [[ "$(distro)" == "rhel" && "$(release)" == "4" ]]; then
+    (cd cpp/boost-1.32-support && make apply)
+fi

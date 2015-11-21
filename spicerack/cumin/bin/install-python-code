@@ -1,0 +1,19 @@
+#!/bin/bash -e
+
+if [[ $# != 2 ]]; then
+    echo "install-python-code SOURCE-DIR DESTINATION-DIR"
+    exit 1
+fi
+
+src_top=$1
+dst_top=$2
+
+find $src_top -type d -not -path "**/.svn*" | while read src_dir
+do
+    dst_dir="${dst_top}${src_dir#$src_top}"
+
+    install -d "$dst_dir"
+    install -pm 0644 ${src_dir}/*.py "$dst_dir" 2> /dev/null || :
+    install -pm 0644 ${src_dir}/*.pyc "$dst_dir" 2> /dev/null || :
+    install -pm 0644 ${src_dir}/*.strings "$dst_dir" 2> /dev/null || :
+done

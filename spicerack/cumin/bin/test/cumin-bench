@@ -1,0 +1,116 @@
+#!/usr/bin/python
+
+import sys
+
+from wooly.bench import BenchmarkHarness
+
+from cumin import Cumin
+from cumin.config import *
+
+def do_main():
+    setup_initial_logging()
+
+    parser = CuminOptionParser()
+
+    # Add additional parameters
+    # We need --profile here to keep optparse from crashing in 
+    # a profile case
+    parser.add_option("--profile", action="store_true")
+    parser.add_option("--host", type=str)
+    parser.add_option("--port", type=int)
+    parser.add_option("--section", default="web")
+
+    # Get options
+    opts, args = parser.parse_args()
+            
+    # --section controls which section is read from the config file
+    # If a section other than "web" is specified, require it to exist
+    config = CuminWebConfig(opts.section, strict_section = opts.section != "web")
+
+    # There might be other sections returned from config.parse() but
+    # currently we don't care about them...
+    values = getattr(config.parse(), opts.section)
+
+    # Use the config values as defaults for unspecified options
+    apply_defaults(values, opts)
+
+    setup_operational_logging(opts, 
+                              values.log_max_mb,
+                              values.log_max_archives)
+
+    broker_uris = [x.strip() for x in opts.brokers.split(",")]
+
+    cumin = Cumin(config.get_home(), broker_uris, 
+                  opts.database, opts.host, opts.port)
+
+    cumin.debug = True
+    cumin.user = values.user
+    cumin.update_interval = values.update_interval
+
+    cumin.check()
+    cumin.init()
+
+    cumin.session.start()
+
+    harness = BenchmarkHarness(cumin)
+    harness.continue_on_error = True
+    harness.check_output = False
+    harness.print_output = False
+
+    try:
+        harness.run(1000)
+    finally:
+        cumin.stop()
+
+def main():
+    if "--profile" in sys.argv:
+        from profile import Profile
+        from pstats import Stats
+
+        prof = Profile()
+
+        print "Calibrating"
+        
+        biases = list()
+    
+        for i in range(5):
+            bias = prof.calibrate(100000)
+            biases.append(bias)
+            print i, bias
+
+        prof.bias = sum(biases) / float(5)
+
+        print "Using bias %f" % prof.bias
+
+        try:
+            statement = "do_main()"
+	    prof.run(statement)
+
+	    raise KeyboardInterrupt()
+	except KeyboardInterrupt:
+            file = "/tmp/cumin-test-stats"
+
+            prof.dump_stats(file)
+
+	    stats = Stats(file)
+
+	    stats.sort_stats("cumulative").print_stats(15)
+	    stats.sort_stats("time").print_stats(15)
+
+            stats.print_callees("wooly/__init__.*\\(marshal_url_vars\\)")
+            stats.print_callees("wooly/__init__.*\\(path\\)")
+            stats.print_callees("wooly/__init__.*\\(get\\)")
+            stats.print_callees("wooly/__init__.*\\(render\\)")
+
+	    stats.strip_dirs()
+    else:
+        do_main()
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
+
+        #from parsley import threadingex
+        #threadingex.print_threads()

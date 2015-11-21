@@ -1,0 +1,68 @@
+#!/usr/bin/python
+
+import os
+import sys
+
+home = os.environ.get("PTOLEMY_HOME", os.path.normpath("/usr/share/ptolemy"))
+sys.path.append(os.path.join(home, "lib", "python"))
+
+from curses.wrapper import wrapper
+from ptolemy.common.config import *
+from ptolemy.common.messaging import *
+from ptolemy.common.model import *
+from ptolemy.console import *
+
+def main():
+    # Defeat the devel logging
+    os.environ.pop("PTOLEMY_DEBUG")
+
+    setup_initial_logging()
+
+    usage = "Usage: %prog [OPTIONS]"
+    parser = PtolemyOptionParser(usage)
+    opts, args = parser.parse_args()
+
+    config = PtolemyConfig(home, "console")
+    config.load()
+    config.update(opts)
+
+    setup_console_logging(config)
+
+    model = Model()
+
+    if opts.init_only:
+        return
+
+    messaging = MessagingThread(config.broker)
+
+    updates = messaging.queue(ptolemy_model_update_address)
+
+    messaging.start()
+
+    session = messaging.connection.session()
+
+    try:
+        model.fetch_update(session)
+    finally:
+        session.close()
+
+    def run(stdscr):
+        window = ConsoleWindow(model, stdscr)
+
+        while True:
+            window.update()
+
+            messaging.wait(timeout=86400)
+
+            message = updates.get()
+
+            if message:
+                model.unmarshal(message.content)
+
+    wrapper(run)
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

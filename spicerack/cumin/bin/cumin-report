@@ -1,0 +1,306 @@
+#!/usr/bin/python
+
+import os
+import sys
+from traceback import print_exc
+
+home = os.environ.get("CUMIN_HOME", os.path.normpath("/usr/share/cumin"))
+sys.path.append(os.path.join(home, "python"))
+
+from cumin.config import *
+from cumin.util import *
+from mint.plumage.main import Plumage
+from parsley.loggingex import PipeLogThread
+from psycopg2 import OperationalError
+from cumin.admin import SchemaVersion, SchemaMissing
+from cumin.errors import CuminErrors
+
+def restore_IO():
+    sys.stderr = sys.__stderr__
+    sys.stdout = sys.__stdout__
+
+def process_classes(mint, values, section_name, on_empty=None):
+
+    return_code = CuminErrors.NO_ERROR
+    pkgs = set()    
+    if values and len(values) > 0:
+
+        for cls_str in values.split(","):
+            pair = cls_str.strip().split(":")
+            if len(pair) == 2:
+                pname = pair[0]
+                cname = pair[1]
+            else:
+                log.error("Configuration section '%s',"\
+                          " class name '%s' is badly formed"\
+                              % (section_name, cls_str.strip()))
+                return_code = CuminErrors.PARSE_ERROR
+                break
+
+            try:
+                pkg = mint.model._packages_by_name[pname]
+                if cname == "*":
+                    pkgs = pkgs.union(set(pkg._classes))
+                else:
+                    try:
+                        cls = pkg._classes_by_name[cname]
+                        pkgs.add(cls)
+                    except KeyError:
+                        log.warning("Configuration section '%s',"\
+                                    " class '%s' is not contained in package"\
+                                    " '%s'" % (section_name, cname, pname))
+            except KeyError:
+                log.warning("Configuration section '%s',"\
+                            " package '%s' not found" % (section_name, pname))
+    elif on_empty == "all":
+        for pkg in mint.model._packages:
+            pkgs = pkgs.union(set(pkg._classes))
+
+    return return_code, pkgs
+
+def adjust_return(passed_init, ret):
+    # Shift non-zer0 return codes left 1 bit
+    # and OR in whether or not init passed
+    if ret != 0:
+        ret = ret << 1 | passed_init
+    return ret
+
+def write_status_path(p, value):
+    try:
+        f = open(p, "w+")
+        if value:
+            f.write(value)
+        f.close()
+    except:
+        pass
+
+def main():
+    passed_init = 1
+    return_code = CuminErrors.NO_ERROR
+    wrote_status = False
+    config = None
+
+    # Do our own simple option check so we can redirect IO early
+    # without worrying about other options or the behavior of optParse
+    opts = check_for_options(["--section", "--daemon"], sys.argv[1:])
+    if type(opts["--section"]) is str:
+        section_name = opts["--section"]
+    else:
+        section_name = "report"
+
+    # If the --daemon option has been set, redirect stderr and stdio through
+    # pipes.  Launch a thread to read those pipes and direct the content to
+    # files with rollover control. 
+    pipeThread = None
+    if opts["--daemon"]:
+        try:
+            cumin_home = os.environ.get("CUMIN_HOME", os.path.normpath("/usr/share/cumin"))
+            err_file = os.path.join(cumin_home, "log", section_name+".stderr")
+            out_file = os.path.join(cumin_home, "log", section_name+".stdout")
+ 
+           # Open pipes and redirect
+            err_r, err_w = os.pipe()
+            out_r, out_w = os.pipe()
+            pipeThread = PipeLogThread(descriptors=[err_r, out_r],
+                                       paths=[err_file, out_file],
+                                       call_on_fail=restore_IO)
+            pipeThread.start()
+            sys.stderr = os.fdopen(err_w, "w", 0)
+            sys.stdout = os.fdopen(out_w, "w", 0)
+        except:
+            print_exc()
+            pipeThread = None
+    
+    class ArgError(Exception):
+        pass
+
+    try:
+        mint = None
+        setup_initial_logging()
+
+        parser = PlumageOptionParser()
+
+        # Add additional parameters for report
+        parser.add_option("--print-stats", action="store_true", default=False)
+        parser.add_option("--print-events", type="int", default=0, metavar="LEVEL")
+        parser.add_option("--section", default="report")
+        parser.add_option("--daemon", action="store_true", default=False)
+        parser.add_option("--no-vacuum", dest="vacuum_enabled", action="store_false")
+        parser.add_option("--no-expire", dest="expire_enabled", action="store_false")
+        parser.add_option("--delete-on-start", action="store_true", default=False)
+
+        # Get options
+        opts, args = parser.parse_args()
+
+        # --section controls which section is read from the config file
+        # If a section other than "report" is specified, require it to exist
+        config = CuminReportConfig(opts.section, strict_section = opts.section != "report")
+
+        # There might be other sections returned from config.parse() but
+        # currently we don't care about them...
+        values = getattr(config.parse(), opts.section)
+
+        # Use the config values as defaults for unspecified options
+        apply_defaults(values, opts)
+
+        # If log_file is a relative path, base it from $CUMIN_HOME/log
+        opts.log_file = config.expand_log_file(opts.log_file)
+        setup_operational_logging(opts, 
+                                  values.log_max_mb,
+                                  values.log_max_archives)
+
+        if len(args) != 0:
+            log.error("Extra arguments:" + "".join([" "+arg for arg in args]))
+            raise ArgError
+
+        model_dir = [os.path.join(config.home, x) for x in ("model/admin", "model/plumage")]
+
+        mint = Plumage(model_dir, values.plumage_host, values.plumage_port, opts.database)
+
+        mint.print_event_level = opts.print_events
+
+        mint.expire_enabled = opts.expire_enabled
+        mint.expire_thread.interval = values.expire_interval
+        mint.expire_thread.threshold = values.expire_threshold
+
+        mint.vacuum_enabled = opts.vacuum_enabled
+        mint.vacuum_thread.interval = values.vacuum_interval
+        
+        mint.plumage_host = values.plumage_host
+        mint.plumage_port = values.plumage_port
+
+        # Data model init has been moved here in the 
+        # bootstrap process so we can process the binding options next...
+        mint.check()
+
+        # Handle class binding options
+        if values.include_classes or values.exclude_classes:
+            return_code, includes = process_classes(mint, 
+                                                    values.include_classes,
+                                                    opts.section, on_empty="all")
+
+            return_code, excludes = process_classes(mint, 
+                                                    values.exclude_classes,
+                                                    opts.section)                
+
+            mint.classes = includes.difference(excludes)
+
+        # Finish initialization
+        mint.init()
+
+        # If we've been instructed to delete timestamp data at
+        # startup, set the flag in the update thread where the
+        # delete logic is located...
+        mint.update_thread.del_on_start = opts.delete_on_start
+
+        # ... and if furthermore the init_only flag is set,
+        # cause the delete to happen before we return
+        if opts.init_only and opts.delete_on_start:
+            mint.update_thread._delete_all_objects()
+
+        # Okay, record the init check status here
+        write_status_path(config.get_init_status_path(), str(return_code)+"\n")
+        wrote_status = True
+
+        # If init_only was set or we failed init, don't proceed...
+        if not opts.init_only and not return_code:
+            passed_init = 0
+
+            mint.start()
+            stats = mint.update_thread.stats
+            count = 0
+
+            exit_msg = "Exiting on termination string from master"
+
+            if opts.print_stats:
+                print "[Starred columns are the number of events per second]"
+
+                while True:
+                    if count % 20 == 0:
+                        stats.print_headings()
+
+                    count += 1
+
+                    stats.print_values()
+                    if opts.es:
+                        if poll_stdin(5, value=opts.es):
+                            log.debug(exit_msg)
+                            break
+                    else:
+                        sleep(5)
+            else:
+                while True:
+                    if opts.es:
+                        if poll_stdin(86400, value=opts.es):
+                            log.debug(exit_msg)
+                            break
+                    else:
+                        sleep(86400)
+
+    except KeyboardInterrupt:
+        log.info("Received shutdown signal")
+
+    except SystemExit:
+        if "--help" not in sys.argv:
+            log.error("Error in options")
+            return_code = CuminErrors.PARSE_ERROR
+
+    except ArgError:
+        return_code = CuminErrors.PARSE_ERROR
+
+    except OperationalError:
+        # Failed to talk to the database on check()
+        log.info("Run 'cumin-database check' as root for more information.")
+        return_code = CuminErrors.DATABASE_ERROR
+
+    except SchemaMissing:
+        log.info("Run 'cumin-admin create-schema' as root")
+        return_code = CuminErrors.SCHEMA_ERROR
+
+    except SchemaVersion:
+        log.info("Run 'cumin-admin upgrade-schema' as root")
+        return_code = CuminErrors.SCHEMA_VER_ERROR
+
+    except:
+        print_exc()
+        return_code = CuminErrors.UNHANDLED_ERROR
+
+    # For parse errors, for example, we won't have a config object yet
+    # but the return code will indicate an init error anyway so a 
+    # parent can check the return code.
+    if not wrote_status and config:
+        write_status_path(config.get_init_status_path(), str(return_code)+"\n")
+
+    def shutdown():
+        if mint:
+            mint.stop()
+        log.info("about to call logging shutdown")
+        logging.shutdown()
+
+    # Run shutdown with a timeout in the main thread.
+    # This guarantees exit.
+    t = ShutdownThread(shutdown)
+    t.start()
+
+    # If we get some error before options are parsed opts.tm won't be set
+    try:
+        tm = opts.tm
+    except:
+        tm = 5
+    t.join(tm)
+    if t.isAlive():
+        log.info("Shutdown thread timed out, exiting")
+    if pipeThread:
+        pipeThread.stop(immediate=True)
+    return adjust_return(passed_init, return_code)
+
+def make_ctrl_c(sig, frame):
+    raise KeyboardInterrupt
+
+if __name__ == "__main__":
+    try:
+        import signal
+        signal.signal(signal.SIGTERM, make_ctrl_c)
+        sys.exit(main())
+    except KeyboardInterrupt:
+        sys.exit(0)

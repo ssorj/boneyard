@@ -1,0 +1,935 @@
+[CuminMainView.css]
+#head {
+    padding: 0;
+    background: #f9f9ff url("resource?name=shade.png") repeat-x scroll bottom center;
+}
+
+#tabs {
+    padding: 0;
+    margin: 0;
+}
+
+#tabs li {
+    display: inline;
+}
+
+#tabs li a {
+    padding: 0.275em 0.5em;
+    border-top: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #e7e7e7;
+    -moz-border-radius: 0.35em 0.35em 0 0;
+    -webkit-border-radius: 0.35em 0.35em 0 0;
+    color: #333;
+    background-color: #f7f7f7;
+    line-height: 1.5em;
+}
+
+#tabs li:first-child a {
+    border-left: 1px solid #ccc;
+}
+
+#tabs li a.selected {
+    background-color: #fff;
+    position: relative;
+    z-index: 2;
+}
+
+#logo {
+    float: left;
+    margin: 0.6em 1em;
+}
+
+#local {
+    padding: 0.15em 0 0 0;
+    margin: 0;
+}
+
+#global {
+    padding: 0.35em 1em;
+    margin: 0;
+    font-size: 0.9em;
+}
+
+#user {
+    padding: 0.35em 1em;
+    margin: 0;
+    font-size: 0.9em;
+}
+
+#user {
+    float: right;
+}
+
+#actions {
+    padding: 0.25em 0.5em;
+    float: right;
+    font-size: 0.9em;
+}
+
+#body {
+  border-top: 1px solid #ccc;
+  padding: 0.75em 1em;
+  position: relative;
+  z-index: 1;
+  min-height: 20em;
+}
+
+#messages {
+    -moz-border-radius: 0.35em;
+    border: 1px solid #886;
+    background-color: #ffd;
+    display: none;
+    font-size: 0.8em;
+    font-weight: normal;
+    padding: 6px 8px;
+    position: relative;
+    z-index: 1;
+    width: 96%;
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+    margin-left: 2%;
+}
+
+#messages p {
+    width: 1em;
+    height: 0.8em;
+    cursor: pointer;
+    float: right;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin: 0;
+    padding: 0 0.25em 0.25em 0.25em;
+    position: relative;
+    top: -2px;
+}
+
+div.TabbedModeSet.mode {
+    /* min-width: 954px; */
+}
+
+[CuminMainView.javascript]
+    cumin.set_updated = function (success) {
+        var updateStr;
+        
+        var kiosk = wooly.session.branch()["kiosk"];
+        if (kiosk != null && kiosk != undefined)
+            updateStr = success ? "**Updated " : "Last update failed ";
+        else
+            updateStr = success ? "Updated " : "Last update failed ";
+        $('heartbeat').set('text', updateStr + new Date().format("%Y-%m-%d %H:%M:%S"));
+        $('shock').style.display = "none";
+        $('heartbeat').style.display = "inline";
+        $('heartbeat').style.color = "#000000";
+
+        if (typeof cumin.myEffect == "undefined")
+            cumin.myEffect = new Fx.Morph('heartbeat', {duration: 1000});
+        setTimeout(function () {cumin.myEffect.start({ 'color': ['#000000', '#666666'] })}, 500);
+    }
+    wooly.addPageUpdateListener(cumin.set_updated);
+    
+    cumin.expireIntervalUpdate = function () {
+        if (typeof cumin.expireID != "undefined") {
+            if (cumin.expireID) {
+                window.clearTimeout(cumin.expireID);
+                cumin.expireID = null;
+            }
+        }
+        // A "kiosk" NV pair in the URL prevents timeouts
+        var kiosk = wooly.session.branch()["kiosk"]
+        if (kiosk == null || kiosk == undefined)
+        {
+            cumin.expireID = setTimeout(function () {
+                wooly.cancelIntervalUpdate();
+                setTimeout(function () {
+                    $('heartbeat').style.display = "none";
+                    $('shock').style.display = "block"}, 1000);
+                $('shock').onclick = function () {
+                    wooly.updateNow();
+                    wooly.resumeIntervalUpdate();
+                    cumin.expireIntervalUpdate();
+                    cumin.set_updated(true);
+                    drawAllCharts();
+                }
+            }, 30*60*1000); // The page updates will last for 30 minutes before the "resume updates" button appears    
+        };
+    };
+    cumin.expireIntervalUpdate();
+    window.addEvent('domready', function () {
+        cumin.set_updated(true);
+    });
+
+[CuminMainView.html]
+<div id="head">
+  <img id="logo" src="{resource_prefix}/mrg-logo-32.png" alt="" />
+
+  <div id="user">
+    Hi, {user_name}
+    <span class="separator">|</span>
+    <a id="logout" onclick="wooly.clearUpdates()" href="{logout_href}">Log out</a>
+    <span class="separator">|</span>
+    <a href="{about_href}">About</a>
+  </div>
+
+  <div id="global">
+    {links}
+  </div>
+
+  <div id="local">
+    <ul id="tabs">{tabs}</ul>
+  </div>
+</div>
+
+<div id="body">
+  {notifications}
+
+  {heartbeat}
+
+  {content}
+</div>
+
+<div id="foot"/>
+
+[CuminPage.error_html]
+<div id="body">
+  <h1 style="margin: 0.5em 0 1em 0;">An error!</h1>
+
+  <p>Something unexpected happened.  Please report this problem
+  at <a href="http://bugzilla.redhat.com">bugzilla.redhat.com</a>
+  under the 
+  <a href="https://bugzilla.redhat.com/enter_bug.cgi?product=Red%20Hat%20Enterprise%20MRG">Red Hat Enterprise MRG product</a>.</p>
+
+  <p><a onclick="$('error').setStyle('display', 'inline')">See the
+  details</a>.  Please include this in any bugs filed.</p>
+
+  <div id="error" style="display: none;">
+    {error_dump}
+  </div>
+</div>
+
+[CuminPage.not_found_html]
+<div id="body">
+  <h1 style="margin: 0.5em 0 1em 0;">We can't find the object you requested</h1>
+
+  <p>This often happens when a far-off agent stops or is disconnected.
+  It may come back under a different database ID.  Try navigating anew
+  from the <a href="/index.html">site root</a>.</p>
+</div>
+
+[CuminPageLinks.css]
+ul.CuminPageLinks {
+    padding: 0;
+    margin: 0;
+}
+
+ul.CuminPageLinks li {
+    display: inline;
+}
+
+ul.CuminPageLinks li {
+    display: inline;
+}
+
+ul.CuminPageLinks li:after {
+    content: " | ";
+}
+
+ul.CuminPageLinks li:after,
+span.separator {
+    color: #ccc;
+}
+
+ul.CuminPageLinks li:last-child:after {
+    content: ""
+}
+
+ul.CuminPageLinks li.selected,
+ul.CuminPageLinks li.selected a {
+    color: black;
+}
+
+[CheckAdmin.sql]
+select 1
+from subject_role_mapping as m
+join role as r on m.role_id = r.id
+{sql_where}
+
+[CuminHeartBeat.css]
+#updateStatus {
+    float:right;
+    padding: 0.25em;
+    font-size: 0.8em;
+}
+
+#updateStatus button {
+    display: none;
+    margin-left:0.5em;
+    padding: 0;
+    background-color: #FFF0F0;
+    color: #600;
+    border: 1px solid #C00;
+}
+
+[CuminHeartBeat.html]
+<div id="updateStatus">
+    <span id="heartbeat"></span>
+    <button id="shock">Resume Updates</button>
+</div>
+
+[CuminView.css]
+ul.context {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    line-height: 1.75em;
+    font-size: 0.9em;
+    color: #999;
+}
+
+ul.context li {
+    display: inline;
+}
+
+ul.context a:after {
+    content: " > ";
+    font-weight: bold;
+    font-size: 0.8em;
+    color: #999;
+}
+
+[CuminView.html]
+<ul class="context">{frames}</ul>
+
+{summary}
+
+{tabs}
+
+[CuminView.frame_html]
+<li>{frame}</li>
+
+[CuminForm.html]
+<form id="{id}" class="mform" method="post" action="?">
+  <div class="head">{title}</div>
+  <div class="body">{body}</div>
+  {form_error}
+  <div class="foot">
+    {help}
+    {submit}
+    {cancel}
+  </div>
+  <div>{hidden_inputs}</div>
+</form>
+<script type="text/javascript">
+//<![CDATA[
+  $("{id}").elements[0].focus();
+//]]>
+</script>
+
+[CuminDetails.css]
+table.CuminDetails {
+    width: 100%;
+    border-collapse: collapse;
+}
+ 
+table.CuminDetails > tbody > tr > td {
+    width: 50%;
+    padding: 0.5em;
+    vertical-align: top;
+}
+
+table.CuminDetails ul.ActionSet {
+    font-size: 0.9em;
+    margin: 1em 0.5em;
+}
+
+[CuminDetails.html]
+<table class="CuminDetails">
+  <tbody>
+  <tr>
+    <td>
+      <h2>Properties</h2>
+      {properties}
+    </td>
+    <td>
+      <h2>Tasks</h2>
+      {tasks}
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+[CuminHeading.css]
+h1.CuminHeading {
+    margin: 0 0 1em 0;
+}
+
+h1.CuminHeading img {
+    vertical-align: -70%;
+    margin: 0 0.25em 0 0;
+}
+
+[CuminHeading.html]
+<h1 class="CuminHeading">
+  <img src="{icon_href}" alt="summary"/>
+  {title}
+</h1>
+
+[StateSwitch.html]
+<ul class="radiotabs">
+  {items}
+</ul>
+
+[StateSwitch.item_html]
+<li>{item_link}</li>
+
+[SubmitSwitch.javascript]
+function submit_state(id, state) {
+    var oHidden = document.forms[0].elements[id];
+
+    if (oHidden) {
+        if (oHidden.length) {
+            for (var i=0; i<oHidden.length; i++) {
+                oHidden[i].value = state;
+            }
+        } else {
+            oHidden.value = state;
+        }
+
+        document.forms[0].action += "#phase";
+        document.forms[0].submit();
+    }
+}
+
+[SubmitSwitch.html]
+<a name="phase"></a><ul class="radiotabs">
+  {items}
+</ul><input type="hidden" name="{name}" value="{value}" />
+
+[CuminEditableProperties.html]
+<table class="PropertySet Editable">
+  <thead>
+    <tr>
+      <th style="width: 50%;">Name</th>
+      <th style="width: 50%;">Value</th>
+    </tr>
+  </thead>
+  <tbody>{items}</tbody>
+</table>
+
+[CuminEditableProperties.property_html]
+<tr>
+  <th>{title}</th><td>{value}</td><td>{inline_help}</td>
+</tr>
+
+[EditablePropertyRenderer.bool_html]
+<input class="edit_bool" id="{pname}.true" type="radio" name="{pname}" value="true" {true_selected} /> <label for="{pname}.true">True</label>
+<input class="edit_bool" id="{pname}.false" type="radio" name="{pname}" value="false" {false_selected} /> <label for="{pname}.false">False</label>
+<input type="hidden" name="{ptype_name}" value="{ptype_value}"/>
+{orig_value}
+
+[EditablePropertyRenderer.string_html]
+<input class="edit_string" type="text" name="{pname}" value="{val}" />
+<input type="hidden" name="{ptype_name}" value="{ptype_value}"/>
+{orig_value}
+
+[EditablePropertyRenderer.bigstring_html]
+<textarea class="edit_bigstring" name="{pname}" rows="4" cols="40">{val}</textarea>
+<input type="hidden" name="{ptype_name}" value="{ptype_value}"/>
+{orig_value}
+
+[EditablePropertyRenderer.number_html]
+<input class="{edit_number_class}" type="text" name="{pname}" value="{val}" />{error}
+<input type="hidden" name="{ptype_name}" value="{ptype_value}"/>
+{orig_value}
+
+[EditablePropertyRenderer.readonly_html]
+<span class="edit_readonly">{display_val}</span><input type="hidden" name="{ptype_name}" value="{ptype_value}"/><input type="hidden" name="{pname}" value="{val}"/>
+{orig_value}
+
+[EditablePropertyRenderer.orig_html]
+<input type="hidden" name="{porig_name}" value="{porig_value}"/>
+
+[TopTableColumnHeader.html]
+<th class="{class}">{content}</th>
+
+[CuminTable.css]
+div.CuminTable table,
+table.CuminTable {
+    table-layout: fixed;
+}
+
+div.CuminTable th.setnav {
+    font-size: 0.9em;
+    padding: 0.35em 0.75em;
+}
+
+div.CuminTable ul.switches,
+div.CuminTable ul.filters,
+div.CuminTable ul.buttons {
+    list-style: none;
+    display: inline;
+    padding: 0;
+    margin: 0;
+}
+
+div.CuminTable ul.filters {
+    float: right;
+}
+
+div.CuminTable ul.buttons li {
+    margin: 0 0.4em 0 0;
+    display: inline;
+}
+
+div.CuminTable form {
+    clear: both;
+}
+
+div.CuminTable table td,
+table.CuminTable td,
+div.CuminTable table th,
+table.CuminTable th {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+div.CuminTable table th,
+table.CuminTable th {
+    font-size: 0.9em;
+}
+
+[CuminTable.javascript]
+wooly.addPageUpdateListener(cumin.restoreTableCheckboxes);
+
+[CuminTable.html]
+<div id="{id}" class="{class}">
+  {links}
+
+  <table class="mobjects">
+    {columns}
+    <thead>
+      <tr>
+        <th class="setnav" colspan="{column_count}">
+          <div class="rfloat">{page}</div>
+          {count}
+        </th>
+      </tr>
+      <tr>{headers}</tr>
+    </thead>
+    <tbody>{items}</tbody>
+  </table>
+</div>
+
+[CuminTableWithControls.html]
+<div id="{id}" class="{class}">
+  {links}
+
+  {filters}
+
+  {switches}
+
+  <table class="mobjects">
+    {columns}
+    <thead>
+      <tr>
+        <th class="setnav" colspan="{column_count}">
+          <div class="rfloat">{page}</div>
+
+          {count}
+        </th>
+      </tr>
+
+      <tr>{headers}</tr>
+    </thead>
+
+    <tbody>{items}</tbody>
+  </table>
+</div>
+
+[CuminSelectionTable.html]
+<div id="{id}" class="{class}">
+  {links}
+
+  {filters}
+
+  {switches}
+
+  <form method="post" action="?">
+    <div class="sactions">
+      <h2>Act on selection</h2>
+      {buttons}
+    </div>
+
+    <table class="mobjects">
+      {columns}
+      <thead>
+        <tr>
+          <th class="setnav" colspan="{column_count}">
+            <div class="rfloat">{page}</div>
+
+            {count}
+          </th>
+        </tr>
+
+        <tr>{headers}</tr>
+      </thead>
+
+      <tbody>{items}</tbody>
+    </table>
+
+    <div>{hidden_inputs}</div>
+  </form>
+</div>
+
+[CuminItemTable.html]
+<div id="{id}" class="CuminTable">
+  <table class="mobjects">
+    {columns}
+    <thead>
+      <tr>
+        <th class="setnav" colspan="{column_count}">
+          <div class="rfloat">{page}</div>
+
+          {count}
+        </th>
+      </tr>
+
+      <tr>{headers}</tr>
+    </thead>
+
+    <tbody>{items}</tbody>
+  </table>
+</div>
+
+[TableHeader.css]
+th.selected a {
+    color: black;
+}
+
+[TableHeader.html]
+<thead>
+  <tr>{items}</tr>
+</thead>
+
+[TableHeader.item_html]
+<th class="{item_class}"><a href="{item_href}">{item_content}</a></th>
+
+[CheckboxColumnHeader.css]
+th.chk_box {
+    width: 2em;
+}
+
+[CheckboxColumnHeader.javascript]
+function checkAll(control_id, form_id, elem_name) {
+    var control = document.getElementById(control_id)
+    var div = document.getElementById(form_id);
+    var form = $(div).getElement("form");
+
+    for (var i = 0; i < form.elements.length; i++) {
+        var elem = form.elements[i];
+
+        if (elem.name == elem_name) {
+            if (elem.checked != control.checked)
+                elem.click();   // fires the onclick event
+        }
+    }
+}
+
+[CheckboxColumnHeader.html]
+<th class="chk_box"><input id="{id}" type="checkbox" name="all"
+    onclick="cumin.clickTableCheckbox(this, 'all'); checkAll('{id}', '{form_id}', '{elem_name}')" value="all"/></th>
+
+[TopN.html]
+<div>
+   <input type="radio" name="{name}" id="{id}" value="{value}" tabindex="{tab_index}" {checked_attr} {disabled_attr}/>
+   Top
+   <input type="text" name="{arg_name}" value="{arg_value}" /> messages
+</div>
+
+[BackgroundInclude.css]
+object.BackgroundInclude {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    z-index: -2;
+}
+
+div#BackgroundGlass {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+[BackgroundInclude.html]
+<div id="BackgroundGlass"><!-- prevents clicks since disabled doesn't work on objects --></div>
+<object id="backgroundInclude" class="BackgroundInclude" data="{data}{background}" type="{type}" />
+
+[FormHelp.javascript]
+function help_window(href) {
+   var left = screen.availWidth / 2;
+   var height = screen.availHeight - 40;
+   var args = "width="+left+",height="+height+",top=0,left="+left+",scrollbars=1,status=1,toolbar=1";
+
+   hwin = window.open(href, "help", args);
+
+   if (hwin.focus) {
+       hwin.focus();
+   }
+
+   return false;
+}
+
+window.addEvent('domready', function attachHelp() {
+
+    if (document.getElementById("help_link")) {
+        document.getElementById("help_link").onclick = function() { return help_window(this.href) }
+    }
+
+});
+
+[FormHelp.html]
+<a class="help action" id="help_link" href="{help_href}">Help</a>
+
+[MoreFieldSet.css]
+div.more_inputs {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    padding: 0.5em;
+    border: 1px dashed #333;
+    background-color: #FCFCFC;
+}
+
+div.more_field_set {
+    margin-bottom: 1em;
+}
+
+div.more_field_set ul.actions {
+    margin-bottom: 0.5em;
+}
+
+
+[MoreFieldSet.html]
+<tr>
+  <th>
+    <div class="title">{title}</div>
+    <div class="help">{help}</div>
+  </th>
+  <td>
+    <div class="more_field_set">
+      <ul class="actions">
+        <li>
+          <a class="nav" href="#" onclick="toggle_more_fieldset(); return false;"><span id="button_{id}">{state_text}</span></a>
+        </li>
+      </ul>{open}
+      <div id="{id}" class="more_inputs" style="display:{open_display};">
+        {inputs}
+      </div>
+    </div><!-- end of "more_field_set" -->
+    <script type="text/javascript">
+        function toggle_more_fieldset() {
+            var oDiv = document.getElementById("{id}");
+            var oButton = document.getElementById("button_{id}");
+            var oState = document.forms[0].elements["{open_path}"];
+
+            if (oDiv) {
+                if (oDiv.style.display == "none") {
+                    oDiv.style.display = "block";
+
+                    if (oButton) {
+                        oButton.innerHTML = "{less_text}";
+                    }
+
+                    if (oState) {
+                        oState.value = "t";
+                    }
+                } else {
+                    oDiv.style.display = "none";
+
+                    if (oButton) {
+                        oButton.innerHTML = "{more_text}";
+                    }
+
+                    if (oState) {
+                        oState.value = "f";
+                    }
+
+                    document.forms[0].submit();
+                }
+            }
+        }
+    </script>
+  </td>
+</tr>
+
+[Wait.html]
+  <div class="loading" style="visibility:visible;"><span>Loading...</span></div>
+
+[CuminFormPage.css]
+body {
+    background-color: #000;
+    height: 100%;
+    z-index: 0;
+}
+
+body > object.BackgroundInclude {
+    opacity: 0.2;
+}
+
+body > form {
+    z-index: 1;
+    width: 48em;
+    margin: 6em auto;
+    background-color: #fff;
+}
+
+[IncrementalSearchInput.javascript]
+addJavascript('resource?name=incrementalSearch.js', 'head');
+
+[IncrementalSearchInput.css]
+div.IncrementalSearchInput select {
+    display: none;
+}
+div.IncrementalSearchInput input.disabled {
+    background:white;
+    color:black;
+    border: 0px solid white;
+    cursor:default;
+}
+
+[IncrementalSearchInput.html]
+<div class="IncrementalSearchInput">
+    <input id="{id}" type="text" name="{name}" value="{value}" tabindex="{tab_index}" size="{size}" autocomplete="off"/>
+    <select id="{id}.list">{items}</select>
+</div>
+<script type="text/javascript">
+//<![CDATA[
+window.addEvent("domready", 
+    function () {
+        new IncrementalSearch($("{id}"), Inc_CIBeginning, "autocomplete", "{id}.list", 8);
+    }
+);
+//]]>
+</script>
+
+[IncrementalSearchInput.item_html]
+<option value="{item_value}">{item_content}</option>
+
+[IncrementalSearchInput.disabled_html]
+<div class="IncrementalSearchInput">
+<input class="disabled" id="{name}" name="{name}" value="{value}" tabindex="{tab_index}" size="{size}" />
+</div>
+<script type="text/javascript">
+//<![CDATA[
+// Using input attribute disabled="disabled' has the unfortunate side effect of not sending the input value
+// when the form is submitted. So we just leave it enabled and filter out keyboard input with javascript. 
+window.addEvent("domready", 
+    function () {
+        $("{name}").addEvent("keypress", 
+        function (e) { 
+            if (!(e.key in {tab:1, left:1, right:1}))
+                if (! (e.key == 'c' && e.control) )
+                    new Event(e).stop();
+        } )
+    }
+);
+//]]>
+</script>
+
+[StaticTableColumnHeader.html]
+<th {attrs}>{content}</th>
+
+[StaticColumnHeader.html]
+<th class="{class}">{content}</th>
+
+[AboutContent.html]
+<div>
+<h3>Management console version</h3>
+{version}
+</div>
+
+[AboutSupportedBrowsers.css]
+.browseritem {
+	margin-left:30px;
+}
+
+[AboutSupportedBrowsers.html]
+<div>
+<h3>Supported Browsers</h3>
+{browser_list}
+</div>
+
+[PageableFilteredSelect.html]
+<script type="text/javascript">
+//<![CDATA[
+window.addEvent('domready', function (){    
+     $$('.multiselect').each(function(multiselect){
+        new MTMultiWidget({'datasrc': {datasrc},
+        					'widgetcls':'{class}',
+        					'selectedcls':'{selected_class}',
+        					'paginator_on_bottom':'true',
+        					'items_per_page':{items_per_page},
+        					'case_sensitive':false,
+        					'setview':'total',
+        					'listcontainer_height':'{listcontainer_height}'});
+    });
+    var focusElements =  $$('.focusfirst');
+    if(focusElements != null) {
+    	focusElements[0].focus();
+    }
+});
+
+//]]>
+		</script>
+		<tr>
+			<th><div class="title">{title}</div></th>
+			<td>
+			  <div style='width:{container_width};height:{container_height};'>
+				<select class='{datasrc}' name="{id}.inputs.param" multiple="multiple" id="{id}.inputs.param" size="10" style="width:{width};">
+					{items}
+				</select>
+			  </div>
+			</td>
+		</tr>
+
+[NotificationSet.css]
+div.NotificationSet {
+    background-color: #fe0;
+    padding: 1em 2em;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    margin: 0.5em auto 1em auto;
+    width: 80%;
+}
+
+div.NotificationSet ul {
+    margin: 0;
+    padding: 0 0 0 1em;
+}
+
+div.NotificationSet a.dismiss {
+    float: right;
+    font-size: 0.9em;
+}
+
+div.NotificationSet .notification_time {
+	font-style: italic;
+	color: #707070;
+}
+
+[NotificationSet.html]
+<div id="{id}" class="{class}">
+  <a class="dismiss" href="{dismiss_all_href}">Dismiss all notifications</a><br/>
+  <ul>{items}</ul>
+</div>
+
+[NotificationItem.html]
+<li>
+  <a class="dismiss" href="{dismiss_href}">Dismiss</a>
+  {message}
+</li>

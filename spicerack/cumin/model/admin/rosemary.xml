@@ -1,0 +1,7 @@
+<model>
+  <package name="com.redhat.cumin" persistent="y">
+    <class name="User">
+      <property name="name" unique="y"/>
+    </class>
+  </package>
+</model>

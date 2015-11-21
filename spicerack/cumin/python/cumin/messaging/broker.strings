@@ -1,0 +1,159 @@
+[BrokerSet.sql]
+select
+  b.id,
+  b.qmf_agent_id,
+  s.node_name || ':' || b.port as name,
+  c.cluster_name as cluster
+from broker as b
+left outer join system as s on b.system_id = s.id
+left outer join cluster as c on c.broker_id = b.id
+{sql_where}
+{sql_orderby}
+{sql_limit}
+
+[BrokerSet.count_sql]
+select count(*)
+from broker as b
+{sql_where}
+
+[BrokerQueueTab.html]
+{items}
+
+[BrokerDetailsTab.html]
+<table class="CuminDetails">
+  <tbody>
+  <tr>
+    <td>
+      <h2>Properties</h2>
+      {properties}
+    </td>
+    <td>
+      <h2>Tasks</h2>
+      {tasks}
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+[BrokerStats.html]
+<table class="twocol">
+  <tbody>
+  <tr>
+    <td>
+      <h2>Access Control</h2>
+      {acl}
+    </td>
+    <td>
+<!-- -->
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+[BrokerBrowser.css]
+table.BrokerBrowser {
+  width: 100%;
+}
+
+table.BrokerBrowser td {
+  vertical-align: top;
+}
+
+table.BrokerBrowser td.nav {
+  width: 20%;
+  vertical-align: top;
+}
+
+table.BrokerBrowser td.nav h2 {
+  font-weight: normal;
+  font-size: 0.9em;
+}
+
+table.BrokerBrowser td.nav ul.slist {
+  margin: 0.5em 0 1em 0;
+}
+
+table.BrokerBrowser td.view {
+  width: 80%;
+}
+
+[BrokerBrowser.html]
+<table class="BrokerBrowser">
+  <tr>
+    <td class="nav">
+      <ul class="actions">
+        <li><a href="{clear_filters_href}">Clear Filters</a></li>
+      </ul>
+
+      <h2>Filter by Group</h2>
+      <ul class="slist">{group_filters}</ul>
+    </td>
+    <td class="view">{brokers}</td>
+  </tr>
+</table>
+
+[BrokerBrowser.group_html]
+<li>{group_link}</li>
+
+[BrokerSetForm.css]
+table.BrokerSetForm td, table.BrokerSetForm th {
+  padding: 0.25em;
+}
+
+table.BrokerSetForm span.example {
+  font-weight: normal;
+  font-size: 0.8em;
+  font-style: italic;
+}
+
+[BrokerSetEngroupForm.css]
+div.content ul {
+    list-style: none;
+}
+
+[BrokerSetEngroupForm.javascript]
+window.addEvent('domready',function () {
+    $$('button')[0].focus();
+});
+
+[BindingAddForm.javascript]
+function bindingExchangeChanged(xtype, keyid, argsid) {
+    var keyrow = $(keyid);
+    var keytitle = keyrow.getElement('div');
+    var keyinput = keyrow.getElement('input');
+    if (xtype == 'fanout') {
+        keyinput.setProperty('disabled', true);
+    } else {
+        keyinput.setProperty('disabled', false);
+    }
+    var argsrow = $(argsid);
+    if (xtype == 'headers') {
+        argsrow.setStyle('display', 'table-row');
+        var names = argsrow.getElements("input.NameInput");
+        names.each( function (item, index) { item.value = ""; } );
+        names[0].value = "x-match";
+        names[1].focus();
+        var values = argsrow.getElements("input.ValueInput");
+        values.each( function (item, index) { item.value = ""; } );
+        values[0].value = "all";
+    } else {
+        argsrow.setStyle('display', 'none');
+    }
+}
+
+[ExchangeBindings.css]
+tr.ExchangeHiddenRow {
+    display: none;
+}
+
+[ExchangeInput.select_html]
+     function (value, data) { 
+        if (typeof data == "undefined") 
+            data = "|";
+        var exchangeData = data.split('|');
+        var xid = exchangeData[0], xtype = exchangeData[1];
+        var xinput = document.forms[0].elements['{alt_value_path}'];
+        xinput.value = xid;
+        bindingExchangeChanged(xtype, '{key_id}', '{args_id}');
+     }
+

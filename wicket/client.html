@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <title>Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  </head>
+  <body>
+    <p id="hitme"/>
+    
+    <script type="text/javascript">
+
+"use strict";
+
+var uri = "ws://localhost:8888/ws";
+
+var ws = new WebSocket(uri);
+
+ws.onopen = function(evt) {
+    console.log("Open: " + evt);
+    ws.send("Why, Hello!");
+};
+
+ws.onclose = function(evt) {
+    console.log("Close: " + evt);
+};
+
+ws.onmessage = function(evt) {
+    console.log("Received: " + evt);
+
+    var elem = document.getElementById("hitme");
+    elem.textContent = evt.data;
+}
+
+    </script>
+  </body>
+</html>

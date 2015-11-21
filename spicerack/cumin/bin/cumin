@@ -1,0 +1,362 @@
+#!/usr/bin/python
+from optparse import OptionParser
+from time import sleep
+import subprocess
+import os
+import sys
+import signal
+import traceback
+from datetime import datetime, timedelta
+import syslog
+
+home = os.environ.get("CUMIN_HOME", os.path.normpath("/usr/share/cumin"))
+sys.path.append(os.path.join(home, "python"))
+
+from cumin.config import *
+from cumin.errors import CuminErrors
+
+from parsley.loggingex import *
+log = logging.getLogger("cumin.master")
+
+# Termination string to children
+exit_s = "exit"
+
+def call_sys_exit(sig,frame):
+    sys.exit()
+
+def set_exit_handler(func):
+    signal.signal(signal.SIGTERM, func)
+
+def log_parse_errors(r):
+    msg = os.fdopen(r, "r").readlines()
+    if len(msg) > 0:
+        _syslog.log()
+        log.error("".join(msg))
+        return 1
+    return 0
+
+def get_args(app, section, init_only, console, es, timeout, extra_options):
+    args = [app, "--section="+section.strip(), "--es="+es.strip(), "--tm="+str(timeout)]
+    if init_only:
+        args.append("--init-only")
+    if not console:
+        args.append("--daemon")
+    if len(extra_options) != 0:
+        args += extra_options.split(" ")
+    prog_string = "".join([" "+x for x in args])
+    return args, prog_string
+
+class _syslog(object):
+    enabled = False
+    @classmethod
+    def log(cls):
+        if _syslog.enabled:
+            home = os.environ.get("CUMIN_HOME", os.path.normpath("/usr/share/cumin"))
+            syslog.syslog("cumin: master script exited with errors, see %s/log/master.log" % home)
+
+# Used to write the pidfile and the startup status files.
+def write_status_path(p, value, append=False):
+    if append:
+        mode = "a+"
+    else:
+        mode = "w+"
+    try:
+        f = open(p, mode)
+        if value:
+            f.write(value)
+        f.close()
+    except:
+        pass   
+
+def read_status_path(p):
+    try:
+        f = open(p, "r")
+        v = f.readline()
+        if v:
+            v = v[:-1]
+    except:
+        v = ""
+    return v
+    
+def main():
+    
+    # tuple indices, for clarity
+    PROCESS = 0
+    ARGS = 1
+    PROG_STRING = 2
+    INIT_FILE = 3
+
+    wrote_status = False
+
+    config = CuminMasterConfig()
+
+    # Clear the status path file.  A monitoring program will
+    # check for writes here to find out the status of init
+    # checks (after a pidfile is written)
+    write_status_path(config.get_init_status_path(), "")
+
+    # Trap exit from parser and save standard error for logging
+    # Then put stderr back to original value
+    r, w = os.pipe()
+    sys.stderr = os.fdopen(w,"w")
+    try:
+        values = config.parse().master
+
+        parser = OptionParser()
+
+        parser.add_option("--init-only", dest="init_only", action="store_true", default=False,
+                          help="Check options and initialization, then return.")
+
+        parser.add_option("--webs", dest="webs", default=values.webs,
+                          help="Configuration section names for cumin-web instances."\
+                               "\nEach value implies a separate cumin-web instance.")
+
+        parser.add_option("--datas", dest="datas", default=values.datas,
+                          help="Configuration section names for cumin-data instances."\
+                               "\nEach value implies a separate cumin-data instance.")
+
+        parser.add_option("--reports", dest="reports", default=values.reports,
+                          help="Configuration section names for cumin-report instances."\
+                               "\nEach value implies a separate cumin-report instance.")
+
+        parser.add_option("--console", dest="console", action="store_true", default=False,
+                          help="Log to stderr rather than master.log, no IO redirection for children.")
+
+        parser.add_option("--timeout", dest="timeout", default="5", type=int,
+                          help="Time that the master will wait for child "\
+                              "processes to exit before exiting itself.  Also "\
+                              "the time child processes will allow themselves "\
+                              "to shutdown before calling sys.exit")
+
+        parser.add_option("--web-options", dest="web_options", default="", type=str,
+                          help="Additional options string to pass to web instances."\
+                               "\nEnclose in quotes, options must be --option form, splits on spaces."\
+                               '\nExample: web_options="--debug --port=12345"')
+
+        parser.add_option("--data-options", dest="data_options", default="", type=str,
+                          help="Additional options string to pass to data instances."\
+                              "\nEnclose in quotes, options must be --option form, splits on spaces."\
+                               '\nExample: data_options="--print-events=5 --print-stats"')
+
+        parser.add_option("--report-options", dest="report_options", default="", type=str,
+                          help="Additional options string to pass to report instances."\
+                              "\nEnclose in quotes, options must be --option form, splits on spaces."\
+                               '\nExample: report_options="--print-events=5 --print-stats"')
+
+        parser.add_option("--syslog", dest="syslog", action="store_true", default=False,
+                          help="Log general error notfications to syslog.  Intended for systemd")
+
+        parser.add_option("--p", dest="write_pid", action="store_true", default=False,
+                          help="Write the pid file (/var/run/cumin.pid). For service starts.")
+
+        (options, args) = parser.parse_args()
+    except SystemExit:
+        options = args = None
+    except:
+        options = args = None
+        traceback.print_exc()
+    sys.stderr.close()
+    sys.stderr = sys.__stderr__
+
+    # Parse may have failed, in which case make a quick check for important 
+    # options ourselves
+    if options:
+        _syslog.enabled = options.syslog
+        console = options.console
+        write_pid = options.write_pid
+    else:
+        _syslog.enabled = "--syslog" in sys.argv[1:]
+        console = "--console" in sys.argv[1:]
+        write_pid = "--p" in sys.argv[1:]
+
+    # Write the pidfile
+    if write_pid:
+        write_status_path("/var/run/cumin.pid", str(os.getpid())+"\n")
+
+    # Set up logging
+    if console:
+        log_dest = sys.stderr
+    else:
+        log_dest =  os.path.join(home, "log", "master.log")  
+    enable_logging("cumin.master", logging.INFO, log_dest)
+
+    # Parser exited, either on --help or with errors                   
+    if not options:
+        v = log_parse_errors(r)
+        write_status_path(config.get_init_status_path(),
+                          str(v)+"\nexit\n")
+        return v
+
+    if len(args) != 0:
+        log.error("Extra arguments:" + "".join([" "+arg for arg in args]))
+        _syslog.log()
+        write_status_path(config.get_init_status_path(), "1\nexit\n")
+        return 1
+
+    apps = []
+    init_files = []
+
+    # This gives us the list of section names, plus the app name,
+    # plus extra options to pass on to the children for each app type
+    sections = [options.webs, options.datas, options.reports]
+    names = ["cumin-web", "cumin-data", "cumin-report"]
+    child_options = [options.web_options, 
+                     options.data_options, 
+                     options.report_options]
+    zipped = zip(sections, names, child_options)
+
+    for info in zipped:
+        instances, app, extra_options = info
+        if len(instances) > 0:
+            for instance in instances.split(','):
+                instance = instance.strip()
+
+                args, prog_string = get_args(app,
+                                             instance,
+                                             options.init_only,
+                                             console,
+                                             exit_s,
+                                             options.timeout,
+                                             extra_options)
+
+                init_path = config.get_init_status_path(instance)
+                init_files.append(init_path)
+                apps.append([None, args, prog_string, init_path])
+
+                # Clear the init file for the app
+                write_status_path(init_path, "")
+
+    # Launch and babysit, do not restart if options.init_only is set
+    complete = 0
+    return_code = 0
+    sleep_time = 0.25
+    slow_down = 40 # slow down polling after initial period
+    try:
+        def start(app, verb):
+            app[PROCESS] = subprocess.Popen(app[ARGS], stdin=subprocess.PIPE)
+            if app[PROCESS]:
+                log.info(verb+"ed subprocess (pid %s): %s" %\
+                         (app[PROCESS].pid, app[PROG_STRING]))
+            else:
+                log.warn("Failed to %s: %s" % (verb, app[PROG_STRING]))
+
+        for app in apps:
+            start(app, "Start")
+
+        while complete != len(apps):
+            sleep(sleep_time)
+            if slow_down > 0:
+                slow_down -= 1
+                if slow_down == 0:
+                    sleep_time = 5
+
+            for app in apps:
+                poll = app[PROCESS] and app[PROCESS].poll()
+                if poll is not None:
+
+                    # If the low bit is set on the return code, the 
+                    # process got an error during init checks.  
+                    # Exit and shut down any processes that have already
+                    # been started, do not start the remaining.
+                    # Note, signals that cause termination will result in
+                    # a negative error code, we treat those as "normal"
+                    err = CuminErrors.translate(poll)
+                    if poll > 0 and poll & 1:
+                        log.error("Subprocess (%s) failed init checks "\
+                                  "with status %s (%s), %s"\
+                                  % (app[PROCESS].pid, poll, err[0], err[1]))
+                        log.info("Subprocess logs may contain more details.")
+                        log.info("Stopping cumin")
+                        _syslog.log()
+                        app[PROCESS] = None
+                        return_code = 2
+                        complete = len(apps)
+                        write_status_path(config.get_init_status_path(),
+                                          str(poll)+"\n")
+                        wrote_status = True
+                        break
+                    else:
+                        log.info("Subprocess (%s) exited with status %s (%s), %s"\
+                                 % (app[PROCESS].pid, poll, err[0], err[1]))
+                        if poll != 0:
+                            log.info("Subprocess logs may contain more details.")
+                        if options.init_only:
+                            app[PROCESS] = None
+                            complete += 1
+                        else:
+                            start(app, "Restart")
+
+                elif app[INIT_FILE] in init_files:
+                    # Check the init status file for the child so that we know
+                    # it has made it through init checks.  When all children
+                    # have made it through init checks, we write our own status.
+                    value = read_status_path(app[INIT_FILE])
+                    if value:
+                        if value != "0":
+                            # we should see an init failure soon 
+                            # ignore init_files and wait for the poll
+                            init_files = []
+                        else:
+                            init_files.remove(app[INIT_FILE])
+                            if len(init_files) == 0:
+                                write_status_path(config.get_init_status_path(),
+                                                  "0\n")
+                                wrote_status = True
+    finally:
+        # Hmm, exiting, but we haven't written the status file yet.
+        # If we had seen an init failure from a child we would have
+        # written the file.  Let's assume it was a success.
+        if not wrote_status:
+            write_status_path(config.get_init_status_path(), "0\n")
+        log.info("Write termination string to all children")
+        complete = 0
+        for app in apps:            
+            if app[PROCESS]:
+                complete += 1
+                try:
+                    app[PROCESS].stdin.write(exit_s+"\n")
+                except:
+                    log.debug("Writing termination failed for subprocess (%s)" \
+                              % app[PROCESS].pid)
+
+        # Wait for children to exit so we can record the result and so that
+        # the initd script can track the pid correctly.  Exit regardless after
+        # timeout+0.5 seconds, even if the children are still running.  Each child
+        # will have a hard exit after timeout seconds from its own main thread,
+        # even if its shutdown activities have not completed, so in most
+        # cases the children *should* exit within timeout+0.5 seconds
+        then = datetime.now()
+        while complete != 0:        
+            for app in apps:
+                poll = app[PROCESS] and app[PROCESS].poll()
+                if poll is not None:
+                    log.info("Subprocess (%s) exited", app[PROCESS].pid)
+                    app[PROCESS] = None
+                    complete -= 1
+
+            if complete == 0:
+                log.info("All children exited")
+                break
+        
+            sleep(0.25)
+            if datetime.now() - then > timedelta(seconds=options.timeout+0.5):
+                log.warn("Timed out waiting for children, exiting")
+                for app in apps:  # just to be paranoid
+                    if app[PROCESS]:
+                        log.warn("Subprocess (%s) failed to stop"\
+                                 % app[PROCESS].pid)
+                break
+    
+        write_status_path(config.get_init_status_path(), "exit\n", append=True)
+    return return_code
+
+if __name__ == "__main__":
+    # This is necessary so that on a SIGTERM we can call sys.exit()
+    # and cause the finally block to be executed.  Ctrl-C will
+    # run the finally block anyway.
+    set_exit_handler(call_sys_exit)
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        sys.exit(0)
+

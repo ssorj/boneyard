@@ -1,0 +1,28 @@
+#!/bin/bash -eu
+
+source "${PTOLEMY_PROJECT}/project.bash"
+
+script-init
+
+if [[ ! -d "$PTOLEMY_BRANCH" ]]; then
+    $SVN checkout "$PTOLEMY_BRANCH_URL" "$PTOLEMY_BRANCH"
+    rev=$(svn-revision "$PTOLEMY_BRANCH")
+    echo "$rev" > ptolemy/revision
+    exit
+fi
+
+last_rev=$(svn-revision "$PTOLEMY_BRANCH")
+
+svn-clean "$PTOLEMY_BRANCH"
+$SVN update "$PTOLEMY_BRANCH"
+
+rev=$(svn-revision "$PTOLEMY_BRANCH")
+
+echo "$rev" > ptolemy/revision
+
+if [[ "$last_rev" == "$rev" ]]; then
+    echo "unchanged" > ptolemy/status
+    exit
+fi
+
+$SVN log --revision "${last_rev}:${rev}" "$PTOLEMY_BRANCH" > ptolemy/changes

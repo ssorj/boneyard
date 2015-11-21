@@ -1,0 +1,34 @@
+harness outputs:
+
+  $PTOLEMY_CYCLE/ptolemy/project_name
+  $PTOLEMY_CYCLE/ptolemy/branch_name
+  $PTOLEMY_CYCLE/ptolemy/host_id
+  $PTOLEMY_CYCLE/ptolemy/id
+
+harness outputs, script inputs:
+
+  PTOLEMY_HOME
+  PTOLEMY_DATA
+
+  PTOLEMY_PROJECT
+  PTOLEMY_BRANCH
+  PTOLEMY_BRANCH_URL
+  PTOLEMY_CYCLE
+
+  # XXX
+  PTOLEMY_REVISION
+
+harness inputs, script outputs:
+
+  $PTOLEMY_CYCLE/ptolemy/status -> "disabled", "unchanged", "passed", "failed"
+  $PTOLEMY_CYCLE/ptolemy/revision
+  $PTOLEMY_CYCLE/ptolemy/changes
+
+standard locations:
+
+  PTOLEMY_HOME=/usr/share/ptolemy
+  PTOLEMY_DATA=/var/lib/ptolemy
+
+  PTOLEMY_PROJECT=$PTOLEMY_HOME/projects/$project
+  PTOLEMY_BRANCH=$PTOLEMY_DATA/checkouts/$project/$branch
+  PTOLEMY_CYCLE=$PTOLEMY_DATA/cycles/$project/$cycle

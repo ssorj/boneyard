@@ -1,0 +1,77 @@
+How to implement a full page widget
+ 
+Any block of HTML can be made full page in cumin. By full page, I mean it can be displayed using most of the browser window's width and height.
+
+To do this, you need to add the class "fullpageable" to the block of HTML. If there is no surrounding block, you'll need to add one.
+For example, to make the following HTML fullpage-able:
+    <h2>This is a cool widget</h2>
+    {cool_widget}
+    
+you'll need to surround the HTML with an element that has a class of "fullpageable" like this:
+    <div class="fullpageable">
+    <h2>This is a coll widget</h2>
+    {cool_widget}
+    </div>
+    
+If the HTML already has a surrounding block, you can just add the "fullpageable" class:
+    <p class="explain">
+        {important_stuff}
+    </p>
+    
+    can be made fullpageable like this:
+    
+    <p class="explain fullpageable">
+        {important_stuff}
+    </p>
+
+If you need to be notified when the widget is made full page, there are two mechanisms: 
+1) Notify the python code that the widget is now in full page mode. This lets the widget render itself based on it's container size.
+2) Notify the javascript code. If the widget doesn't auto-update, this lets you adjust the widget's presentation in javascript.
+
+1) Background updating of widgets and fullpage:
+    Sometimes the HTML you want to make fullpagable will contain one or more widgets.
+    If those widgets get automatically updated (using self.update_enabled = True), 
+    AND you want the widgets to be aware of when they are being rendered full page, you need
+    to do three things:
+    1. inherit the widget from FullPageNotify as well as any other classes
+    2. in the element surrounding your widget (the same element that has the id="{id}"), add a class named fullpage_notify.
+    3. in the render method for the widget, examine the return value of self.get_fullpage
+ 
+    For example:
+    1. class TopTable(SqlTable, FullPageNotify):
+    2. [TopTable.html]
+        <table id="{id}" class="TopTable fullpage_notify">
+           ...
+        </table>
+    3. # rendering a table column in TopTable
+       def render_content(self, session, data):
+            width = self.parent.get_fullpage(session)
+            # if width is None, we are not in fullpage
+            # if width has a value, we are in fullpage and width is the available size in pixels
+ 
+2) To have a javascript function called when the widget is made full page, add the onfullpage and onrestore attributes to the widget.
+For example:
+    $('slot_visualization').onfullpage = function (width) { vis.notify(true, width); };
+    $('slot_visualization').onrestore = function () { vis.notify(false, original_clip_size); };
+The width passed to the onfullpage function is the new width of the widget when in full page mode. 
+
+How it looks:
+    A block of HTML that is fullpageable will have a special mouseover style. 
+    When the mouse if over any part of the HTML, there will be a light purple bar at the top of the HTML with a 
+    small icon in the upper right corner.
+    Clicking on the icon will display the HTML in a block that is about 95% of the page's width and height.
+    If the contents of the HTML automatically sizes to it's container, it should expand to the full page.
+    
+    If however, the HTML is a fixed size, it won't expand. Instead, you may want to use the background
+    update ability of cumin to re-render the widget using it's new container size.
+    
+Under the kimono:
+    When the page first loads, there is a script that runs and finds all elements containing the class "fullpageable".
+    It then surrounds each of those elements with some divs and wires in some mouseover and click behaviors.
+    When the fullpage icon is clicked, the handler will "promote" the fullpageable HTML to be a direct child
+    of the document.body. This allows the HTML to be positioned and sized to the full window. Clicking the
+    icon again will restore the HTML to it's original position in the DOM.
+    
+    
+    
+     

@@ -1,0 +1,8 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid-stable-java.bash
+
+script-init
+
+java -version 2>&1 | grep '^java version "1\.[567]\.' || disable

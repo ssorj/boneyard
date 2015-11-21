@@ -1,0 +1,50 @@
+#!/usr/bin/python
+
+import sys, os
+
+from basil.server import *
+
+def usage():
+    print "Usage: basil [BROKER-HOST:BROKER-PORT]"
+    print "Example: basil localhost:5672"
+    sys.exit(1)
+
+def do_main(host, port):
+    app = BasilApplication()
+    server = BasilServer(app, host, port)
+
+    print "Initializing"
+
+    app.init()
+    app.start()
+
+    try:
+        print "Starting web service at %s:%i" % (host, port)
+
+        try:
+            server.start()
+        finally:
+            server.stop()
+    finally:
+        app.stop()
+
+def main():
+    try:
+        addr = sys.argv[1]
+    except IndexError:
+        addr = "localhost:55672"
+
+    try:
+        host, port = addr.split(":")
+        port = int(port)
+    except:
+        print "Error: Malformed address"
+        usage()
+
+    try:
+        do_main(host, port)
+    except KeyboardInterrupt:
+        pass
+
+if __name__ == "__main__":
+    main()

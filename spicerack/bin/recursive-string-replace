@@ -1,0 +1,8 @@
+#!/bin/bash -ex
+
+if [[ $# != 3 ]]; then
+    echo "Usage: recursive-string-replace GLOB MATCH-EXPR REPLACEMENT"
+    exit 1
+fi
+
+sed -i "s/$2/$3/g" $(find . -name $1)

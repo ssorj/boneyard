@@ -1,0 +1,13 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid-stable.bash
+
+script-init
+
+export CXXFLAGS="-I${INSTALL_PATH}/include -I${INSTALL_PATH}/include/qpid-boost"
+export LDFLAGS="-L${INSTALL_PATH}/lib"
+
+cd "${SOURCE_PATH}/cpp"
+
+make check

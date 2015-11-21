@@ -1,0 +1,118 @@
+<model>
+   <package name="com.redhat.grid.plumage" persistent="timestamp">
+      <class name="OSUtil">
+        <loading_class>
+        	<name>OSUtilLoader</name>
+        </loading_class>
+        
+		<source>
+			<database>condor_stats</database>
+			<collection>samples.machine</collection>
+		</source>
+        
+        <property name="host">
+        	<title>Host</title>
+        </property>
+        
+        <statistic name="ts" timestamp="y">
+        </statistic>
+
+		<statistic name="total">
+			<title>Total</title>
+		</statistic>
+
+		<statistic name="used">
+			<title>Used</title>
+		</statistic>
+		
+		<statistic name="unused">
+			<title>Unused</title>
+		</statistic>
+		
+		<statistic name="owner">
+			<title>Owner</title>
+		</statistic>
+		
+		<statistic name="efficiency">
+			<title>Efficiency percentage</title>
+		</statistic>
+		
+		<statistic name="freemem">
+			<title>Free(MB)</title>
+		</statistic>
+		
+		<statistic name="usedmem">
+			<title>Used(MB)</title>
+		</statistic>
+		
+		<statistic name="availmem">
+			<title>Available(MB)</title>
+		</statistic>
+		
+		<statistic name="totalmem">
+			<title>Total(MB)</title>
+		</statistic>
+
+		<statistic name="freecpu">
+			<title>Free</title>
+		</statistic>
+		
+		<statistic name="usedcpu">
+			<title>Used</title>
+		</statistic>
+		
+		<statistic name="availcpu">
+			<title>Available</title>
+		</statistic>
+		
+		<statistic name="totalcpu">
+			<title>Total</title>
+		</statistic>
+    </class>
+    <class name="Accountant">
+        <loading_class>
+        	<name>AccountantLoader</name>
+        </loading_class>
+        
+		<source>
+			<database>condor_stats</database>
+			<collection>samples.accountant</collection>
+		</source>
+        
+        <statistic name="user" />
+        <statistic name="ts" timestamp="y" />
+        
+        <statistic name="agroup">
+        	<title>Accounting group</title>
+        </statistic>        	
+        
+		<statistic name="prio">
+			<title>Priority</title>
+		</statistic>
+
+		<statistic name="wresused">
+			<title>Weighted resources used</title>
+		</statistic>
+		
+		<statistic name="resused">
+			<title>Resources used</title>
+		</statistic>
+		
+		<statistic name="cquota">
+			<title>Configured quota</title>
+		</statistic>
+		
+		<statistic name="equota">
+			<title>Effective quota</title>
+		</statistic>
+		
+		<statistic name="squota">
+			<title>Subtree quota</title>
+		</statistic>
+		
+		<statistic name="wausage">
+			<title>Weighted accumulated usage</title>
+		</statistic>
+	</class>    
+   </package>
+</model>

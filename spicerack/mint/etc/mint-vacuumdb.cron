@@ -1,0 +1,4 @@
+# run database-wide vacuum nightly
+0 2 * * * /usr/bin/mint-vacuumdb full >> /var/log/cumin/mint-vacuum.log 2>&1
+# run table-specific vacuum every 10 minutes
+*/10 * * * * /usr/bin/mint-vacuumdb tables >> /var/log/cumin/mint-vacuum.log 2>&1

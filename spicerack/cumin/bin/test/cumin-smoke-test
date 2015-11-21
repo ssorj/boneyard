@@ -1,0 +1,140 @@
+#!/usr/bin/python
+
+import os
+import sys
+
+from threading import Event
+
+home = os.environ.get("CUMIN_HOME", os.path.normpath("/usr/share/cumin"))
+sys.path.append(os.path.join(home, "python"))
+
+from cumin import *
+from cumin.config import *
+from cumin.util import *
+
+def main():
+    setup_initial_logging()
+
+    parser = CuminOptionParser()
+
+    # Add additional parameters for web
+    parser.add_option("--host")
+    parser.add_option("--port", type=int)
+    parser.add_option("--section", default="web")
+
+    # Get options
+    opts, args = parser.parse_args()
+            
+    # --section controls which section is read from the config file
+    # If a section other than "web" is specified, require it to exist
+    config = CuminWebConfig(opts.section, strict_section = opts.section != "web")
+
+    # There might be other sections returned from config.parse() but
+    # currently we don't care about them...
+    values = getattr(config.parse(), opts.section)
+
+    # Use the config values as defaults for unspecified options
+    apply_defaults(values, opts)
+
+    setup_operational_logging(opts, 
+                              values.log_max_mb,
+                              values.log_max_archives)
+
+    broker_uris = [x.strip() for x in opts.brokers.split(",")]
+
+    cumin = Cumin(config.get_home(), broker_uris, opts.database,
+                  opts.host, opts.port)
+
+    cumin.user = values.user
+
+    cumin.check()
+    cumin.init()
+
+    if opts.init_only:
+        return
+
+    cumin.start()
+
+    sleep(2)
+
+    try:
+        conn = cumin.database.get_connection()
+        cursor = conn.cursor()
+
+        def invoke_test(test):
+            print "[%s]" % name[6:]
+
+            try:
+                test(cumin, cursor)
+            except:
+                print_exc()
+
+                print "FAILES!"
+
+        try:
+            chosen = sys.argv[1]
+        except IndexError:
+            chosen = None
+
+        attrs = globals()
+
+        if chosen:
+            name = "_test_%s" % chosen
+
+            assert name in attrs
+
+            invoke_test(attrs[name])
+        else:
+            for name in [x for x in attrs if x.startswith("_test")]:
+                invoke_test(attrs[name])
+    finally:
+        cumin.stop()
+
+def _test_submit(cumin, cursor):
+    cls = cumin.model.com_redhat_grid.Scheduler
+    obj = cls.get_object(cursor)
+
+    assert obj
+
+    print "Submitting to", obj.Name, 
+
+    ad = {"Cmd": "/bin/sleep",
+          "Args": "5m",
+          "JobUniverse": 5,
+          "Requirements": "TRUE",
+          "Iwd": "/tmp",
+          "Owner": "gridmonkey",
+          "!!descriptors": {"Requirements": "com.redhat.grid.Expression"}}
+
+    completed = Event()
+
+    def completion(x, y):
+        print "-> [%s, %s]" % (x, y)
+
+        completed.set()
+
+    cumin.session.call_method(completion, obj, "SubmitJob", (ad,))
+
+    completed.wait(30)
+
+def _test_job_summaries(cumin, cursor):
+    cls = cumin.model.com_redhat_grid.Submission
+    obj = cls.get_object(cursor)
+
+    print "Getting job summaries for", obj,
+
+    assert obj
+
+    summs = cumin.model.get_submission_job_summaries(obj)
+
+    assert summs is not None
+
+    print "-> [%i job summaries]" % len(summs)
+
+    #pprint(summs)
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

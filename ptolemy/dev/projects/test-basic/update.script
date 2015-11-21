@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+echo "$RANDOM" > ptolemy/revision
+
+cat <<EOF > ptolemy/changes
+a
+b
+c
+EOF

@@ -1,0 +1,8 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid-stable-java.bash
+
+script-init
+
+test -x "${INSTALL_PATH}/sbin/qpidd" || disable

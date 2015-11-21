@@ -1,0 +1,15 @@
+[SelectionList.css]
+ul.SelectionList {
+    list-style: none;
+}
+
+[TaskLink.css]
+a.TaskLink {
+    font-size: 0.9em;
+}
+
+a.TaskLink:before {
+    content: "\00BB \0020";
+    font-weight: bold;
+    color: #dc9f2e;
+}

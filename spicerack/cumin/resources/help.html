@@ -1,0 +1,286 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Cumin - Help</title>
+    <link rel="stylesheet" href="resource?name=default.css" type="text/css" />
+    <link rel="stylesheet" href="resource?name=documentation.css" type="text/css" />
+    <link rel="stylesheet" href="resource?name=docnav.css" type="text/css" />
+    <link rel="stylesheet" href="resource?name=reports.css" type="text/css" />
+    <link rel="stylesheet" href="resource?name=dirty.css" type="text/css" />
+    
+  </head>
+  <body>
+    <p id="title">
+      <a href="http://www.redhat.com/docs">
+        <strong>Cumin Help</strong>
+      </a>
+    </p>
+    <a name="top"/>
+    <p>
+       <span class="filename">Main - Broker - Queue</span> 
+    </p>
+    <div class="section" lang="en-US" xml:lang="en-US">
+      <div class="titlepage">
+		  <a name="main.broker.queue.queuebindingadd.help"/>
+            <h3 class="title">Bind a Queue to an Exchange</h3>
+      </div>
+      <p>
+			 Allows an existing queue to bind to an existing exchange. Select one or more exchanges from the list and
+			 enter the exchange key and other required information. Each exchange type has different required information.
+	  </p>
+
+      <div class="programlisting">
+		<ul>
+			<li>A "direct" exchange uses the queue name as the binding key so no input is required.</li>
+			<li>A "fanout" exchange does not require a binding key</li>
+			<li>A "topic" exchange requires a binding key</li>
+			<li>A "xml" exchange reqires a binding key and an XQuery. Selecting an "xml" exchange displays an XQuery input box.</li>
+			<li>A "headers" exchange requires:
+				<ul>
+					<li>a binding key</li>
+					<li>an x-match type of "all" or "any"</li>
+					<li>zero or more match keys. If a match key is entered, an optional type, value can be entered.</li>
+				</ul>
+				Selecting a "headers" exchange displays the additional inputs.</li>
+		</ul>
+      <p>
+				The exchanges listed default to all available exchanges. To view only "Active" exchanges, select the Active option above the list.
+	  </p>
+	  </div>
+
+
+<ul class="docnav">
+  <li class="up">
+    <a accesskey="u" href="#top">
+      <strong>Help Index</strong>
+    </a>
+  </li>
+</ul>
+
+      <div class="titlepage">
+		<a name="main.broker.queueadd.help"/>
+            <h3 class="title">Adding a new Queue</h3>
+      </div>
+      <p>
+			 Allows the creation of a new queue and optionally allows binding to an existing exchange. A new queue
+			 requires a name and has several attributes:
+	  </p>
+      <div class="programlisting">
+		<ul>
+			<li><strong>Durable</strong> Will the queue survive if the broker becomes unavailable.</li>
+			<li><strong>Exclusive</strong> </li>
+			<li><strong>Auto Delete</strong> </li>
+		</ul>
+	  </div>
+
+	  <p>	 
+			 Optionally, a queue can be bound to one or more exchanges. Select an exchange from the list and
+			 enter the exchange key and other required information. Each exchange type has different required information.
+	  </p>
+      <div class="programlisting">
+		<ul>
+			<li>A "direct" exchange uses the queue name as the binding key so no input is required.</li>
+			<li>A "fanout" exchange does not require a binding key</li>
+			<li>A "topic" exchange requires a binding key</li>
+			<li>A "xml" exchange reqires a binding key and an XQuery. Selecting an "xml" exchange displays an XQuery input box.</li>
+			<li>A "headers" exchange requires:
+				<ul>
+					<li>a binding key</li>
+					<li>an x-match type of "all" or "any"</li>
+					<li>zero or more match keys. If a match key is entered, an optional type, value can be entered.</li>
+				</ul>
+				Selecting a "headers" exchange displays the additional inputs.</li>
+		</ul>
+	  </div>
+      <p>
+				The exchanges listed default to all available exchanges. To view only "Active" exchanges, select the Active option above the list.
+	  </p>
+
+<ul class="docnav">
+  <li class="up">
+    <a accesskey="u" href="#top">
+      <strong>Help Index</strong>
+    </a>
+  </li>
+</ul>
+
+      <div class="titlepage">
+		<a name="main.broker.exchangeadd.help"/>
+            <h3 class="title">Adding a new Exchange</h3>
+      </div>
+      <p>
+			 Allows the creation of a new exchange. An exchange name is required.
+			 Choose one of the exchange types listed.
+	  </p>
+
+<ul class="docnav">
+  <li class="up">
+    <a accesskey="u" href="#top">
+      <strong>Help Index</strong>
+    </a>
+  </li>
+</ul>
+
+	
+      <div class="titlepage">
+      	 <a name="main.broker.brokeradd.help"/>
+ 	     <h3 class="title">Adding a Broker Link</h3>
+      </div>
+      <p>
+			 Allows the creation of a new link between brokers. An broker address is required. It can be an IP address or a host name.
+			 A port, username and password are optional. If a port is entered, it must be a numeric value.
+	  </p>
+	  <p>A durable link survives after a broker is restarted.</p>
+
+<ul class="docnav">
+  <li class="up">
+    <a accesskey="u" href="#top">
+      <strong>Help Index</strong>
+    </a>
+  </li>
+</ul>
+
+      <div class="titlepage">
+      	 <a name="main.broker.brokersclose.help"/>
+ 	     <h3 class="title">Closing a Broker Link</h3>
+      </div>
+      <p>
+			 Closes the links between the current broker and all selected brokers. If a linked broker has link routes (also known as bridges), they will be abandoned.
+	  </p>
+
+<ul class="docnav">
+  <li class="up">
+    <a accesskey="u" href="#top">
+      <strong>Help Index</strong>
+    </a>
+  </li>
+</ul>
+
+      <div class="titlepage">
+      	 <a name="main.broker.peer.bridgeadd.help"/>
+ 	     <h3 class="title">Adding a Route to a Broker Link</h3>
+      </div>
+      <p>
+      	Adds a Route to an existing Broker Link. Messages are exchanged with a linked broker based on Routes. A Route requires an exchange and a routing key.
+	  </p>
+	  <p>
+	  	Optionally, a tag and exclude list can be supplied.
+	  </p>
+
+<ul class="docnav">
+  <li class="up">
+    <a accesskey="u" href="#top">
+      <strong>Help Index</strong>
+    </a>
+  </li>
+</ul>
+
+
+      <div class="titlepage">
+      	 <a name="main.broker.peer.routesclose.help"/>
+ 	     <h3 class="title">Remove a Link Route</h3>
+      </div>
+      <p>
+      	Closes and deletes a route between the current broker and a linked broker.
+	  </p>
+
+<ul class="docnav">
+  <li class="up">
+    <a accesskey="u" href="#top">
+      <strong>Help Index</strong>
+    </a>
+  </li>
+</ul>
+
+      <div class="titlepage">
+      	 <a name="main.pool.job.editads.help"/>
+ 	     <h3 class="title">Edit Job Attributes</h3>
+      </div>
+      <p>
+			There are three types of job attributes that can be edited:
+			<dl>
+				<dt>Boolean</dt>
+				<dd>Choose between <input type="radio" id="true" value="true" name="tf" checked="checked" /><label for="true">TRUE</label> and <input type="radio" id="false" value="false" name="tf"/><label for="false">FALSE</label>.</dd>
+				
+				<dt>Number</dt>
+				<dd><div class="inline_help">Enter any <span class="edit_number">numeric value</span>.
+				Numeric fields are surround by a dashed blue box.
+				<p>
+					If a <span class="numeric_error">non-numeric value</span> is entered in a numeric field, the 
+					surrounding box changes to red dashes and an error message is displayed.<br/>
+					<br/>
+					<em>A blank value in a numeric field is considered an error.</em>
+				</p></div>
+				</dd>
+				
+				<dt>Text</dt>
+				<dd><div class="inline_help"><span class="edit_string">Enter any sequence of numbers or characters.</span></div>
+				Text fields are surround by a light grey box. 
+				<p>If the initial value of a text field is longer than forty characters, a larger input box is provided.</p> 
+				</dd>
+			</dl>
+	  </p>
+
+<ul class="docnav">
+  <li class="up">
+    <a accesskey="u" href="#top">
+      <strong>Help Index</strong>
+    </a>
+  </li>
+</ul>
+
+      <div class="titlepage">
+      	 <a name="main.pool.jobgrouphold.help"/><a name="main.pool.jobgroupremove.help"/><a name="main.pool.jobgrouprelease.help"/>
+		 <a name="main.pool.jobshold.help" /><a name="main.pool.jobsremove.help" /><a name="main.pool.jobsrelease.help" />
+ 	     <h3 class="title">Job Actions</h3>
+      </div>
+      <p>
+			The following actions can be performed on a job:
+			<dl>
+				<dt>Hold</dt>
+				<dd>Prevent the job from running until it is manually released.</dd>
+				
+				<dt>Release</dt>
+				<dd>Release a job from the Held state.</dd>
+				
+				<dt>Remove</dt>
+				<dd>Mark the job as removed. Removed jobs will not run. Removed jobs are only viewable by selecting the 
+					<ul class="radiotabs">
+						<li><a  href="javascript:void(0)" class="selected" >Removed</a></li>
+					</ul> button on the jobs page.
+				</dd>
+			</dl>
+			<p>When any of these actions are performed on a job group, the action is performed on all the jobs in the group.</p>
+	  </p>
+
+<ul class="docnav">
+  <li class="up">
+    <a accesskey="u" href="#top">
+      <strong>Help Index</strong>
+    </a>
+  </li>
+</ul>
+
+      <div class="titlepage">
+      	 <a name="main.pool.limit.edit.help"/>
+      	 <h3 class="title">Edit Concurrency Limits</h3>
+      </div>
+      <p>
+			Change the maximum number of jobs that can be run concurrently using a limiter.
+			<p>A Limiter is a resource that must be allocated to a job before the job can run.<p>
+	  </p>
+
+<ul class="docnav">
+  <li class="up">
+    <a accesskey="u" href="#top">
+      <strong>Help Index</strong>
+    </a>
+  </li>
+</ul>
+
+    </div><!-- section -->
+
+	<div style="height:1000px;"><!-- --></div>
+  </body>
+</html>

@@ -1,0 +1,55 @@
+How to defer the rendering of a widget until the page has loaded
+
+Some widgets rely on method calls that can potentially be lengthy. Getting the Job Ads is an example.
+In these cases it is desirable to render the containing page immediately, and then after the page has displayed, 
+render the widget that relies on the method call.
+
+To accomplish this, take these steps:
+1. in the __init__ method of the widget add         self.defer_enabled = True
+2. in the html for the widget, make sure the containing tag has an id attribute
+
+For example, to defer the rendering of the JobAdsViewer:
+<jobs.py>
+class JobAdsViewer(JobAdsSet):
+    def __init__(self, app, name):
+        super(JobAdsViewer, self).__init__(app, name)
+
+        self.defer_enabled = True
+
+    def render_deferred_job_ads(self, session, *args):
+        """ this won't be called until after the page has loaded """
+        return "Job Ads"
+
+<jobs.strings>
+[JobAdsViewer.html]
+<div id="{id}">
+    {deferred_job_ads}
+</div>
+
+
+In the above example, the page is loaded and instead of displaying "Job Ads", a Loading animation is displayed.
+Then as soon as the page has loaded, an ajax call is made to fetch the html for the job ad.
+
+To prevent the loading animation, or to contain the widget in something other than a <div>, 
+override the .deferred_html for the widget. In this next example, the limit count on a tab is deferred.
+<limit.py>
+class LimitCount(Widget):
+    def __init__(self, app, name):
+        super(LimitCount, self).__init__(app, name)
+        self.defer_enabled = True
+
+    def render_count(self, session):
+        """ this won't be called until after the page has loaded """
+        """ stuff to get the count goes here """
+        pass
+
+<limit.strings>
+[LimitCount.html]
+<span id="{id}">Limits <span class="count">({count})</span></span>
+
+[LimitCount.deferred_html]
+<span id="{id}">Limits <span class="count">(?)</span></span>
+
+Multiple widgets on a page can be deferred.
+Deferred rendering can be used at the same time as background updating of the same widget(s).
+

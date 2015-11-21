@@ -1,0 +1,69 @@
+This all uses spec language, so:
+
+  virtual host = fhost
+  server = broker
+
+ * Top
+
+   - Tabs: servers, clusters, virtual hosts (though I have a question
+     about this)
+
+   - Server tab: two views, individual servers and groups
+
+ * Server
+
+   - Properties: name, cluster
+
+   - Actions: shutdown
+
+   - Tabs: virtual hosts, server groups, config
+
+ * Server group
+
+   - Properties: name, containing groups
+
+   - Actions: (all actions from server), add and remove server, apply
+     template
+
+   - Tabs: servers, subgroups
+
+ * Cluster
+
+   - Properties: name
+
+   - Tabs: servers
+
+ * Virtual host
+
+   - Properties: name, virtual host groups
+
+   - Actions: add queue, add exchange
+
+   - Tabs: queues, exchanges
+
+ * Virtual host group
+
+   - Properties: name, containing groups
+
+   - Actions: (all actions from virtual host), add and remove virtual
+     host, apply template
+
+   - Tabs: virtual hosts, subgroups
+
+ * Queue
+
+   - Properties: name
+
+   - Actions: remove self, add binding, edit properties
+
+   - Status: queue depth, errors and warnings
+
+   - Tabs: bindings
+
+ * Exchange
+
+   - Properties: name
+
+   - Actions: remove self, add binding, edit properties
+
+   - Tabs: bindings

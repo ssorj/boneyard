@@ -1,0 +1,30 @@
+[ActionInvocationSet.html]
+<div id="{id}" class="actionInvocation">{items}</div>
+
+[ActionInvocationSet.item_html]
+<div class="action">
+<span class="description">{description}</span> <span class="{status_class}">{status}</span>
+</div>
+
+[ActionInvocationSet.javascript]
+(function() {
+    var old_action_count = 0;
+    cumin.hideActions = function () {
+        $("messages").dissolve();
+    }
+    cumin.showActions = function () {
+        $("messages").reveal();
+    }
+
+    wooly.addPageUpdateListener( function () {
+        var actions = $$('div#messages div.action');
+        if (actions.length > old_action_count) {
+            cumin.showActions();
+        }
+        if (actions.length == 0) {
+            cumin.hideActions();
+        }
+        old_action_count = actions.length;
+    } );
+
+}())

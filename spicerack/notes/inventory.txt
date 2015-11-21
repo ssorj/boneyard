@@ -1,0 +1,400 @@
+mrg.grid:collector					Type		UI
+	Pool						Property	No						
+	System						Property	No
+	CondorPlatform					Property	No
+	CondorVersion					Property	No
+	Name						Property	Yes
+	PublicNetworkIpAddr				Property	Yes
+	
+mrg.grid:master
+	Pool						Property	No
+	System						Property	No
+	Name						Property	No
+	Machine						Property	No
+	PublicNetworkIpAddr				Property	No
+	MyAddress					Property	No
+	RealUid						Property	No
+	CondorPlatform					Property	No
+	CondorVersion					Property	No
+	DaemonStartTime					Property	No
+
+	MonitorSelfAge					Statistic	No
+	MonitorSelfCPUUsage				Statistic	No
+	MonitorSelfImageSize				Statistic	No
+	MonitorSelfRegisteredSocketCount		Statistic	No
+	MonitorSelfResidentSetSize			Statistic	No
+	MonitorSelfTime					Statistic	No
+
+	Start						Method		Yes
+	Stop						Method		Yes
+
+mrg.grid.negotiator
+	Pool						Property	No
+	System						Property	No
+	Name						Property	Yes
+	Machine						Property	Yes
+	MyAddress					Property	Yes
+	CondorPlatform					Property	No
+	CondorVersion					Property	No
+	DaemonStartTime					Property	Yes
+
+	MonitalSelfAge					Statistic	No					
+	MonitorSelfCPUUsage				Statistic	No
+	MonitorSelfImageSize				Statistic	No
+	MonitorSelfRegisteredSocketCount		Statistic	No
+	MonitorSelfResidentSetSize			Statistic	No
+	MonitorSelfTime					Statistic	No
+	
+	SetLimit					Method		Yes
+	GetLimits					Method		Yes
+	Reconfig					Method		Yes
+	
+mrg.grid:scheduler
+	CondorPlatform					Property	No
+	CondorVersion					Property	No
+	DaemonStartTime					Property	No
+	Pool						Property	No
+	System						Property	Yes
+	JobQueueBirthdate				Property	Yes
+	MaxJobsRunning					Property	Yes
+	Machine						Property	Yes
+	MyAddress					Property	Yes
+	Name						Property	Yes
+	PublicNetworkIpAddr				Property	Yes
+
+	MonitorSelfAge					Statistic	No
+	MonitorSelfCPUUsage				Statistic	No
+	MonitorSelfImageSize				Statistic	No
+	MonitorSelfRegisteredSocketCount		Statistic	No
+	MonitorSelfResidentSetSize			Statistic	No
+	MonitorSelfTime					Statistic	No
+	NumUsers					Statistic	Yes
+	TotalHeldJobs					Statistic	Yes
+	TotalIdleJobs					Statistic	Yes
+	TotalJobAds					Statistic	Yes
+	TotalRemovedJobs				Statistic	Yes
+	TotalRunningJobs				Statistic	Yes
+
+mrg.grid.slot
+	CondorPlatform					Property	No
+	CondorVersion					Property	No
+	DaemonStartTime					Property	No
+	Pool						Property	No
+	System						Property	No
+	AccountingGroup					Property	No
+	Arch						Property	No
+	CheckpointPlatform				Property	No
+	ClientMachine					Property	No
+	ConcurrencyLimits				Property	No
+	Cpus						Property	No
+	CurrentRank					Property	No
+	Disk						Property	No
+	FileSystemDomain				Property	No
+	GlobalJobId					Property	No                       
+	ImageSize					Property	No	                        
+	IsValidCheckpointPlatform			Property	No
+	JobId						Property	No         
+	JobStart					Property	No                          
+	KFlops						Property	No
+	Machine						Property	No                           
+	MaxJobRetirementTime				Property	No
+	Memory						Property	No
+	Mips						Property	No
+	MyAddress					Property	No
+	Name						Property	No
+	OpSys						Property	No
+	PreemptingConcurrencyLimits			Property	No
+	PreemptingOwner					Property	No
+	PreemptingUser					Property	No
+	PreemptingRank					Property	No
+	RemoteOwner					Property	No
+	RemoteUser					Property	No
+	Requirements					Property	No
+	PublicNetworkIpAddr				Property	No
+	Rank						Property	No
+	SlotID						Property	No
+	Start						Property	No
+	StarterAbilityList				Property	No
+	TotalClaimRunTime				Property	No
+	TotalClaimSuspendTime				Property	No
+	TotalCpus					Property	No
+	TotalDisk					Property	No
+	TotalJobRunTime					Property	No
+	TotalJobSuspendTime				Property	No
+	TotalMemory					Property	No
+	TotalSlots					Property	No
+	TotalVirtualMemory				Property	No
+	UidDomain					Property	No
+	VirtualMemory					Property	No
+	WindowsBuildNumber				Property	No
+	WindowsMajorVersion				Property	No
+	WindowsMinorVersion				Property	No
+
+	MonitorSelfAge					Statistic	No
+	MonitorSelfCPUUsage				Statistic	No
+	MonitorSelfRegisteredSocketCount		Statistic	No
+	MonitorSelfResidentSetSize			Statistic	No
+	MonitorSelfTime					Statistic	No
+	Activity					Statistic	No
+	ClockDay					Statistic	No
+	ClockMin					Statistic	No
+	CondorLoadAvg					Statistic	No
+	ConsoleIdle					Statistic	No
+	EnteredCurrentActivity				Statistic	No
+	EnteredCurrentState				Statistic	No
+	KeyboardIdle					Statistic	No
+	LastBenchmark					Statistic	No
+	LastFetchWorkCompleted				Statistic	No
+	LastFetchWorkSpawned				Statistic	No
+	LastPeriodicCheckpoint				Statistic	No
+	LoadAvg						Statistic	No
+	MyCurrentTime					Statistic	No
+	NextFetchWorkDelay				Statistic	No
+	State						Statistic	No
+	TimeToLive					Statistic	No
+	TotalCondorLoadAvg				Statistic	No
+	TotalLoadAvg					Statistic	No
+	TotalTimeBackfillBusy				Statistic	No
+	TotalTimeBackfillIdle				Statistic	No
+	TotalTimeBackfillKilling			Statistic	No
+	TotalTimeClaimedBusy				Statistic	No
+	TotalTimeClaimedIdle				Statistic	No
+	TotalTimeClaimedRetiring			Statistic	No
+	TotalTimeClaimedSuspended			Statistic	No
+	TotalTimeMatchedIdle				Statistic	No
+	TotalTimeOwnerIdle				Statistic	No
+	TotalTimePreemptingKilling			Statistic	No
+	TotalTimePreemptingVacating			Statistic	No
+	TotalTimeUnclaimedBenchmarking			Statistic	No
+	TotalTimeUnclaimedIdle				Statistic	No
+
+mrg.grid:submitter
+	schedulerRef					Property	No   
+	JobQueueBirthdate				Property	No
+	Machine						Property	No
+	Name						Property	Yes
+	ScheddName					Property	No
+
+	HeldJobs					Statistic	Yes	Charted
+	IdleJobs					Statistic	Yes	Charted
+	RunningJobs					Statistic	Yes	Charted
+
+mrg.grid.job
+	schedulerRef					Property	No
+	submitterRef					Property	No
+	AccountingGroup					Property	No
+	Args						Property	No
+	ClusterId					Property	No
+	Cmd						Property	No
+	ConcurrencyLimits				Property	No
+	CustomGroup					Property	No
+	CustomId					Property	No
+	CustomPriority					Property	No
+	GlobalJobId					Property	No
+	In						Property	No
+	Iwd						Property	No
+	JobStatus					Property	No
+	Note						Property	No
+	Out						Property	No
+	Owner						Property	No
+	User						Property	No
+	ProcId						Property	No
+	QDate						Property	No
+	JobUniverse					Property	No
+	Title						Property	No
+	UserLog						Property	No
+	HoldReason					Property	No
+	DAGNodeName					Property	No
+	DAGParentNodeNames				Property	No
+	DAGManJobId					Property	No
+	Ad						Property	No
+
+	GetAd						Method		Yes
+	SetAttribute					Method		Yes
+	Remove						Method		Yes
+	Release						Method		Yes
+	Hold						Method		Yes
+	Fetch						Method		Yes
+
+mrg.grid:sysimage
+	uuid						Property	Yes
+	osName						Property	Yes
+	nodeName					Property	Yes
+	release						Property	Yes
+	version						Property	Yes
+	machine						Property	Yes
+	distro						Property	Yes
+	memTotal					Property	No
+	swapTotal					Property	No
+
+	memFree						Statistic	Yes	Charted
+	swapFree					Statistic	Yes
+	loadAverage1Min					Statistic	Yes	Charted
+	loadAverage5Min					Statistic	Yes
+	loadAverage10Min				Statistic	Yes
+	procTotal					Statistic	Yes
+	procRunning					Statistic	Yes
+
+org.apache.qpid.broker:system
+	systemId					Property	No
+	osName						Property	No
+	nodeName					Property	No
+	release						Property	No
+	version						Property	No
+	machine						Property	No
+	
+org.apache.qpid.broker:agent
+	clientConnection				Property	No
+	label						Property	No
+	broker						Property	No
+	systemId					Property	No
+	brokerBank					Property	No
+	agentBank					Property	No
+
+org.apache.qpid.broker:binding
+	exchange					Property	No
+	queue						Property	No
+	bindingKey					Property	No
+	arguments					Property	No
+	origin						Property	No
+
+	msgMatched					Statistic	No
+
+org.apache.qpid.broker:bridge
+	linkRef						Property	No
+	channelId					Property	No
+	durable						Property	No
+	src						Property	No
+	dest						Property	No     
+	key						Property	No
+	srcIsQueue					Property	No
+	srcIsLocal					Property	No
+	tag						Property	No
+	excludes					Property	No
+	dynamic						Property	No
+
+	close						Method		Yes
+
+org.apache.qpid.broker:broker
+	system						Property	No
+	port						Property	Yes
+	workerThreads					Property	Yes
+	maxConns					Property	Yes
+	connBacklog					Property	Yes
+	stagingThreshold				Property	Yes
+	mgmtPubInterval					Property	Yes
+	version						Property	Yes
+	dataDir						Property	Yes
+
+	echo						Method		No
+	connect						Method		Yes
+	queueMoveMessages				Method		Yes
+
+org.apache.qpid.broker:connection
+	vhost						Property	No
+	address						Property	Yes
+	incoming					Property	No
+	SystemConnection				Property	Yes
+	federationLink					Property	Yes
+	authIdentity					Property	Yes
+
+	closing						Statistic	Yes
+	framesFromClient				Statistic	Yes
+	framesToClient					Statistic	Yes
+	bytesFromClient					Statistic	Yes	Charted
+	bytesToClient					Statistic	Yes	Charted
+
+	close						Method		Yes
+
+org.apache.qpid.broker:exchange
+	vhost						Property	No
+	name						Property	Yes
+	type						Property	Yes
+	durable						Property	Yes
+	arguments					Property	Yes
+
+	producerCount					Statistic	Yes
+	producerCountLow				Statistic	No
+	producerCountHigh				Statistic	No
+	bindingCount					Statistic	Yes
+	bindingCountLow					Statistic	No
+	bindingCountHigh				Statistic	No
+	msgReceives					Statistic	Yes
+	msgDrops					Statistic	Yes
+	msgRoutes					Statistic	Yes
+	byteReceives					Statistic	Yes
+	byteDrops					Statistic	Yes
+	byteRoutes					Statistic	Yes
+
+org.apache.qpid.broker:link
+	vhost						Property	No
+	host						Property	No
+	port						Property	No
+	transport					Property	No
+	durable						Property	No
+
+	state						Statistic	Yes
+	lastError					Statistic	Yes
+
+	close						Method		Yes
+	bridge						Method		Yes
+	
+org.apache.qpid.broker:queue
+	vhost						Property	No
+	name						Property	Yes
+	durable						Property	Yes
+	autoDelete					Property	Yes
+	exclusive					Property	Yes
+	arguments					Property	Yes
+
+	msgTotalEnqueues				Statistic	Yes	Charted
+	msgTotalDequeues				Statistic	Yes	Charted
+	msgTxnEnqueues					Statistic	Yes	Charted
+	msgTxnDequeues					Statistic	Yes	Charted
+	msgPersistEnqueues				Statistic	Yes	Charted
+	msgPersistDequeues				Statistic	Yes	Charted
+	msgDepth					Statistic	Yes	Charted
+	byteDepth					Statistic	Yes
+	byteTotalEnqueues				Statistic	Yes
+	byteTotalDequeues				Statistic	Yes
+	byteTxnEnqueues					Statistic	Yes
+	byteTxnDequeues					Statistic	Yes
+	bytePersistEnqueues				Statistic	Yes
+	bytePersistDequeues				Statistic	Yes
+	consumerCount					Statistic	Yes	Charted
+	consumerCountLow				Statistic	No
+	consumerCountHigh				Statistic	No
+	bindingCount					Statistic	Yes
+	bindingCountLow					Statistic	No
+	bindingCountHigh				Statistic	No
+	unackedMessages					Statistic	Yes
+	unackedMessagesLow				Statistic	No
+	unackedMessagesHigh				Statistic	No
+	messageLatencyMin				Statistic	Yes
+	messageLatencyMax				Statistic	Yes
+	messageLatencyAverage				Statistic	Yes
+	messageLatencySamples				Statistic	No
+
+	purge						Method		Yes
+
+org.apache.qpid.broker:session
+	vhost						Property	No
+	name						Property	Yes
+	channelId					Property	No
+	clientConnection				Property	No
+	detachedLifespan				Property	No
+	attached					Property	Yes
+	expireTime					Property	No
+	
+	framesOutstanding				Statistic	No
+	TxnStarts					Statistic	No
+	TxnCommits					Statistic	No
+	TxnRejects					Statistic	No
+	TxnCount					Statistic	No
+
+	solicitAck					Method		No
+	detach						Method		No
+	resetLifespan					Method		No
+	close						Method		No
+
+

@@ -1,0 +1,35 @@
+<section>
+  <h1>Connection setup</h1>
+
+  <section>
+    <h1>Python</h1>
+
+    <pre>conn = Connection()
+conn.set_attribute("host", "example.net")
+conn.set_attribute("reconnect", True)
+
+conn.open()
+try:
+    #
+    # Your code here
+    #
+finally:
+    conn.close()</pre>
+  </section>
+
+  <section>
+    <h1>Java</h1>
+
+    <pre>Connection conn = new Connection();
+conn.setAttribute("host", "example.net");
+conn.setAttribute("reconnect", true);
+
+try {
+    //
+    // Your code here
+    //
+} finally {
+   conn.close();
+}</pre>
+  </section>
+</section>

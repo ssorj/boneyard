@@ -1,0 +1,544 @@
+<model>
+  <package name="com.redhat.cumin.grid">
+    <class name="JobSummary">
+      <property name="GlobalJobId">
+        <title>Job id</title>
+      </property>
+
+      <property name="Cmd">
+        <title>Command</title>
+      </property>
+
+      <property name="JobStatus">
+        <title>Job status</title>
+      </property>
+    </class>
+
+    <class name="Quota">
+      <property name="id">
+        <title />
+      </property>
+
+      <property name="Quota">
+        <title>Dynamic quota</title>
+      </property>
+    </class>
+
+    <class name="Limit">
+      <property name="Usage">
+        <title>Current usage</title>
+      </property>
+
+      <property name="Allowance">
+        <title>Max allowance</title>
+      </property>
+    </class>
+  </package>
+
+  <package name="org.apache.qpid.broker">
+    <class name="Binding">
+      <property name="bindingKey">
+        <title>Binding key</title>
+      </property>
+
+      <property name="arguments">
+        <title>Arguments</title>
+      </property>
+
+      <property name="origin">
+        <title>Origin</title>
+      </property>
+
+      <statistic name="msgMatched">
+        <title>Messages matched</title>
+      </statistic>
+    </class>
+
+    <class name="Broker">
+      <object>
+        <title>%(name)s</title>
+      </object>
+
+      <property name="maxConns">
+        <title>Max connections</title>
+      </property>
+
+      <property name="connBacklog">
+        <title>Connection backlog</title>
+      </property>
+
+      <property name="mgmtPubInterval">
+        <title>QMF publish interval</title>
+      </property>
+
+      <property name="dataDir">
+        <title>Data directory</title>
+      </property>
+    </class>
+
+    <class name="Connection">
+      <object>
+	<title>%(address)s</title>
+      </object>
+
+      <property name="remoteProcessName">
+        <title>Process (PID)</title>
+      </property>
+      <property name="remotePid">
+        <title>Process ID</title>
+        <!-- value -->
+      </property>
+
+      <property name="remoteParentPid">
+        <title>Parent PID</title>
+      </property>
+    </class>
+
+    <class name="Exchange">
+      <property name="name">
+        <title>Name</title>
+        <formatter>fmt_exchange_name</formatter>
+      </property>
+
+      <statistic name="producerCount">
+        <title>Producers</title>
+      </statistic>
+
+      <statistic name="bindingCount">
+        <title>Bindings</title>
+      </statistic>
+
+      <statistic name="msgRoutes">
+        <title>Messages routed</title>
+      </statistic>
+
+      <statistic name="byteRoutes">
+        <title>Bytes routed</title>
+      </statistic>
+    </class>
+
+    <class name="Queue">
+      <property name="name">
+        <title>Name</title>
+      </property>
+
+      <statistic name="consumerCount">
+        <title>Consumers</title>
+      </statistic>
+
+      <statistic name="bindingCount">
+        <title>Bindings</title>
+      </statistic>
+
+      <statistic name="msgDepth">
+        <title>Queue messages</title>
+      </statistic>
+
+      <statistic name="byteDepth">
+        <title>Bytes</title>
+      </statistic>
+
+      <statistic name="msgPersistEnqueues">
+        <title>Messages enqueued</title>
+      </statistic>
+
+      <statistic name="msgPersistDequeues">
+        <title>Messages dequeued</title>
+      </statistic>
+
+      <statistic name="bytePersistEnqueues">
+        <title>Bytes enqueued</title>
+      </statistic>
+
+      <statistic name="bytePersistDequeues">
+        <title>Bytes dequeued</title>
+      </statistic>
+
+      <statistic name="msgTotalEnqueues">
+        <title>Messages enqueued</title>
+      </statistic>
+
+      <statistic name="msgTotalDequeues">
+        <title>Messages dequeued</title>
+      </statistic>
+
+      <statistic name="byteTotalEnqueues">
+        <title>Bytes enqueued</title>
+      </statistic>
+
+      <statistic name="byteTotalDequeues">
+        <title>Bytes dequeued</title>
+      </statistic>
+
+      <statistic name="unackedMessages">
+        <title>Messages unacked</title>
+      </statistic>
+
+      <statistic name="messageLatency">
+        <title>Message latency</title>
+      </statistic>
+    </class>
+
+    <class name="System">
+      <property name="nodeName">
+        <title>Host</title>
+      </property>
+    </class>
+
+    <class name="Vhost">
+      <title>Broker</title>
+    </class>
+  </package>
+
+  <package name="org.apache.qpid.cluster">
+    <class name="Cluster">
+      <property name="clusterName">
+        <title>Cluster</title>
+      </property>
+    </class>
+  </package>
+
+  <package name="com.redhat.cumin.messaging">
+    <class name="BrokerGroup">
+      <title>Broker group</title>
+
+      <property name="name">
+        <title>Name</title>
+      </property>
+
+      <property name="description">
+        <title>Description</title>
+      </property>
+    </class>
+  </package>
+
+  <package name="com.redhat.sesame">
+    <class name="Sysimage">
+      <title>System</title>
+
+      <object>
+        <title>%(nodeName)s</title>
+      </object>
+
+      <property name="uuid">
+        <title>System ID</title>
+      </property>
+
+      <property name="nodeName">
+        <title>Host</title>
+      </property>
+
+      <property name="osName">
+        <title>Kernel</title>
+      </property>
+
+      <property name="release">
+        <title>Kernel release</title>
+      </property>
+
+      <property name="version">
+        <title>Kernel version</title>
+      </property>
+
+      <property name="machine">
+        <title>Architecture</title>
+      </property>
+
+      <property name="distro">
+        <title>Distribution</title>
+      </property>
+
+      <property name="memTotal">
+        <title>Mem Total</title>
+        <formatter>fmt_kbmb</formatter>
+      </property>
+
+      <property name="swapTotal">
+        <title>Swap Total</title>
+        <formatter>fmt_kbmb</formatter>
+      </property>
+
+      <statistic name="memFree">
+        <title>Free Memory</title>
+        <formatter>fmt_kbmb</formatter>
+      </statistic>
+
+      <statistic name="swapFree">
+        <title>Free Swap</title>
+        <formatter>fmt_kbmb</formatter>
+      </statistic>
+
+      <statistic name="loadAverage1Min">
+        <title>Load average</title>
+      </statistic>
+
+      <statistic name="loadAverage5Min">
+        <title>Load average (5 minutes)</title>
+      </statistic>
+
+      <statistic name="loadAverage10Min">
+        <title>Load average (10 minutes)</title>
+      </statistic>
+
+      <statistic name="procTotal">
+        <title>Processes</title>
+      </statistic>
+
+      <statistic name="procRunning">
+        <title>Running processes</title>
+      </statistic>
+    </class>
+  </package>
+
+  <package name="com.redhat.grid">
+    <class name="Scheduler">
+      <statistic name="MonitorSelfCPUUsage">
+        <title>CPU usage</title>
+      </statistic>
+
+      <statistic name="MonitorSelfResidentSetSize">
+        <title>Memory used</title>
+      </statistic>
+
+      <statistic name="MonitorSelfAge">
+        <title>Up-time (dd:hh:mm)</title>
+        <formatter>fmt_timestamp_ddhhmmss</formatter>
+      </statistic>
+
+      <statistic name="MonitorSelfImageSize">
+        <title>Image size</title>
+      </statistic>
+
+      <statistic name="MonitorSelfRegisteredSocketCount">
+        <title>Registered socket count</title>
+      </statistic>
+
+      <statistic name="JobsSubmitted">
+        <title>Submitted</title>
+      </statistic>
+
+      <statistic name="JobsStarted">
+        <title>Started</title>
+      </statistic>
+
+      <statistic name="JobsCompleted">
+        <title>Completed</title>
+      </statistic>
+
+      <statistic name="JobsSubmittedCum">
+        <title>Jobs submitted cumulative</title>
+        <short>Submitted</short>
+      </statistic>
+
+      <statistic name="JobsCompletedCum">
+        <title>Jobs completed cumulative</title>
+        <short>Completed</short>
+      </statistic>
+
+      <statistic name="JobsExitedCum">
+        <title>Jobs exited cumulative</title>
+        <short>Exited</short>
+      </statistic>
+
+      <statistic name="ShadowExceptionsCum">
+        <title>Shadow exceptions cumulative</title>
+        <short>Shadow exceptions</short>
+      </statistic>
+
+      <statistic name="JobsStartedCum">
+        <title>Jobs started cumulative</title>
+        <short>Started</short>
+      </statistic>
+
+      <statistic name="MeanTimeToStartCum">
+        <title>Mean time to start cumulative</title>
+        <short>Time to start</short>
+      </statistic>
+
+      <statistic name="MeanRunningTimeCum">
+        <title>Mean running time cumulative</title>
+        <short>Running time</short>
+      </statistic>
+
+      <statistic name="MeanTimeToStart">
+        <title>Mean time to start</title>
+        <short>Time to start</short>
+      </statistic>
+
+      <statistic name="MeanRunningTime">
+        <title>Mean running time</title>
+        <short>Running time</short>
+      </statistic>
+
+      <statistic name="SumTimeToStartCum">
+        <title>Sum time to start cumulative</title>
+      </statistic>
+
+      <statistic name="SumRunningTimeCum">
+        <title>Sum running time cumulative</title>
+      </statistic>
+
+      <statistic name="JobCompletionRate">
+        <short>Completion</short>
+      </statistic>
+
+      <statistic name="JobStartRate">
+        <short>Start</short>
+      </statistic>
+
+      <statistic name="JobSubmissionRate">
+        <short>Submission</short>
+      </statistic>
+
+      <statistic name="JobsExited">
+        <short>Exited</short>
+      </statistic>
+    </class>
+
+    <class name="Collector">
+      <title>Pool</title>
+
+      <object>
+        <title>%(Pool)s</title>
+      </object>
+
+      <statistic name="HostsClaimed">
+        <title>Claimed hosts</title>
+        <short>Claimed</short>
+      </statistic>
+
+      <statistic name="HostsUnclaimed">
+        <title>Unclaimed hosts</title>
+        <short>Unclaimed</short>
+      </statistic>
+
+      <statistic name="HostsOwner">
+        <title>Unavailable hosts</title>
+        <short>Unavailable</short>
+      </statistic>
+
+      <statistic name="HostsTotal">
+        <title>Total hosts</title>
+      </statistic>
+
+      <statistic name="MonitorSelfCPUUsage">
+        <title>CPU usage</title>
+      </statistic>
+
+      <statistic name="MonitorSelfResidentSetSize">
+        <title>Memory used</title>
+      </statistic>
+
+      <statistic name="MonitorSelfImageSize">
+        <title>Image size</title>
+      </statistic>
+
+      <statistic name="MonitorSelfRegisteredSocketCount">
+        <title>Registered socket count</title>
+      </statistic>
+
+      <statistic name="MonitorSelfAge">
+        <title>Up-time (dd:hh:mm)</title>
+        <formatter>fmt_timestamp_ddhhmmss</formatter>
+      </statistic>
+    </class>
+
+    <class name="Slot">
+      <index name="Pool" attributes="Pool"/>
+      <index name="Name" attributes="Name"/>
+      <index name="System" attributes="System"/>
+
+      <property name="JobId">
+        <title>Job ID</title>
+      </property>
+
+      <property name="GlobalJobId">
+        <title>Global job ID</title>
+      </property>
+
+      <property name="AccountingGroup">
+        <title>Accounting group</title>
+      </property>
+
+      <property name="Arch">
+        <title>Architecture</title>
+      </property>
+
+      <property name="OpSys">
+        <title>Operating system</title>
+      </property>
+
+      <property name="ConcurrencyLimits">
+        <title>Concurrency limits</title>
+      </property>
+
+      <property name="Cpus">
+        <title>CPUs</title>
+      </property>
+
+      <property name="Mips">
+        <title>MIPS</title>
+      </property>
+
+      <statistic name="CondorLoadAvg">
+        <title>Condor load average</title>
+        <!-- "%2.02f" -->
+      </statistic>
+
+      <statistic name="LoadAvg">
+        <title>Load average</title>
+        <!-- "%2.02f" -->
+      </statistic>
+    </class>
+
+    <class name="Submission">
+      <index name="Name" attributes="Name"/>
+      <property name="Name">
+        <title>Description</title>
+      </property>
+      <property name="QDate">
+        <title>Enqueued</title>
+      </property>
+    </class>
+
+    <class name="Negotiator">
+      <statistic name="Duration">
+        <title>Total duration</title>
+      </statistic>
+
+      <statistic name="MonitorSelfCPUUsage">
+        <title>CPU usage</title>
+      </statistic>
+
+      <statistic name="MonitorSelfResidentSetSize">
+        <title>Memory used</title>
+      </statistic>
+
+      <statistic name="MonitorSelfImageSize">
+        <title>Image size</title>
+      </statistic>
+
+      <statistic name="MonitorSelfRegisteredSocketCount">
+        <title>Registered socket count</title>
+      </statistic>
+
+      <statistic name="CandidateSlots">
+        <title>Candidate slots</title>
+      </statistic>
+
+      <statistic name="Matches">
+        <title>Matched jobs</title>
+      </statistic>
+
+      <statistic name="NumJobsConsidered">
+        <title>Considered jobs</title>
+      </statistic>
+
+      <statistic name="MonitorSelfAge">
+        <title>Up-time (dd:hh:mm)</title>
+        <formatter>fmt_timestamp_ddhhmmss</formatter>
+      </statistic>
+    </class>
+  </package>
+
+</model>

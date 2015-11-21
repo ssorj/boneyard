@@ -1,0 +1,10 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid-java.bash
+
+script-init
+
+cd "${SOURCE_PATH}/java"
+
+ant-test-external cpp.cluster

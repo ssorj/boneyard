@@ -1,0 +1,10 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+
+script-init
+
+svn-update "http://anonsvn.jboss.org/repos/rhmessaging/mgmt/trunk" "$SOURCE_PATH"
+
+svn-save-revision "$SOURCE_PATH"
+svn-save-changes "$SOURCE_PATH"

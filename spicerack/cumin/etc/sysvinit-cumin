@@ -1,0 +1,165 @@
+#!/bin/sh
+#
+# chkconfig: 2345 80 30
+# description: A web management interface
+# cumin: Cumin daemon
+# processname: cumin
+# pidfile: /var/run/cumin.pid
+#
+
+SYSCONFIG="/etc/sysconfig/cumin"
+[ -r "$SYSCONFIG" ] && source "$SYSCONFIG"
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# so we can rearrange this easily
+processname=cumin
+servicename=cumin
+pidfile=/var/run/cumin.pid
+lockfile=/var/lock/subsys/cumin
+
+RETVAL=0
+DELAY=5
+
+start() {
+
+    echo -n $"Starting cumin: "
+    if [[ "$EUID" != "0" ]]; then
+        echo_failure; echo
+        echo "Must be run as root"
+        exit 1
+    fi
+
+    # Sanity checks.
+    test -x /usr/bin/cumin || {
+        echo_failure; echo
+        echo "/usr/bin/cumin has been removed"
+        exit 1
+    }
+
+    test -x /usr/sbin/cumin-database || {
+        echo_failure; echo
+        echo "/usr/sbin/cumin-database has been removed"
+        exit 1
+    }
+
+    test -x /usr/sbin/cumin-admin || {
+        echo_failure; echo
+        echo "/usr/sbin/cumin-admin has been removed"
+        exit 1
+    }
+
+    # Initial checks for the start case
+    cumin-database check-started &> /dev/null || {
+        echo_failure; echo
+        echo "Cumin's database server is not running"
+        echo "Run 'cumin-database start' as root"
+        exit 1
+    }
+
+    cumin-database check &> /dev/null || {
+        # Run again with output left on for user.
+        echo_failure; echo
+        echo "(detailed output from cumin-database check:)"
+        cumin-database check
+        exit 1
+    }
+
+    cumin-admin check-schema &> /dev/null || {
+        # Run again with output left on for user.
+        echo_failure; echo
+        echo "(detailed output from cumin-admin check-schema:)"
+        cumin-admin check-schema
+        exit 1
+    }
+
+    # If it's already running, be happy and return success
+    status $processname -p $pidfile -l $lockfile &> /dev/null
+    [ $? -eq 0 ] && echo_success && echo && return
+
+    # Make sure the pid file is there and empty so cumin can write it
+    cat /dev/null > $pidfile
+    chown cumin.cumin $pidfile
+
+    # Squelch all IO, let cumin redirect.
+    # Cumin will write the value in the pidfile.
+    daemon --pidfile $pidfile --user cumin --check $servicename $processname "--p --timeout="$DELAY $CUMIN_OPTIONS < /dev/null &> /dev/null \&
+    RETVAL=$?
+    [ $RETVAL = 0 ] && touch $lockfile
+    if [ $RETVAL = 0 ]; then
+        /usr/sbin/cumin-checkpid --timeout=$DELAY
+        RETVAL=$?
+    fi
+
+    # Tidy up the banner
+    if [ $RETVAL -ne 0 ] ; then
+        # We want to remove the pidfile when the
+	# cumin master indicates exit
+        /usr/sbin/cumin-checkpid --exit --timeout=$DELAY
+        if [ $? = 0 ]; then
+            rm -f $lockfile
+            rm -f $pidfile
+        fi     
+        echo_failure; echo; return $RETVAL
+    fi
+    echo_success && echo
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping cumin: "
+
+    # if we think it's running we'll wait before clearing the pidfile
+    status $processname -p $pidfile -l $lockfile &> /dev/null
+    running=$?
+
+    killproc $servicename SIGTERM
+    RETVAL=$?
+    echo 
+    if [ $RETVAL -eq 0 ]; then
+        if [ $running -eq 0 ]; then
+	    /usr/sbin/cumin-checkpid --exit --timeout=$DELAY
+            if [ $? -eq 0 ]; then
+                rm -f $lockfile
+                rm -f $pidfile
+            else
+                echo "Timed out, cumin may not have stopped completely."
+            fi
+        fi
+    else
+        if [[ "$EUID" != "0" ]]; then
+            echo "Must be run as root"
+        fi
+    fi
+}
+
+# See how we were called.
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status $processname
+        RETVAL=$?
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    condrestart)
+        if [ -f /var/lock/subsys/$servicename ]; then
+            stop
+	    sleep 3
+            start
+        fi
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart}"
+        RETVAL=2
+        ;;
+esac
+exit $RETVAL

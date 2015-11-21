@@ -1,0 +1,11 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid-stable.bash
+
+script-init
+
+cd "${SOURCE_PATH}/specs"
+
+mkdir -p "${INSTALL_PATH}/share/amqp"
+cp *.xml "${INSTALL_PATH}/share/amqp"

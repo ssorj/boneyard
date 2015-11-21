@@ -1,0 +1,29 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid-stable-java.bash
+
+script-init
+
+cd "${SOURCE_PATH}/java"
+
+port=56789
+code=0
+
+replace "localhost:5672" "localhost:${port}" test-provider.properties
+
+ant-test-external cpp.async "$port" || code=1
+ant-test-external cpp.noprefetch "$port" || code=1
+
+args="--ssl-require-client-authentication"
+args="${args} --ssl-cert-name localhost.localdomain"
+args="${args} --ssl-cert-password-file ${PWD}/test_resources/ssl/pfile"
+args="${args} --ssl-cert-db ${PWD}/test_resources/ssl/server_db"
+
+ant-test-external cpp.ssl "$port" "$args" || code=1
+
+args="--cluster-name cpp-java-test-cluster"
+
+ant-test-external cpp.cluster "$port" "$args" || code=1
+
+exit "$code"

@@ -1,0 +1,6 @@
+#!/usr/bin/python
+
+from parsley.collectionsex import *
+
+x = defaultdict(list)
+x["a"].append(1)

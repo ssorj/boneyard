@@ -1,0 +1,19 @@
+#!/bin/bash -u
+
+servers="harness model alert file console master"
+tmpdir=$(mktemp -d)
+
+for server in $servers; do 
+    cmd=ptolemy-$server-server
+    out=$tmpdir/$server.out
+
+    $cmd --init-only &>> $out
+    echo -n $?\ 
+
+    $cmd --help &>> $out
+    echo -n $?\ 
+
+    echo $out
+done
+
+rm -rf $tmpdir

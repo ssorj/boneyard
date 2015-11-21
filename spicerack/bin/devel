@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ -z "$DEVEL_HOME" ]; then
+    echo "DEVEL_HOME not set"
+    exit 1
+fi
+
+echo "DEVEL_HOME is ${DEVEL_HOME}"
+
+cd "$DEVEL_HOME"
+
+source "etc/devel.profile"
+
+make tags
+
+exec emacs -nw -l "etc/devel.el"

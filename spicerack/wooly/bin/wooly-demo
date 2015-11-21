@@ -1,0 +1,51 @@
+#!/usr/bin/python
+
+from wooly.demo import *
+
+def usage():
+    print "Usage: wooly-demo [HOST:PORT]"
+    print "Example: wooly-demo localhost:8888"
+    sys.exit(1)
+
+def do_main(host, port):
+    app = DemoApplication()
+    server = DemoServer(app, host, port)
+
+    print "Initializing"
+
+    app.init()
+    app.start()
+
+    try:
+        print "Starting web service at %s:%i" % (host, port)
+
+        try:
+            server.start()
+
+            while True:
+                time.sleep(5)
+        finally:
+            server.stop()
+    finally:
+        app.stop()
+
+def main():
+    try:
+        addr = sys.argv[1]
+    except IndexError:
+        addr = "localhost:8888"
+
+    try:
+        host, port = addr.split(":")
+        port = int(port)
+    except:
+        print "Error: Malformed address"
+        usage()
+
+    try:
+        do_main(host, port)
+    except KeyboardInterrupt:
+        pass
+
+if __name__ == "__main__":
+    main()

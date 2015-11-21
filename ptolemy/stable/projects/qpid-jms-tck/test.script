@@ -1,0 +1,77 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid.bash
+
+script-init
+
+export JAVA_HOME="/usr/lib/jvm/java"
+export TS_HOME="$SOURCE_PATH"
+export ANT_OPTS=-Xmx1024M
+
+set +x # Quiet the classpath business
+
+for jar in "$TS_HOME"/lib/*.jar; do
+    CLASSPATH="$CLASSPATH:$jar"
+done
+
+for jar in "$INSTALL_PATH"/share/java/*.jar; do
+    CLASSPATH="$CLASSPATH:$jar"
+done
+
+for jar in "$INSTALL_PATH"/share/java/qpid-deps/*.jar; do
+    CLASSPATH="$CLASSPATH:$jar"
+done
+
+set -x
+
+start-broker
+tmpdir=$(mktemp -d)
+
+function cleanup {
+    stop-broker
+    rm -rf "$tmpdir"
+}
+
+trap cleanup EXIT
+
+function run-tests {
+    java \
+        -DTS_HOME="$TS_HOME" \
+        -DJAVA_HOME="$JAVA_HOME" \
+        -DJAVA_OPTIONS="$JAVA_OPTIONS" \
+        -DLOCAL_CLASSES="$CLASSPATH" \
+        -Dcts.jtroutput=true \
+        -Dlog4j.configuration="file://${PWD}/log4j.properties" \
+        -Djava.security.policy="${TS_HOME}/bin/harness.policy" \
+        -Djavatest.security.allowPropertiesAccess=true \
+        -Dtechnology.name=JMS \
+        -Ddeliverable.class=com.sun.ts.lib.deliverable.jms.JMSDeliverable \
+        com.sun.javatest.tool.Main \
+        -EsysProps \
+        -batch \
+        -testsuite "${TS_HOME}/src" \
+        -workDirectory "${tmpdir}/work" \
+        -envFiles "${PWD}/ts.jte" \
+        -env ts_unix \
+        "$@"
+}
+
+sed "s/@QPID_PORT@/${TEST_BROKER_PORT}/g" jndi.properties.in > "${tmpdir}/jndi.properties"
+jar -cvf "${tmpdir}/jndi.properties.jar" -C "$tmpdir" jndi.properties
+
+export CLASSPATH="${tmpdir}/jndi.properties.jar:$CLASSPATH"
+
+mkdir "${tmpdir}/work"
+
+failures="${tmpdir}/failures"
+
+echo "First run"
+run-tests | tee >(fgrep -a "Some tests did not pass" > "$failures") 2>&1
+echo "Second run"
+run-tests | tee >(fgrep -a "Some tests did not pass" > "$failures") 2>&1
+
+if [[ -s "$failures" ]]; then
+    cat "$failures"
+    exit 1
+fi

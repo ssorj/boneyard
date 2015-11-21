@@ -1,0 +1,20 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid.bash
+
+script-init
+
+version=$(ruby -r rbconfig -e 'puts Config::CONFIG["ruby_version"]')
+path="${INSTALL_PATH}/lib/ruby/site_ruby/${version}"
+
+cd "${SOURCE_PATH}/ruby"
+
+make build
+
+install -d "$path"
+install -m 644 lib/qpid.rb "$path"
+install -d "${path}/qpid"
+install -m 644 lib/qpid/*.rb "${path}/qpid"
+install -d "${path}/qpid/spec_cache"
+install -m 644 lib/qpid/spec_cache/* "${path}/qpid/spec_cache"

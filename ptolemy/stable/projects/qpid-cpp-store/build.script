@@ -1,0 +1,15 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid.bash
+
+script-init
+
+export CXXFLAGS="${CXXFLAGS} -I${INSTALL_PATH}/include -I${INSTALL_PATH}/include/qpid-boost"
+
+cd "$SOURCE_PATH"
+
+./bootstrap
+./configure --prefix="$INSTALL_PATH" --with-qpid-prefix="$INSTALL_PATH"
+make -j$(core-count)
+make install

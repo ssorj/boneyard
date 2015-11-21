@@ -1,0 +1,9 @@
+#!/bin/bash -eu
+
+source "${PTOLEMY_PROJECT}/project.bash"
+
+script-init
+
+cd "$STORE_BUILD"
+
+make check

@@ -1,0 +1,9 @@
+[Unit]
+Description=MRG Management system agent
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sesame
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,46 @@
+[PoolView.error_html]
+<div id="{id}" class="{class}">
+    {heading}
+    <div class="NotificationSet">
+        <ul>
+            <li>
+            <b>Collector not found.</b> 
+            Please ensure the grid is setup correctly and that cumin-data is running. 
+            If cumin was just started, it may take a few minutes for the collector to become available.
+            </li>
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    setTimeout(function () {
+        window.location.reload( true );
+    }, 9000);
+</script>
+
+[PoolOverview.css]
+div#PoolOverview div.col1, div#PoolOverview div.col2 {
+    float: left;
+    width: 47%;
+}
+div#PoolOverview div.col1 {
+    padding-right: 2em;
+}
+
+[PoolOverview.html]
+<div id="PoolOverview">
+<div class="col1">
+  <h2>Statistics</h2>
+  {collector_stats}
+  <div>{jobs}</div>
+  <div>{slots}</div>
+  {grid_stats}
+</div>
+</div>
+<div style="clear:left;"><!-- --></div>
+
+[GridStats.html]
+<br/>
+<h2>Stats for Grid {grid_name}</h2>
+{stats}
+<div>{jobs_chart}</div>
+<div>{submit_chart}</div>

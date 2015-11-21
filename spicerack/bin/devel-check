@@ -1,0 +1,84 @@
+#!/bin/bash
+
+function print_path {
+    for line in $(echo $1 | tr ":" " "); do
+        echo "  ${line}"
+    done
+}
+
+function find_executable {
+    echo -n "Executable '$1' ->"
+
+    path=$(which "$1" 2> /dev/null)
+
+    test -z "$path" && {
+        path="[not found]"
+    }
+
+    echo " $path"
+}
+
+test "$1" = "--verbose" -o "$1" = "-v" && {
+    verbose=1
+}
+
+echo "== Environment =="
+
+echo DEVEL_HOME $DEVEL_HOME
+echo CUMIN_HOME $CUMIN_HOME
+
+find_executable reschema
+find_executable mint-test
+find_executable cumin
+find_executable cumin-admin
+
+test "$verbose" && {
+    echo PYTHONPATH; print_path $PYTHONPATH
+    echo PATH; print_path $PATH
+}
+
+echo "== Python =="
+
+which python && python <<EOF
+import sys, traceback
+
+print "Python %s" % sys.version
+
+smodules = ["qpid", "mllib", "psycopg2"]
+
+for smodule in smodules:
+    print "Module '%s' ->" % smodule,
+    try:
+        module = __import__(smodule)
+        print module
+    except ImportError:
+        print "[not found]"
+
+try:
+    import qpid
+
+    path = qpid.spec.default()
+    print "Loading spec '%s' ->" % path,
+    spec = qpid.spec.load(path)
+    print spec
+except:
+    traceback.print_exc()
+
+EOF
+
+echo "== Database =="
+
+which psql && {
+    test "$verbose" && psql -l
+
+    psql -d cumin -U cumin -h localhost -c "\q" && {
+        psql -d cumin -U cumin -h localhost -c "select * from mint_info;"
+
+        test "$verbose" && {
+            psql -d cumin -U cumin -h localhost <<EOF
+\pset pager
+\dt+
+EOF
+        }
+    }
+}

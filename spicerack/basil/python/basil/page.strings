@@ -1,0 +1,23 @@
+[ObjectView.html]
+<div id="{id}">
+  <h2>{name}</h2>
+
+  <table class="PropertySet">
+    <thead>
+      <tr><th><a>Name</a></th><th><a>Value</a></th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Created</td><td>{create_time}</td></tr>
+      <tr><td>Updated</td><td>{update_time}</td></tr>
+      <tr><td>Deleted</td><td>{delete_time}</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Properties</h3>
+
+  {props}
+
+  <h3>Statistics</h3>
+
+  {stats}
+</div>

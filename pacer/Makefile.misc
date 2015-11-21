@@ -1,0 +1,10 @@
+.PHONY: symbols clang
+
+default:
+	@echo "symbols, clang"
+
+symbols: main
+	nm main --demangle --extern-only --print-file-name
+
+clang:
+	clang++ -Iinclude -c -o main src/main.cpp

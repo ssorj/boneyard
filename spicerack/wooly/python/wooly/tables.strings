@@ -1,0 +1,58 @@
+[ItemTable.css]
+table.ItemTable {
+    table-layout: fixed;
+}
+
+table.ItemTable td, table.ItemTable th {
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+[ItemTable.html]
+<table class="{class}">
+  {columns}
+  <thead><tr>{headers}</tr></thead>
+  <tbody>{items}</tbody>
+</table>
+
+[ItemTable.item_html]
+<tr>{cells}</tr>
+
+[ItemTableColumnHeader.css]
+a.ItemTableColumnHeader > span {
+	border:1px solid transparent;
+	padding: 2px 4px;
+	position: relative;
+	left: -5px;  /* 4 padding + 1 border */
+}
+a.ItemTableColumnHeader > span:hover {
+	border:1px solid #EAEAEA;
+	background-color: #FFFFFF;
+}
+a.ItemTableColumnHeader > span > span {
+	padding-right: 14px;
+}
+
+/* for right align columns, align with the right */
+th.ralign a.ItemTableColumnHeader > span {
+	left:19px;
+}
+
+a.ItemTableColumnHeader span.unsorted_down:hover {
+	background: url(resource?name=sort-arrow-down.png) right 4px no-repeat;
+}
+a.ItemTableColumnHeader span.unsorted_up:hover {
+	background: url(resource?name=sort-arrow-up.png) right 3px no-repeat;
+}
+a.ItemTableColumnHeader span.up {
+	background: url(resource?name=sort-arrow-up.png) right 3px no-repeat;
+}
+a.ItemTableColumnHeader span.down {
+	background: url(resource?name=sort-arrow-down.png) right 4px no-repeat;
+}
+
+[ItemTableColumnHeader.html]
+<th {attrs}><a class="ItemTableColumnHeader" href="{href}"><span><span class="{sorted_dir}">{content}</span></span></a></th>
+
+[SqlTable.find_sql]
+select * from %s

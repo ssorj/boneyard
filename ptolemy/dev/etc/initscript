@@ -1,0 +1,71 @@
+#!/bin/sh
+#
+# chkconfig: 2345 80 30
+# description: A continuous integration server
+# ptolemy: Ptolemy server
+# processname: ptolemy-master-server
+# pidfile: /var/run/ptolemy-master-server.pid
+#
+
+# Sanity checks.
+[ -x /usr/bin/ptolemy-master-server ] || exit 0
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# so we can rearrange this easily
+processname=ptolemy-master-server
+servicename=ptolemy
+username=ptolemy
+
+RETVAL=0
+
+start() {
+    echo -n $"Starting Ptolemy: "
+    daemon --check $servicename --user $username $processname \&
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$servicename
+}
+
+stop() {
+    echo -n $"Stopping Ptolemy: "
+
+    killproc $servicename -TERM
+    RETVAL=$?
+    echo
+    if [ $RETVAL -eq 0 ]; then
+        rm -f /var/lock/subsys/$servicename
+        rm -f /var/run/$processname.pid
+    fi
+}
+
+# See how we were called.
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status $processname
+        RETVAL=$?
+        ;;
+    restart)
+        stop
+	sleep 3
+        start
+        ;;
+    condrestart)
+        if [ -f /var/lock/subsys/$servicename ]; then
+            stop
+	    sleep 3
+            start
+        fi
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart}"
+        ;;
+esac
+exit $RETVAL

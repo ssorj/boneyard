@@ -1,0 +1,3 @@
+#!/bin/bash
+echo create index \"Submission_Name_idx\" on \"com.redhat.grid\".\"Submission\"\(\"Name\"\) | psql -d cumin -U cumin -h localhost
+echo alter table \"com.redhat.grid\".\"Submission\" add column \"QDate\" timestamp | psql -d cumin -U cumin -h localhost

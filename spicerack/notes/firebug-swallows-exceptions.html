@@ -1,0 +1,42 @@
+<html>
+<head>
+<title>Test</title>
+<script>
+var scratchy;
+
+(function() {
+    scratchy = new Scratchy();
+
+    function Scratchy() {
+        this.x = true;
+
+        this.itchy = function(callback) {
+            var y = this.x;
+
+            setTimeout(a, 1000);
+
+            function a() {
+                b();
+            }
+
+            function b() {
+                if (y) callback();
+            }
+        }
+    }
+}());
+</script>
+</head>
+<body>
+Test
+<script defer="defer">
+(function() {
+    var code = function() {
+        throw Error();
+    }
+
+    scratchy.itchy(code);
+}());
+</script>
+</body>
+</html>

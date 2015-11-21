@@ -1,0 +1,11 @@
+#!/bin/bash -eu
+
+source "${PTOLEMY_PROJECT}/project.bash"
+
+script-init
+
+export ANT_OPTS="${ANT_OPTS} -Djavax.net.debug=ssl"
+
+cd "${QPID_BUILD}/java"
+
+java-test-with-cpp-broker cpp.ssl

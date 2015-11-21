@@ -1,0 +1,5 @@
+#!/bin/bash
+su - postgres -c 'echo alter table \"com.redhat.grid\".\"Submission\" add column \"Suspended\" bigint'
+su - postgres -c 'echo alter table \"com.redhat.grid\".\"Submission_samples\" add column \"Suspended\" bigint'
+su - postgres -c 'echo alter table \"com.redhat.grid\".\"Submission\" add column \"TransferringOutput\" bigint'
+su - postgres -c 'echo alter table \"com.redhat.grid\".\"Submission_samples\" add column \"TransferringOutput\" bigint'

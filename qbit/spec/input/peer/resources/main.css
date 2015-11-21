@@ -1,0 +1,103 @@
+@font-face {
+    font-family: 'Droid Sans';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Droid Sans'), url('DroidSans-webfont.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Droid Sans';
+    font-style: normal;
+    font-weight: bold;
+    src: local('Droid Sans Bold'), url('DroidSans-Bold-webfont.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Droid Serif';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Droid Serif'), url('DroidSerif-Regular-webfont.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Droid Serif';
+    font-style: normal;
+    font-weight: bold;
+    src: local('Droid Serif Bold'), url('DroidSerif-Bold-webfont.woff') format('woff');
+}
+
+body {
+    width: 44em;
+    margin: 0 auto;
+    padding: 0;
+    background-color: white;
+    font-family: 'Droid Sans';
+    font-size: 0.9em;
+}
+
+section.module > h1, section.class > h1 {
+    color: #474;
+}
+
+section.attributes, section.methods {
+    margin: 0;
+}
+
+section.attributes > h1, section.methods > h1 {
+    font-size: 1em;
+}
+
+section.class, section.exception, section.attribute, section.method {
+    display: none;
+    margin: 0 2pt;
+    padding: 0 1em;
+    border-left: 2pt dotted #f0f0f0;
+}
+
+h1 {
+    margin: 1em 0 0.5em 0;
+    font-family: 'Droid Sans';
+}
+
+p {
+    margin: 1em 0;
+}
+
+ol, ul {
+    list-style: square;
+    padding: 0 2em;
+}
+
+a {
+    text-decoration: none;
+}
+
+a.visibility-toggle {
+    color: #474;
+    cursor: pointer;
+    border: 1px dotted #474;
+    padding: 2pt 4pt 1pt 4pt;
+    display: inline;
+    vertical-align: 10%;
+}
+
+table.props, table.params {
+    text-align: left;
+    vertical-align: top;
+    font-size: 0.9em;
+    margin: 0;
+    padding: 0;
+}
+
+table.props th, table.props td, table.params th, table.params td {
+    border-collapse: collapse;
+    padding: 1pt 1em 1pt 0;
+}
+
+span.flag {
+    color: #996;
+}
+
+span.signature {
+    color: #999;
+}

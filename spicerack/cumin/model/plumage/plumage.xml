@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema package="com.redhat.grid.plumage" package_type="generic">
+  <class name="OSUtil">
+    <property name="host" type="sstr" />
+    <statistic name="ts" type="absTime" unit="uint32" />    
+    <statistic name="total" type="uint32" uint="uint32" />
+    <statistic name="used" type="uint32" uint="uint32" />
+    <statistic name="unused" type="uint32" uint="uint32" />
+    <statistic name="owner" type="uint32" uint="uint32" />
+    <statistic name="efficiency" type="float" />
+    <statistic name="freemem" type="uint32" uint="uint32" />
+    <statistic name="usedmem" type="uint32" uint="uint32" />
+    <statistic name="availmem" type="uint32" uint="uint32" />
+    <statistic name="totalmem" type="uint32" uint="uint32" />
+    <statistic name="freecpu" type="uint32" uint="uint32" />
+    <statistic name="usedcpu" type="uint32" uint="uint32" />
+    <statistic name="availcpu" type="uint32" uint="uint32" />
+    <statistic name="totalcpu" type="uint32" uint="uint32" />
+  </class>
+  
+  <class name="Accountant">
+    <property name="host" type="sstr" />
+    <statistic name="user" type="sstr" />
+    <statistic name="agroup" type="sstr" optional="y" />
+    <statistic name="ts" type="absTime" unit="uint32" />    
+    <statistic name="prio" type="float" optional="y" />
+    <statistic name="wresused" type="uint32" uint="uint32" optional="y" />
+    <statistic name="resused" type="uint32" uint="uint32" optional="y" />
+    <statistic name="cquota" type="float" optional="y" />
+    <statistic name="equota" type="float" optional="y" />
+    <statistic name="squota" type="float" optional="y" />
+    <statistic name="wausage" type="uint32" uint="uint32" optional="y" />
+  </class>  
+</schema>

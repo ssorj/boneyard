@@ -1,0 +1,5 @@
+#!/bin/bash -ex
+
+cumin-admin drop-schema
+cumin-admin create-schema
+cumin-admin add-user guest guest

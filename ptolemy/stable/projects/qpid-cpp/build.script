@@ -1,0 +1,43 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid.bash
+
+script-init
+
+cd "${SOURCE_PATH}/cpp"
+
+./bootstrap
+./configure --prefix="$INSTALL_PATH"
+make -j$(core-count)
+make install
+
+install -d "${INSTALL_PATH}/include/qpid/broker"
+install -d "${INSTALL_PATH}/include/qpid/framing"
+install -d "${INSTALL_PATH}/include/qpid/management"
+install -d "${INSTALL_PATH}/include/qpid/sys"
+
+install -pm 0644 src/qpid/DataDir.h "${INSTALL_PATH}/include/qpid"
+install -pm 0644 src/qpid/Plugin.h "${INSTALL_PATH}/include/qpid"
+install -pm 0644 src/qpid/RefCounted.h "${INSTALL_PATH}/include/qpid"
+install -pm 0644 src/qpid/SessionState.h "${INSTALL_PATH}/include/qpid"
+
+install -pm 0644 src/qpid/broker/*.h "${INSTALL_PATH}/include/qpid/broker"
+install -pm 0644 src/qpid/framing/*.h "${INSTALL_PATH}/include/qpid/framing"
+install -pm 0644 src/qpid/management/*.h "${INSTALL_PATH}/include/qpid/management"
+install -pm 0644 src/qpid/sys/*.h "${INSTALL_PATH}/include/qpid/sys"
+
+if [[ "$(distro)" == "rhel" && "$(release)" == "4" ]]; then
+    install -d "${INSTALL_PATH}/include/qpid-boost/boost/detail"
+    install -d "${INSTALL_PATH}/include/qpid-boost/boost/ptr_container/detail"
+    install -d "${INSTALL_PATH}/include/qpid-boost/boost/parameter/aux_/python"
+    install -d "${INSTALL_PATH}/include/qpid-boost/boost/parameter/aux_/preprocessor"
+    install -pm 0644 src/boost/*.hpp "${INSTALL_PATH}/include/qpid-boost/boost"
+    install -pm 0644 src/boost/detail/*.hpp "${INSTALL_PATH}/include/qpid-boost/boost/detail"
+    install -pm 0644 src/boost/ptr_container/*.hpp "${INSTALL_PATH}/include/qpid-boost/boost/ptr_container"
+    install -pm 0644 src/boost/ptr_container/detail/*.hpp "${INSTALL_PATH}/include/qpid-boost/boost/ptr_container/detail"
+    install -pm 0644 src/boost/parameter/*.hpp "${INSTALL_PATH}/include/qpid-boost/boost/parameter"
+    install -pm 0644 src/boost/parameter/aux_/*.hpp "${INSTALL_PATH}/include/qpid-boost/boost/parameter/aux_"
+    install -pm 0644 src/boost/parameter/aux_/python/*.hpp "${INSTALL_PATH}/include/qpid-boost/boost/parameter/aux_/python"
+    install -pm 0644 src/boost/parameter/aux_/preprocessor/*.hpp "${INSTALL_PATH}/include/qpid-boost/boost/parameter/aux_/preprocessor"
+fi

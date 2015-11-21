@@ -1,0 +1,186 @@
+[TabSet.css]
+ul.TabSet.tabs {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+ul.TabSet.tabs li {
+  display: inline;
+}
+
+ul.TabSet.tabs li a {
+  padding: 0.275em 0.5em;
+  border-top: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-left: 1px solid #e7e7e7;
+  -moz-border-radius: 0.35em 0.35em 0 0;
+  -webkit-border-radius: 0.35em 0.35em 0 0;
+  color: #333;
+  background-color: #f7f7f7;
+  line-height: 1.5em;
+}
+
+ul.TabSet.tabs li:first-child a {
+  border-left: 1px solid #ccc;
+}
+
+ul.TabSet.tabs li a.selected {
+  color: #000;
+  background-color: #fff;
+  position: relative;
+  z-index: 2;
+}
+
+div.TabSet.mode {
+  background-color: white;
+  padding: 1em;
+  border: 1px solid #ccc;
+  margin: 0 0 1em 0;
+  background-color: #fff;
+  position: relative;
+  z-index: 1;
+  min-height: 20em;
+}
+
+[TabSet.html]
+{links}
+<div class="{class} mode">{content}</div>
+
+[TabSetLink.html]
+<li><a href="{href}" {class}>{content}</a></li>
+
+[RadioModeSet.html]
+<ul class="radiotabs tabs">{tabs}</ul>
+<div class="radiotabs mode">{content}</div>
+
+[WidgetSet.html]
+<ul id="{id}" class="{class}">{widgets}</ul>
+
+[WidgetSet.widget_html]
+<li>{widget}</li>
+
+[Link.html]
+<a class="{class}" href="{href}" title="{title}">{content}</a>
+
+[Toggle.css]
+a.Toggle.on {
+  font-weight: bold;
+}
+
+[Toggle.html]
+<a href="{href}" class="Toggle {state}">{content}</a>
+
+[ItemSet.css]
+ul.ItemSet li.selected, ul.ItemSet li.selected a {
+    color: black;
+}
+
+[ItemSet.html]
+<ul id="{id}" class="{class}">{items}</ul>
+
+[ItemSet.item_html]
+<li class="{item_class}">{item_content}</li>
+
+[SelectionItemSet.item_html]
+<li class="{item_class}"><a href="{item_href}">{item_content}</a></li>
+
+[ItemTree.html]
+<ul class="ItemTree">{items}</ul>
+
+[ItemTree.item_html]
+<li>{item_content}</li>
+<ul>{child_items}</ul>
+
+[ItemTable.html]
+<table>
+  {items}
+</table>
+
+[ItemTable.item_html]
+<tr>
+  {cells}
+</tr>
+
+[Paginator.css]
+ul.Paginator {
+  display: inline;
+  font-size: 0.9em;
+}
+
+ul.Paginator li {
+  display: inline;
+  margin: 0 0.1em;
+}
+
+ul.Paginator a {
+  padding: 0.075em 0.25em;
+  border: 1px solid #f7f7f7;
+}
+
+ul.Paginator a:hover {
+  border: 1px solid #ddd;
+  background-color: white;
+}
+
+ul.Paginator a.pagenav {
+  border: 1px solid #ddd;
+  color: black;
+}
+
+ul.Paginator a.disabled {
+  color: #ccc;
+}
+
+ul.Paginator a.pagenav:hover {
+  background-color: white;
+}
+
+[Paginator.html]
+<ul class="Paginator">
+  <li>{prev_pageset_link}</li><li>{prev_page_link}</li>{items}<li>{next_page_link}</li><li>{next_pageset_link}</li>
+</ul>
+
+[Paginator.page_html]
+<li><a {class_attr} href="{href}">{content}</a></li>
+
+[PropertySet.css]
+table.PropertySet {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0.5em;
+}
+
+table.PropertySet tr {
+  border-top: 1px dotted #ccc;
+}
+
+table.PropertySet th, table.PropertySet td {
+  padding: 0.35em 0.5em;
+  font-weight: normal;
+  vertical-align: top;
+}
+
+table.PropertySet th {
+  color: #444;
+  text-align: left;
+}
+
+table.PropertySet thead th {
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+[PropertySet.html]
+<table class="PropertySet" id="{id}">
+  <thead>
+    <tr>
+      <th style="width: 50%;">Name</th>
+      <th style="width: 50%;">Value</th>
+    </tr>
+  </thead>
+  <tbody>{items}</tbody>
+</table>
+
+[PropertySet.property_html]
+<tr><th>{title}</th><td>{value}</td></tr>

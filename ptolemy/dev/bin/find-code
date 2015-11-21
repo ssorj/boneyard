@@ -1,0 +1,8 @@
+#!/bin/bash
+
+find "${DEVEL_HOME}/" \
+    -path "${DEVEL_HOME}/instance" -prune  \
+    -or -name "*.py" -print \
+    -or -name "*.script" -print \
+    -or -name "*.bash" -print \
+    -or -executable -type f -print

@@ -1,0 +1,8 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+
+script-init
+
+(cd "${SOURCE_PATH}/mint" && make install PREFIX="$INSTALL_PATH")
+(cd "${SOURCE_PATH}/cumin" && make install PREFIX="$INSTALL_PATH")

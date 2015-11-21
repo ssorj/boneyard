@@ -1,0 +1,17 @@
+[ConnectionOverview.html]
+<table class="twocol">
+  <tbody>
+  <tr>
+    <td>
+      <h2>Input/Output</h2>
+      {io}
+
+      <h2>General</h2>
+      {general}
+    </td>
+    <td>
+      {sendrecv}
+    </td>
+  </tr>
+  </tbody>
+</table>

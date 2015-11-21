@@ -1,0 +1,64 @@
+[DemoPage.css]
+.initial {
+  margin-top: 0;
+}
+
+div.instance {
+  background-color: #f0f0f0;
+  border: 1px dotted #e7e7e7;
+  padding: 1em 1.2em;
+}
+
+[MainView.html]
+<h1>Wooly Demo</h1>
+
+{tabs}
+
+[Introduction.html]
+<p class="initial">Hello.  This is a little application to explain the
+features of the <strong>Wooly</strong> web user-interface toolkit.</p>
+
+<p>The code for this demo is available in the <tt>wooly.demo</tt>
+module.</p>
+
+[LinkDemo.css]
+div.secret {
+  display: inline;
+  float: right;
+  width: 66%;
+}
+
+[LinkDemo.html]
+<h2 class="initial">Basic Links</h2>
+
+<p>A <tt>Link</tt> renders an HTML link with a URL to an alternate
+page state.  In Wooly, this is how transitions from one view or state
+to another are accomplished.</p>
+
+<p>A <tt>Link</tt> is really just a thin wrapper around the more
+fundamental ability in Wooly to take an existing <tt>Session</tt>
+object, with all its current state, and change just one part of it in
+order to produce a new, different URL and view.</p>
+
+<div class="instance">
+  <h3 class="initial">A link that changes the view to the intro tab</h3>
+
+  <p>{visit_intro_link}</p>
+</div>
+
+<h2>Toggles</h2>
+
+<p>A <tt>Toggle</tt> is a <tt>Link</tt> that remembers whether it is
+toggled or not.  It's often useful to use that state to trigger other
+behaviors.</p>
+
+<p>Internally, <tt>Toggle</tt> holds a <tt>BooleanParameter</tt>
+called "toggled".  Each time the <tt>Toggle</tt> is rendered, it
+generates a URL for its other possible state, toggled if it's
+currently untoggled and vice versa.</p>
+
+<div class="instance">
+  <h3 class="initial">A single toggle with a conditionally rendered message</h3>
+
+  <p><div class="secret">{secret}</div> {secret_toggle}</p>
+</div>

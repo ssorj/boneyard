@@ -1,0 +1,348 @@
+<?xml version="1.0"?>
+<model name="qpid">
+  <module name="peer">
+    <class name="home">
+      A context for sending and receiving messages.
+      <constructor name="create">
+        Create a new home object.
+        <input name="host" type="string" value="localhost.localdomain"/>
+        <input name="port" type="string" value="5672"/>
+        <output name="home" type="@home"/>
+      </constructor>
+      <attribute name="connection-properties" type="@connection-properties"
+                 value="@connection-properties" group="Connectivity">
+	The connection configuration this home uses to accept inbound
+	connections and establish outbound connections.
+      </attribute>
+      <attribute name="default-timeout" type="integer" value="30"
+		 group="Configuration">
+        The default timeout for blocking operations, used when making
+        blocking calls without specifying a timeout.
+      </attribute>
+      <attribute name="sync-send" type="boolean" value="true"
+                 group="Configuration">
+        If true (the default), send blocks until the delivery is
+        acknowledged.  Otherwise, send returns immediately after
+        creating a delivery.  Acknowledgement can be handled
+        asynchronously via {delivery#wait-acknowledge}.
+      </attribute>
+      <attribute name="sync-acknowledge" type="boolean" value="true"
+                 group="Configuration">
+        If true (the default), acknowledge blocks until the delivery
+        is settled.  Otherwise, acknowledge returns immediately after
+        sending a disposition.  Settlement can be handled
+        asynchronously via {delivery#wait-settle}.
+      </attribute>
+      <attribute name="auto-connect" type="boolean" value="true"
+                 group="Configuration">
+        If true (the default), any send or receive invocation will
+        attempt to establish a connection if one does not already
+        exist.  Otherwise, the user must use {connector#connect}.
+      </attribute>
+      <attribute name="auto-acknowledge" type="boolean" value="false"
+		 group="Configuration">
+        If true, received messages are automatically acknowledged.
+        Otherwise, the user must call {delivery#acknowledge}.
+      </attribute>
+      <attribute name="auto-settle" type="boolean" value="true"
+		 group="Configuration">
+        If true (the default), acknowledged messages are automatically
+        settled.  Otherwise, the user must call {delivery#settle} to
+        complete delivery.
+      </attribute>
+
+      <method name="send" group="Message Processing">
+        Send a message.
+
+        Creates and returns a delivery object to represent the state
+        of the transfer.
+
+        If {home#auto-connect} is true (the default) and there is no
+        connection established, one will be established.
+
+        If a target does not already exist for the address, one will
+        be created.
+
+        If no address is given, {message#address} is used. If that's
+        not set, a "null" address is used.
+
+        If {home#sync-send} is true (the default), it will internally
+        call {delivery#wait-acknowledge} with the given timeout.
+
+        This method blocks until there is credit for sending to the
+        given address.  You can use {target#credit} to ensure there
+        is credit available.
+        <input name="message" type="@message"/>
+        <input name="address" type="string" nullable="true"/>
+        <input name="timeout" type="integer" nullable="true"/>
+        <output name="delivery" type="@delivery"/>
+        <complement name="receive"/>
+      </method>
+      <method name="receive" group="Message Processing">
+        Receive a message.
+
+        Message content is loaded into the passed-in message object.
+        If it is null, a new message object will be created.
+
+        Returns a delivery object representing the state of the
+        transfer.  The message is available via {delivery#message}.
+
+        If {home#auto-connect} is true (the default) and no connection
+        is currently established, one will be established.
+
+        If a source does not already exist for the given address, one
+        will be created.
+
+        If no address is given, a "null" address is used.
+
+        If {home#auto-acknowledge} is true, the delivery will be
+        acknowledged before returning.
+
+        This method blocks until there is a delivery on the given
+        address.  You can use {source#deliveries} to ensure there are
+        deliveries ready.
+        <input name="message" type="@message" nullable="true"/>
+        <input name="address" type="string" nullable="true"/>
+        <input name="timeout" type="integer" nullable="true"/>
+        <output name="delivery" type="@delivery"/>
+        <complement name="send"/>
+      </method>
+
+      <method name="create-source" group="Configuration">
+        Create a source for receiving messages.
+        <input name="address" type="string"/>
+        <output name="source" type="@source"/>
+      </method>
+      <method name="create-target" group="Configuration">
+        Create a target for sending messages.
+        <input name="address" type="string"/>
+        <output name="target" type="@target"/>
+      </method>
+
+      <method name="next-event" group="Asynchronous Message Processing">
+        Return an event object representing an occasion to do further
+        work.  This method blocks until such an event becomes
+        available or the timeout is exceeded.
+
+        The class argument indicates which event type you wish to
+        select, {source}, {target}, or {delivery}.  If none is
+        specified (the default), all three types are selected.
+        <input name="event-class" type="class" nullable="true"/>
+        <input name="timeout" type="integer" nullable="true"/>
+        <output name="event" type="@event"/>
+      </method>
+    </class>
+    <class name="message">
+      A message encapsulates data to send and receive.
+      <constructor name="create">
+        Create a new message.
+        <output name="message" type="@message"/>
+      </constructor>
+      <attribute name="address" type="string" nullable="true" group="Addressing">
+        The address of the message.
+      </attribute>
+      <attribute name="content" type="any" group="Content">
+        The payload of the message.
+      </attribute>
+      <attribute name="content-type" type="string" group="Content">
+        The content type of the payload.
+      </attribute>
+    </class>
+    <class name="delivery">
+      A delivery is an instance of transferring a message.
+      <constructor name="create" private="true">
+        Create a new delivery.
+        <output name="message" type="@message"/>
+      </constructor>
+      <attribute name="message" type="@message">
+        The message associated with this delivery.
+      </attribute>
+      <attribute name="disposition" type="@disposition" writeable="false">
+        The disposition of the delivery.  This is set when the
+        receiver acknowledges the delivery.
+      </attribute>
+      <attribute name="settled" type="boolean" writeable="false">
+        Indicates whether the delivery has been settled.
+      </attribute>
+      <method name="acknowledge" group="Message Processing">
+        Acknowledge the delivery, indicating its disposition.  This is
+        typically used to indicate whether message processing on the
+        receiver was successful.
+
+        If no disposition is specified, {disposition#accepted} is
+        used.
+
+        If {home#sync-acknowledge} is true (the default), it will
+        internally call {delivery#wait-settle} with the given timeout.
+        <input name="disposition" type="@disposition" nullable="true"/>
+        <input name="timeout" type="integer" nullable="true"/>
+      </method>
+      <method name="wait-acknowledge" group="Asynchronous Message Processing">
+	Wait for the receiver to acknowledge the delivery.
+
+        If the disposition argument is specified, this method will
+        raise a {processing-error} if the disposition of the
+        acknowledgment does not match.
+        <input name="required-disposition" type="@disposition" nullable="true"/>
+        <input name="timeout" type="integer" nullable="true"/>
+        <complement name="acknowledge"/>
+      </method>
+      <method name="settle" group="Message Processing">
+        Declare the delivery settled.  The sender no longer bears any
+        responsibility for the message.
+        <complement name="wait-settle"/>
+      </method>
+      <method name="wait-settle" group="Asynchronous Message Processing">
+	Wait for the sender to settle the delivery.  Once settled, the
+	receiver has accepted all responsibility for the message.
+        <input name="timeout" type="integer" nullable="true"/>
+        <complement name="settle"/>
+      </method>
+    </class>
+    <class name="source">
+      A conduit for receiving messages.
+      <constructor name="create" private="true">
+        Create a new source object.
+	<input name="home" type="@home"/>
+	<input name="address" type="string"/>
+        <output name="source" type="@source"/>
+      </constructor>
+      <attribute name="address" type="string" group="Configuration"
+                 writeable="false">
+        The address used to create this node.
+      </attribute>
+      <attribute name="deliveries" type="integer" writeable="false">
+        The number of deliveries ready to be received.
+      </attribute>
+      <method name="grant-credit" group="Asynchronous Message Processing">
+        Grant the sender credit for new deliveries and return
+        immediately.
+        <input name="credit" type="integer"/>
+      </method>
+      <method name="receive" group="Message Processing">
+        Receive a message from this source.
+
+        Message content is loaded into the passed-in message object.
+        If it is null, a new message object will be created.
+
+        Returns a delivery object representing the state of the
+        transfer.  The message is available via {delivery#message}.
+
+        If {home#auto-connect} is true (the default) and no connection is
+        currently established, one will be established.
+
+        This method blocks until there is a delivery for this source.
+        You can use {source#deliveries} to ensure there are deliveries
+        ready.
+        <input name="message" type="@message" nullable="true"/>
+        <input name="timeout" type="integer" nullable="true"/>
+        <output name="delivery" type="@delivery"/>
+        <complement name="send"/>
+      </method>
+    </class>
+    <class name="target">
+      A conduit for sending messages.
+      <constructor name="create" private="true">
+        Create a new target object.
+	<input name="home" type="@home"/>
+	<input name="address" type="string"/>
+        <output name="target" type="@target"/>
+      </constructor>
+      <attribute name="address" type="string" group="Configuration"
+                 writeable="false">
+        The address used to create this target.
+      </attribute>
+      <attribute name="credit" type="integer" writeable="false">
+        The current credit avaliable for sending.
+      </attribute>
+      <method name="send" group="Message Processing">
+        Send a message to this target.
+
+        Creates and returns a delivery object to represent the state
+        of the transfer.
+
+        If {home#auto-connect} is true (the default) and there is no
+        connection established, one will be established.
+
+        If no address is given, {message#address} is used.  If that's
+        not set, a "null" address is used.
+
+        If {home#sync-send} is true (the default), it will internally
+        call {delivery#wait-acknowledge} with the given timeout.
+
+        This method blocks until there is credit for sending to the
+        given address.  You can use {target#credit} to ensure there is
+        credit available.
+        <input name="message" type="@message"/>
+        <input name="timeout" type="integer" nullable="true"/>
+        <output name="delivery" type="@delivery"/>
+        <complement name="receive"/>
+      </method>
+    </class>
+    <exception name="connection-error">
+      A problem encountered when trying to establish or maintain
+      connectivity
+    </exception>
+    <exception name="processing-error">
+      A problem encountered during message processing.
+    </exception>
+    <topic name="connection-setup">
+    </topic>
+    <enumeration name="disposition">
+      <constant name="accepted">
+      </constant>
+      <constant name="rejected">
+      </constant>
+      <constant name="acquired">
+      </constant>
+      <constant name="released">
+      </constant>
+    </enumeration>
+    <class name="connection-properties">
+      Establishes an outbound tcp connection.
+      <constructor name="create">
+        Create a new connector object.
+        <input name="home" type="@home"/>
+        <input name="host" type="string"/>
+        <input name="port" type="string"/>
+        <output name="connection-properties" type="@connection-properties"/>
+      </constructor>
+      <attribute name="host" type="string" value="localhost.localdomain" group="Configuration">
+        The domain name of the remote host to which to connect.
+      </attribute>
+      <attribute name="port" type="string" value="5672" group="Configuration">
+        The port of the remote host to which to connect.
+      </attribute>
+      <attribute name="username" type="string" group="Configuration">
+        The string user ID for use in authenticating the connection
+      </attribute>
+      <attribute name="password" type="string" group="Configuration">
+        The secret key to use in authenticating the connection
+      </attribute>
+      <attribute name="listening-enabled" type="boolean" group="Configuration">
+        XXX        
+      </attribute>
+    </class>
+    <class name="event">
+      Represents work to be done.
+      <constructor name="create" private="true">
+        Create a new event object.
+        <output name="event" type="@event"/>
+      </constructor>
+      <attribute name="source" type="@source" nullable="true" writeable="false">
+        A source ready for receiving.
+      </attribute>
+      <attribute name="target" type="@target" nullable="true" writeable="false">
+        A target ready for sending.
+      </attribute>
+      <attribute name="delivery" type="@delivery" nullable="true" writeable="false">
+        A delivery in need of acknowledgment or settlement.
+      </attribute>
+    </class>
+  </module>
+  <type name="string"/>
+  <type name="boolean"/>
+  <type name="integer"/>
+  <type name="any"/>
+  <type name="class"/>
+</model>

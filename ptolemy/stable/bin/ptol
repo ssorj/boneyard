@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+
+import sys, os, logging, socket
+
+from ptolemy.client import *
+from ptolemy.util import *
+
+def main():
+    client = PtolemyClient()
+    client.init()
+
+    try:
+        scommand = sys.argv[1]
+    except IndexError:
+        client.print_usage()
+        sys.exit(1)
+
+    try:
+        command = client.commands_by_name[scommand]
+    except KeyError:
+        print "Command '%s' is unknown" % scommand
+        client.print_usage()
+        sys.exit(1)
+
+    try:
+        addr = os.environ["PTOLEMY_BROKER"]
+    except KeyError:
+        addr = "mrg2.lab.bos.redhat.com:5672"
+
+    try:
+        host, port = addr.split(":", 1)
+        port = int(port)
+    except:
+        print "Error: Broker address '%s' is malformed" % addr
+        sys.exit(1)
+
+    try:
+        sock = connect(host, port)
+    except socket.error, e:
+        print "Error: Failed connecting to '%s': %s" % (addr, e)
+        sys.exit(1)
+
+    conn = Connection(sock)
+
+    try:
+        conn.start()
+        session = conn.session(long_id())
+
+        client.setup_broker_wiring(session)
+
+        try:
+            opts, args = command.parse(sys.argv[2:])
+
+            if "help" in opts:
+                command.print_usage()
+                return
+
+            command.run(session, opts, args)
+        except CommandException, e:
+            print "Error: %s" % e.message
+            e.command.print_usage()
+            sys.exit(1)
+    finally:
+        pass
+        #conn.close() XXX restore this when it's safe
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

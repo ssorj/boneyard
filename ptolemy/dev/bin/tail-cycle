@@ -1,0 +1,3 @@
+#!/bin/bash -ue
+
+exec tail -f $PTOLEMY_HOME/cycles/$1*/*.out

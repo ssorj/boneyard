@@ -1,0 +1,25 @@
+#!/bin/bash -eu
+
+source "${PTOLEMY_PROJECT}/project.bash"
+
+script-init
+
+cd "${QPID_BUILD}/java"
+
+tmpdir=$(mktemp -d)
+#datadir="${tmpdir}/data"
+out="${tmpdir}/default.out"
+
+ant test </dev/null 2>&1 | tee "$out"
+
+code="${PIPESTATUS[0]}"
+
+if [[ "$code" != 0 ]]; then
+    echo "== profile 'default' =="
+
+    java-print-failures "$out"
+fi
+
+rm -rf "$tmpdir"
+
+exit "$code"

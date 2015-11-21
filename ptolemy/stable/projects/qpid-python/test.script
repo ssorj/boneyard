@@ -1,0 +1,16 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid.bash
+
+script-init
+
+test -x "${INSTALL_PATH}/sbin/qpidd" || disable
+
+start-broker
+trap stop-broker EXIT
+
+export PYTHONPATH=$(python-path)
+export PATH="${INSTALL_PATH}/bin:${PATH}"
+
+qpid-python-test -b "localhost:${TEST_BROKER_PORT}"

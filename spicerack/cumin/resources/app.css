@@ -1,0 +1,825 @@
+body {
+	margin: 0;
+}
+
+body.modal {
+	background-color: #f7f7f7;
+}
+
+h2 {
+	margin: 0;
+}
+
+span.none {
+	font-style: italic;
+	color: #999;
+}
+
+.oblock {
+	padding: 0;
+	background-color: white;
+}
+
+.iblock {
+	margin: 1em 0;
+	padding: 0 1em;
+}
+
+.notice {
+	margin: 2em;
+	padding: 2em;
+	border: 1px dotted black;
+	width: 66%;
+	text-align: center;
+}
+
+ul.actions {
+	padding: 0;
+	margin: 0 0 1em 0;
+	list-style: none;
+}
+
+ul.actions li {
+	display: inline;
+}
+
+ul.actions.disabled a {
+	color: #666666;
+}
+
+ul.actions.disabled li a.nav:before {
+	color: #666666;
+}
+
+ul.actions.disabled a:hover {
+	background-color: #f7f7f7;
+}
+
+a.nav:before {
+	content: "\00BB \0020";
+	font-weight: bold;
+	color: #dc9f2e;
+}
+
+div.sactions {
+	margin: 0;
+	padding: 0.35em 0.75em;
+	background-color: #e7e7f7;
+}
+
+div.sactions h2 {
+	display: inline;
+	font-size: 0.9em;
+	font-weight: normal;
+	margin: 0 0.5em 0 0;
+}
+
+div.sactions select {
+	margin: 0 0.5em 0 0;
+}
+
+div.mobject div.mactions h2 {
+	display: inline;
+	font-size: 0.9em;
+	font-weight: normal;
+	margin: 0 0.5em 0 0;
+}
+
+button,ul.actions a,a.action {
+	margin: 0;
+	border-top: 1px solid #ddd;
+	border-left: 1px solid #ddd;
+	border-bottom: 1px solid #bbb;
+	border-right: 1px solid #bbb;
+	padding: 0.2em 0.4em;
+	background: url(resource?name=button-background.png) repeat;
+	color: #000;
+	font-size: 0.9em;
+	-moz-border-radius: 0.4em;
+	-webkit-border-radius: 0.4em;
+}
+
+button:hover,ul.actions a:hover,a.action:hover {
+	background-color: white;
+}
+
+button.disabled {
+	color: #bbb;
+	border: 1px solid #ddd;
+}
+
+button.disabled:hover {
+	background-color: #f7f7f7;
+}
+
+ul.mobjects {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+ul.mobjects li {
+	margin: 0;
+	border-top: 1px solid #ccc;
+	padding: 0.5em 0;
+}
+
+ul.mobjects li:first-child {
+	margin: 0;
+	border: none;
+}
+
+ul.mobjects li a.action {
+	float: right;
+}
+
+ul.mobjects .flags {
+	font-size: small;
+	font-style: italic;
+}
+
+ul.mobjects .config {
+	padding: 0 0 0 2em;
+}
+
+ul.mobjects .status {
+	padding: 0 0 0 2em;
+	color: #936;
+}
+
+table.mobjects {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 0;
+}
+
+table.mobjects tr {
+	border-top: 1px dotted #ccc;
+	vertical-align: top;
+}
+
+table.mobjects td {
+	padding: 0.35em 0.5em;
+}
+
+table.mobjects th {
+	padding: 0.35em 0.5em;
+}
+
+table.mobjects th {
+	text-align: left;
+	font-weight: normal;
+	background-color: #f7f7f7;
+}
+
+form.mform {
+	width: 50em;
+	border: 1px solid #ddd;
+	background-color: #fff;
+	-moz-border-radius: 0.4em;
+	-webkit-border-radius: 0.4em;
+}
+
+form.mform fieldset {
+	border: none;
+	padding: 0.75em;
+}
+
+form.mform .legend {
+	font-weight: bold;
+}
+
+form.mform .head,.mform .body,.mform .foot {
+	padding: 0.5em 0.75em;
+	margin: 0;
+}
+
+form.mform .head {
+	font-weight: bold;
+	color: white;
+	background-color: #87a;
+	-moz-border-radius: 0.3em 0.3em 0 0;
+	-webkit-border-radius: 0.3em 0.3em 0 0;
+	/* background-color: #564979; */
+}
+
+form.mform .head h1 {
+	margin: 0;
+	font-size: 1.1em;
+}
+
+form.mform .foot {
+	text-align: right;
+	border-top: 1px solid #ddd;
+}
+
+form.mform .field {
+	margin: 0.25em 0;
+}
+
+form.mform .field input {
+	border-style: groove;
+}
+
+form.mform ul.errors {
+	list-style: none;
+	display: block;
+	float: right;
+	color: red;
+	padding: 0.25em 0.5em;
+	border: 1px solid red;
+	margin: 0 0.5em;
+	max-width: 20em;
+}
+
+form.mform button,form.mform a.help {
+	margin: 0.5em;
+	padding: 0.25em 0.25em 0 0.25em;
+}
+
+form.mform button.midformbutton {
+	margin: 0em;
+}
+
+form.mform a.help {
+	float: left;
+	margin: 0.5em;
+	padding: 0.25em 0.35em 0 0.5em;
+}
+
+form.mform a.help:before {
+	content: url(resource?name=help-20.png);
+	padding: 0 0.25em 0 0;
+	vertical-align: -35%;
+}
+
+form.mform button.cancel:before {
+	content: url(resource?name=cancel-20.png);
+	padding: 0 0.25em 0 0;
+	vertical-align: -35%;
+}
+
+form.mform button.submit:before {
+	content: url(resource?name=submit-20.png);
+	padding: 0 0.25em 0 0;
+	vertical-align: -35%;
+}
+
+form.mform td {
+	vertical-align: top;
+}
+
+ul.radiotabs {
+	list-style: none;
+	margin: 0 0 1em 0;
+	padding: 0;
+}
+
+ul.radiotabs li {
+	display: inline;
+	padding: 0 0.75em 0 0;
+}
+
+ul.radiotabs li:last-child {
+	display: inline;
+	margin: 0;
+}
+
+ul.radiotabs li a:before {
+	content: url(resource?name=radio-button.png);
+	margin: 0 0.5em 0 0;
+	vertical-align: -15%;
+}
+
+ul.radiotabs li a.selected {
+	color: black;
+}
+
+ul.radiotabs li a.selected:before {
+	content: url(resource?name=radio-button-checked.png);
+}
+
+ul.radiotabs li a.disabled:before {
+	content: url(resource?name=radio-button.png);
+}
+
+ul.radiotabs li a.disabled {
+	color: #666666;
+}
+
+div.statuslight {
+	float: left;
+	width: 1em;
+	height: 1em;
+	margin: 0.25em 1px 0 0;
+	padding: 0.15em;
+	font-size: 0.8em;
+	text-align: center;
+	line-height: 1.1em;
+}
+
+div.statuslight.red {
+	background-color: #e33;
+	color: #fd3;
+}
+
+div.statuslight.yellow {
+	background-color: #fd3;
+	color: #e33;
+}
+
+div.statuslight.green {
+	background-color: #9e9;
+}
+
+pre.code {
+	background-color: #f7f7f7;
+	padding: 1em;
+	border: 1px dotted #ddd;
+}
+
+ul.comma {
+	list-style: none;
+}
+
+ul.comma li {
+	display: inline;
+}
+
+ul.comma li:after {
+	content: ", ";
+}
+
+ul.comma li:last-child:after {
+	content: "";
+}
+
+ul.slist {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+ul.slist a:before {
+	content: url(resource?name=radio-button.png);
+	vertical-align: -10%;
+	margin: 0 0.5em 0 0;
+}
+
+ul.slist a.selected:before {
+	content: url(resource?name=radio-button-checked.png);
+}
+
+table.twocol {
+	width: 100%;
+}
+
+table.twocol>tbody>tr>td {
+	width: 50%;
+	vertical-align: top;
+}
+
+table.twocol>tbody>tr>td:first-child {
+	padding: 0 1.5em 0 0;
+}
+
+table.twocol>tbody>tr>td:last-child {
+	padding: 0 0 0 1.5em;
+}
+
+.ralign,table.mobjects .ralign,div.mstatus table .ralign {
+	text-align: right;
+}
+
+form.inline {
+	display: inline;
+}
+
+span.count {
+	font-size: 0.9em;
+	color: #999;
+}
+
+.rfloat {
+	float: right;
+}
+
+.lfloat {
+	float: left;
+}
+
+.rclear {
+	font-size: 0.01em;
+	width: 0.01px;
+	clear: right;
+	line-height: 0.01px;
+}
+
+table.Editable input.edit_string,table.Editable textarea.edit_bigstring,div.inline_help span.edit_string
+	{
+	border: 1px solid #CCCCCC;
+}
+
+table.Editable input.edit_number,div.inline_help span.edit_number {
+	border: 1px dashed #66CCFF;
+}
+
+table.Editable input.numeric_error,div.inline_help span.numeric_error {
+	border: 1px dashed #FF0000;
+}
+
+table.Editable span.edit_readonly {
+	background-color: #FFFFFF;
+	color: #444444;
+}
+
+table.Editable input.edit_string,table.Editable input.edit_number,table.Editable input.numeric_error
+	{
+	width: 20em;
+}
+
+table.Editable textarea.edit_bigstring {
+	width: 25em;
+}
+
+table.Editable div.error {
+	color: #FF0000;
+	font-size: 0.9em;
+}
+
+form.editform {
+	border: 0 none !important;
+	width: 100% !important;
+}
+
+div.inline_help {
+	margin: 1em;
+}
+
+div.inline_help span.edit_string,div.inline_help span.edit_number,div.inline_help span.numeric_error
+	{
+	color: #444444;
+	font-weight: normal;
+	margin-right: 0.5em;
+	padding: 0.05em 0.2em;
+}
+
+div.inline_help h2 {
+	margin-right: 1em;
+}
+
+span.prop_example {
+	font-size: 0.9em;
+}
+
+span.prop_example:before {
+	content: "Example:";
+	padding-right: 0.25em;
+}
+
+div.fullpageable {
+	position: relative;
+	background-color: transparent;
+	border: 0;
+	width: auto;
+	height: auto;
+	left: 0;
+	top: 0;
+}
+
+div.fullpaged {
+	background-color: white;
+	border: 10px solid white;
+	width: 98% !important;
+	position: absolute !important;
+	left: 0px;
+	top: 0px;
+	z-index: 201;
+}
+
+p.fullpageIcon,p.fullpageIconOldLocation {
+	background-color: white;
+	border-top: 2px solid #685B8A;
+	border-left: 1px solid #685B8A;
+	border-bottom: 1px solid #685B8A;
+	border-right: 1px solid #685B8A;
+	margin: 8px 4px;
+	padding: 0;
+	width: 8px;
+	height: 6px;
+	cursor: pointer;
+	float: right;
+	z-index: 4;
+	position: absolute;
+	top: 27px;
+	right: 60px;
+	display: none;
+}
+
+p.fullpageIconOldLocation {
+	top: -2px;
+	right: 14px;
+}
+
+div.fullpageable:hover div.fullpageTitle,div.fullpageable:hover p.fullpageIcon,div.fullpaged div.fullpageTitle,div.fullpaged p.fullpageIcon,div.fullpaged p.fullpageIconOldLocation,div.fullpageable:hover p.fullpageIconOldLocation
+	{
+	display: block;
+}
+
+div.fullpaged p.fullpageIcon,div.fullpaged p.fullpageIconOldLocation {
+	border-top: 1px solid #cbb4ff;
+	border-left: 1px solid #cbb4ff;
+	border-bottom: 2px solid #685B8A;
+	border-right: 1px solid #cbb4ff;
+}
+
+div.fullpaged h2 {
+	background-color: #E7E7F7;
+	padding: 0.25em;
+}
+
+div.fullpageBack {
+	background-color: white;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	display: none;
+	z-index: 199;
+}
+
+div.imgHighlight_red {
+	border: 1px solid red;
+	width: 12px;
+	height: 12px;
+	position: absolute;
+	opacity: 0.5;
+	z-index: 1000;
+}
+
+div.imgHighlight_green {
+	border: 1px solid green;
+	width: 12px;
+	height: 12px;
+	position: absolute;
+	opacity: 0.5;
+	z-index: 1000;
+}
+
+div.imgHighlight_blue {
+	border: 1px solid blue;
+	width: 12px;
+	height: 12px;
+	position: absolute;
+	opacity: 0.5;
+	z-index: 1000;
+}
+
+div.imgValues_red {
+	color: red;
+	font-size: 0.8em;
+	background-color: white;
+	position: absolute;
+	z-index: 1000;
+}
+
+div.imgValues_green {
+	color: green;
+	font-size: 0.8em;
+	background-color: white;
+	position: absolute;
+	z-index: 1000;
+}
+
+div.imgValues_blue {
+	color: blue;
+	font-size: 0.8em;
+	background-color: white;
+	position: absolute;
+	z-index: 1000;
+}
+
+table.DataTable.Cumin tr {
+	border-top: 1px dotted #ccc;
+}
+
+table.DataTable.Cumin td,table.DataTable.Cumin th {
+	padding: 0.35em 0.5em;
+}
+
+table.DataTable.Cumin th {
+	font-weight: normal;
+}
+
+table.DataTable.Cumin td.selected,table.DataTable.Cumin th.selected {
+	
+}
+
+table.DataTable.Cumin thead,table.DataTable.Cumin tfoot {
+	background-color: #f7f7f7;
+}
+
+table.DataTable.Cumin tfoot {
+	text-align: center;
+	font-style: italic;
+	font-size: 0.9em;
+}
+
+a.TaskLink.Cumin:before {
+	content: "\00BB \0020";
+	font-weight: bold;
+	color: #dc9f2e;
+}
+
+.autocomplete {
+	cursor: pointer;
+	border: 1px solid #999;
+	border-top: none;
+	background: #fff;
+	z-index: 2;
+}
+
+.autocomplete div {
+	padding: 0 0.2em;
+}
+
+.autocomplete .normal {
+	border-top: 1px solid #fefefe;
+}
+
+.autocomplete .selected {
+	background: #ddf;
+}
+
+.autocomplete .highlited {
+	font-weight: bold;
+	color: #008;
+}
+
+div.OverviewView>table {
+	width: 100%;
+}
+
+div.OverviewView>table>tbody>tr>td {
+	width: 50%;
+	vertical-align: top;
+}
+
+div.OverviewView h2>img {
+	vertical-align: bottom;
+	margin: 0 0.2em 0 0;
+}
+
+div.OverviewView {
+	clear: both;
+}
+
+.mtmultiselect {
+	width: 400px;
+	background: #E7E7F7;
+	font: 12px verdana;
+}
+
+.mtmultiselect .selected {
+	background-color: #E8F7E8;
+}
+
+.mtmultiselect ol {
+	background-color: #FFFFFF;
+}
+
+.mtmultiselect ol .selected {
+	background-color: #E8F7E8;
+	background-image: url(resource?name=check-mark.png);
+	background-position: left;
+	background-repeat: no-repeat;
+}
+
+.mtmultiselect ul li {
+	display: inline;
+	padding: 0px 15px 0px 15px;
+}
+
+.disabled {
+	color: #ccc;
+}
+
+.mtms_filterbox {
+	float: left;
+	padding: 5px 5px 0px 5px;
+}
+
+.listcontainer {
+	overflow: auto;
+	border: none;
+	background-color: #FFFFFF;
+	padding: 0px;
+	clear:both;
+}
+
+.mtms_filterbox input.textbox {
+	padding-right: 20px;
+}
+
+.input_x {  
+    cursor:pointer;
+    color:#38468F;
+    font-weight:bold;
+    position:relative;
+    height:20px;
+    left:-18px;
+}
+
+.filterbox_second_row {
+	clear:both;
+	width:100%;	
+}
+
+.mtms_filtercontrols {
+	color: #000;
+	padding: 40px 0px 0px 0px;
+}
+
+.mtms_filtercontrols a,.mtms_paginator a {
+	color: #000;
+	padding: 0 4px 0 6px;
+	text-decoration: underline;
+}
+
+.mtms_filterlabel {
+	color: #000;
+	padding: 0 4px 0 0;
+}
+
+.mtms_paginator {
+	clear: both;
+	padding: 5px;
+}
+
+.mtms_paginator .selected,.mtms_paginator .disabled {
+	text-decoration: none;
+}
+
+.mtmultiselect ol {
+	padding: 0;
+}
+
+.mtmultiselect ol li {
+	list-style-type: none;
+	background-color: #FFF;
+	color: #000;
+	padding: 1px 5px 1px 25px;
+}
+
+.mtmultiselect ol li:hover {
+	background-color: #22BB22;
+	color: #111;
+}
+
+ul.autocompleter-choices {
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	border: 1px solid #7c7c7c;
+	border-left-color: #c3c3c3;
+	border-right-color: #c3c3c3;
+	border-bottom-color: #ddd;
+	background-color: #fff;
+	text-align: left;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	z-index: 50;
+	background-color: #fff;
+}
+
+ul.autocompleter-choices li {
+	position: relative;
+	margin: -2px 0 0 0;
+	padding: 0.2em 1.5em 0.2em 1em;
+	display: block;
+	float: none !important;
+	cursor: pointer;
+	font-weight: normal;
+	white-space: nowrap;
+	font-size: 1em;
+	line-height: 1.5em;
+}
+
+ul.autocompleter-choices li.autocompleter-selected {
+	background-color: #444;
+	color: #fff;
+}
+
+ul.autocompleter-choices span.autocompleter-queried {
+	display: inline;
+	float: none;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+}
+
+ul.autocompleter-choices li.autocompleter-selected span.autocompleter-queried
+	{
+	color: #9FCFFF;
+}

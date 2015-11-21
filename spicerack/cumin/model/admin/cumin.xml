@@ -1,0 +1,21 @@
+<model>
+  <package name="com.redhat.cumin">
+    <class name="Info">
+      <property name="schema_version" type="sstr"/>
+    </class>
+
+    <class name="User">
+      <property name="name" type="sstr" index="y"/>
+      <property name="password" type="sstr"/>
+    </class>
+
+    <class name="Role">
+      <property name="name" type="sstr" index="y"/>
+    </class>
+
+    <class name="UserRoleMapping">
+      <property name="user" references="User" index="y"/>
+      <property name="role" references="Role" index="y"/>
+    </class>
+  </package>
+</model>

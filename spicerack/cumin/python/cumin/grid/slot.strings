@@ -1,0 +1,41 @@
+[SlotDataSet.sql]
+select
+  _id,
+  "Name",
+  "Pool",
+  "Machine",
+  "System",
+  "JobId",
+  "AccountingGroup",
+  "OpSys",
+  "Arch",
+  "Activity",
+  "State",
+  "LoadAvg"
+from "com.redhat.grid"."Slot"
+{sql_where}
+{sql_order_by}
+{sql_limit}
+
+[SlotDataSet.count_sql]
+select count(*)
+from slot as s
+{sql_where}
+
+[SlotStats.html]
+<table class="twocol">
+  <tbody>
+    <tr>
+      <td>
+        <h2>General</h2>
+        {general}
+        <h2>Job Info</h2>
+        {job_info}
+      </td>
+      <td>
+        {chart}
+      </td>
+    </tr>
+  </tbody>
+</table>
+

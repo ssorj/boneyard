@@ -1,0 +1,2 @@
+export PYTHONPATH=$PYTHONPATH:$HOME/code/proton/proton-c/bindings/python
+export PYTHONPATH=$PYTHONPATH:$PWD/src

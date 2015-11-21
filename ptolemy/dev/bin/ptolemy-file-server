@@ -1,0 +1,37 @@
+#!/usr/bin/python
+
+import os
+import sys
+
+home = os.environ.get("PTOLEMY_HOME", os.path.normpath("/usr/share/ptolemy"))
+sys.path.append(os.path.join(home, "lib", "python"))
+
+from ptolemy.common.config import *
+from ptolemy.fileserver import *
+
+def main():
+    setup_initial_logging()
+
+    usage = "Usage: %prog [OPTIONS]"
+    parser = PtolemyOptionParser(usage)
+    opts, args = parser.parse_args()
+
+    config = FileServerConfig(home)
+    config.load()
+    config.update(opts)
+
+    setup_server_logging(config)
+
+    server = FileServer(config)
+    server.init()
+
+    if opts.init_only:
+        return
+
+    server.run()
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

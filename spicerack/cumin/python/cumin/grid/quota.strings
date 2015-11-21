@@ -1,0 +1,7 @@
+[QuotaSelector.css]
+
+span.QuotaError {
+    font-style: italic;
+    color: red;
+}
+

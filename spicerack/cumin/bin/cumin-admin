@@ -1,0 +1,661 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import csv
+import subprocess
+from subprocess import PIPE
+
+from psycopg2 import IntegrityError, OperationalError, ProgrammingError
+
+home = os.environ.get("CUMIN_HOME", os.path.normpath("/usr/share/cumin"))
+sys.path.append(os.path.join(home, "python"))
+
+from parsley.collectionsex import defaultdict
+
+from cumin.main import *
+from cumin.config import *
+from cumin.util import *
+from cumin.admin import SchemaMissing
+
+def main():
+    uid = os.getuid()
+    file_uid = os.stat(sys.argv[0]).st_uid
+
+    if uid not in (file_uid, 0):
+        error("You have insufficient privileges")
+    
+    if uid == 0:
+        import pwd
+        
+        # Okay, if the file is not owned by us, then this is a local 
+        # (development) instance and cumin is not installed as a package.
+        # In this case we need to set the effective uid as the file owner.  
+        # That owner should have added themselves as a postgres user so 
+        # auth will work.
+        if file_uid != uid:
+            os.seteuid(file_uid)
+        else:
+            # Become the cumin user so we have
+            # access to the db with ident authentication
+            cumin = pwd.getpwnam("cumin")
+            os.seteuid(cumin[2])
+
+    setup_initial_logging()
+
+    # Read config file, just the common section
+    config = CuminCommonConfig()
+
+    # Set a log file default...
+    home = os.environ.get("CUMIN_HOME", os.path.normpath("/usr/share/cumin"))
+    config.set_log(os.path.join(home, "log", "admin.log"))
+
+    values = config.parse()
+
+    # Get options
+    parser = CuminOptionParser()
+    parser.remove_option("--es")
+    parser.set_usage(generate_usage())
+    opts, args = parser.parse_args()
+
+    # Use config values as defaults for unspecified options
+    apply_defaults(values.common, opts)
+ 
+    setup_operational_logging(opts)
+
+    try:
+        name = args[0]
+    except IndexError:
+        parser.print_usage()
+        sys.exit(1)
+
+    name = name.replace("-", "_")
+
+    handlers = globals()
+
+    try:
+        handler = handlers["handle_%s" % name]
+    except KeyError:
+        print "Command '%s' is unknown" % name
+        sys.exit(1)
+
+    authmech = [x.strip() for x in values.common.auth.split(";") if x != ""]
+
+    app = Cumin(config.get_home(), [], opts.database, authmech=authmech)
+
+    app.check()
+
+    # Normally, a schema version check during Cumin init will raise
+    # an exception if the schema version doesn't match.  However,
+    # cumin-admin is the mechanism for fixing the schema so we
+    # have to avoid the check here!
+    try:
+        app.db_init(schema_version_check=False)
+    except OperationalError:
+        print "Can't talk to the database"
+        error("Run 'cumin-database check' as root for more information")
+    
+    conn = app.database.get_connection()
+    cursor = conn.cursor()
+    
+    # Okay, do the schema version check here and disallow
+    # all but schema commands if the version is wrong
+    if name not in ["check_schema",
+                    "create_schema",
+                    "drop_schema",
+                    "print_schema",
+                    "upgrade_schema"]:
+        err = True
+        try:
+            app.admin.check_schema(cursor)
+            err = False
+        except SchemaMissing:
+            print("The schema is missing, run 'cumin-admin create-schema'")
+        except SchemaVersion, e:
+            print str(e)
+            print("Run 'cumin-admin upgrade-schema'")
+        if err:
+            error("Only schema commands are allowed until the schema is repaired")
+
+    try:
+        res = handler(app, cursor, opts, args[1:])
+        if type(res) is tuple:
+            conn, cursor = res
+        conn.commit()
+    finally:
+        cursor.close()
+
+def warn(msg):
+    print "Warning: %s" % msg
+
+def error(msg):
+    print "Error: %s" % msg
+    sys.exit(1)
+
+def generate_usage():
+    lines = list()
+
+    lines.append("cumin-admin [OPTIONS] COMMAND")
+    lines.append("")
+    lines.append("User commands:")
+    lines.append("")
+    lines.append("  add-user USER [PASSWORD]      Add USER")
+    lines.append("  external-user USER            Add USER with external authentication.")
+    lines.append("                                Use this command when a role other than 'user'")
+    lines.append("                                will be set for this external user. Otherwise,")
+    lines.append("                                this command is not necessary.")
+    lines.append("")
+    lines.append("  remove-user USER              Remove USER")
+    lines.append("  add-assignment USER ROLE      Add USER to ROLE")
+    lines.append("  remove-assignment USER ROLE   Remove USER from ROLE")
+    lines.append("  change-password USER          Change USER's password")
+    lines.append("  list-users                    List users")
+    lines.append("  list-roles                    List roles")
+    lines.append("  export-users FILE             Export user list to file")
+    lines.append("  import-users FILE             Import user list from file")
+    lines.append("  expunge-users                 Remove all users.  Use with caution")
+    lines.append("                                You may want to run export-users first")
+    lines.append("")
+    lines.append("Schema commands:")
+    lines.append("")
+    lines.append("  check-schema                  Check schema")
+    lines.append("  create-schema                 Create schema objects")
+    lines.append("  drop-schema                   Drop schema and all data")
+    lines.append("  print-schema                  Print the schema definition")
+    lines.append("  upgrade-schema                Run utility scripts to upgrade the schema to")
+    lines.append("                                the expected version if necessary")
+          
+    return "\n".join(lines)
+
+def confirm(prompt, resp=False):    
+    if resp:
+        prompt = '%s [%s]|%s: ' % (prompt, 'yes', 'no')
+    else:
+        prompt = '%s [%s]|%s: ' % (prompt, 'no', 'yes')
+        
+    while True:
+        ans = raw_input(prompt)
+        if not ans:
+            return resp
+        ans = ans.lower()
+        if ans not in ['y', 'n', 'yes', 'no']:
+            print 'Please enter yes or no.'
+            continue
+        return ans in ('y', 'yes')
+
+def get_upgrade_map(upgrade_dir):
+    res = defaultdict(list)
+    try:
+        scripts = os.listdir(upgrade_dir)
+    except:
+        # Hmm, dir or path is messed up
+        return res
+
+    for s in scripts:
+        if "_to_" in s:
+            v1, v2 = s.split("_to_")
+            res[v1].append(v2)
+    for k,v in res.iteritems():
+        v.sort()
+    return res
+
+def find_upgrade_path(upgrades, curr, target):
+    # upgrades is a dictionary of sorted lists where
+    # each entry represents possible movement
+    # from one schema version (the key) to one or more
+    # other versions.
+    res = []
+    while True:
+        if curr not in upgrades:
+            # Can't finish, no path
+            return []
+
+        # Always make the biggest jump forward in version that we can 
+        # (to keep it simple) even though there might be another 
+        # possible solution.
+        latest = None
+        for v in upgrades[curr]:
+            if v <= target:
+                latest = v
+
+        if latest == None:
+            # Can't finish, no path
+            return []
+
+        # Add the version jumps to the upgrade path
+        res.append((curr, latest))
+
+        if latest == target:
+            # We're done!
+            return res
+        else:
+            # Look for the next jump
+            curr = latest
+
+def handle_print_schema(app, cursor, opts, args):
+    print app.admin.get_schema(),
+
+def handle_upgrade_schema(app, cursor, opts, args):
+    try:
+        curr = app.admin.get_schema_version(cursor)
+    except SchemaMissing:
+        error("The schema is missing, run 'cumin-admin create-schema'")
+
+    target = app.admin.get_target_schema_version()
+    if curr == target:
+        print "The schema is already version %s, nothing to do" % target
+
+    elif curr > target:
+        print "This version of cumin-admin can upgrade the schema to version %s" % target
+        print "The schema version is already %s" % curr
+        print "Have you been using a newer version of cumin?"
+        print "You will have to recreate the schema with "\
+              "'cumin-admin drop-schema' and 'cumin-admin create-schema'"
+    else:
+        print "Attempting to upgrade the schema from %s to %s" % (curr, target)
+        upgrade_dir = os.path.join(app.home, "model/upgrades")
+        upgrade_path = find_upgrade_path(get_upgrade_map(upgrade_dir), 
+                                         curr, target)
+        if not upgrade_path:
+            print "Could not find an upgrade path from %s to %s in %s" % \
+                  (curr, target, upgrade_dir)
+            print "You will have to recreate the schema with "\
+                  "'cumin-admin drop-schema' and 'cumin-admin create-schema'"
+        else:
+
+            if not confirm("Found an update path.  Alter the schema?", True):
+                print "No action taken"
+                return
+
+            for steps in upgrade_path:
+                script = os.path.join(upgrade_dir, steps[0]+"_to_"+steps[1])
+                print "Executing script %s" % script
+                
+                res = subprocess.Popen(script, shell=True).wait()
+                if res != 0:
+                    print "Script exited with error code %s" % res
+                    break
+                else:
+                    # Well, some upgrade scripts might restart the server
+                    # Get the connection back.  Try multiple, the server
+                    # may be in the process of starting
+                    conn = None
+                    for i in range(20):
+                        try:
+                            conn = app.database.get_connection()
+                            break
+                        except:
+                            import time
+                            time.sleep(0.5)
+                    if conn is None:
+                        print "Upgrade failed,  unable to write "\
+                            "new schema version."
+                        return
+
+                    cursor = conn.cursor()                            
+                    app.admin.update_schema_version(cursor, steps[1])
+        
+        curr = app.admin.get_schema_version(cursor) 
+        if curr != target:
+            print "Upgrade failed, schema is version %s" % curr
+        else:
+            print "Upgrade to schema version %s succeeded" % target
+            return conn, cursor
+
+def handle_create_schema(app, cursor, opts, args):
+    try:
+        conn, cursor = app.admin.create_schema(cursor)
+    except ProgrammingError:
+        error("The schema already exists")
+
+    app.admin.add_role(cursor, "user")
+    app.admin.add_role(cursor, "admin")
+
+    print "The schema is created"
+    if conn and cursor:
+        return conn, cursor
+
+def handle_check_schema(app, cursor, opts, args):
+    try:
+        schema_version = app.admin.check_schema(cursor)
+    except SchemaMissing:
+        error("The schema is missing, run 'cumin-admin create-schema'")
+    except SchemaVersion, e:
+        error(str(e) + ", run 'cumin-admin upgrade-schema'")
+     
+    print "The schema is OK (schema version %s)" % schema_version
+    
+def handle_drop_schema(app, cursor, opts, args):
+    try:
+        app.admin.drop_schema(cursor)
+        print "The schema is dropped"
+    except SchemaMissing:
+        print "The schema has already been dropped"
+
+def get_users(app, cursor):
+    user_cls = app.model.com_redhat_cumin.User
+    role_cls = app.model.com_redhat_cumin.Role
+    mapping_cls = app.model.com_redhat_cumin.UserRoleMapping
+
+    query = SqlQuery(mapping_cls.sql_table)
+
+    SqlInnerJoin(query,
+                 role_cls.sql_table,
+                 role_cls._id.sql_column,
+                 mapping_cls.sql_table._role_id)
+
+    users = user_cls.get_selection(cursor)
+
+    cols = (mapping_cls.sql_table._user_id, role_cls.name.sql_column)
+    sql = query.emit(cols)
+
+    cursor.execute(sql)
+
+    roles_by_user_id = defaultdict(list)
+
+    for id, name in cursor.fetchall():
+        roles_by_user_id[id].append(name)
+
+    return users, roles_by_user_id
+
+def handle_list_users(app, cursor, opts, args):
+ 
+    print "  ID   Name                 Roles"
+    print "----   -------------------- --------------------"
+
+    users, roles_by_user_id = get_users(app, cursor)
+    externals = 0
+    for user in users:
+        try:
+            roles = ", ".join(roles_by_user_id[user._id])
+        except KeyError:
+            roles = ""
+        if len(user.password) == 0:
+            ex = "*"
+            externals += 1
+        else:
+            ex = " "
+        print "%4i %s %-20s %-20s" % (user._id, ex, user.name, roles)
+
+    count = len(users)
+
+    print
+    print "(%i user%s found)" % (count, ess(count))
+    if externals > 0:
+        print "(%i external user%s, indicated by *)" % (externals, ess(externals))
+
+def handle_external_user(app, cursor, opts, args):
+    try:
+        name = args[0]
+    except IndexError:
+        error("USER is required")
+    role = app.admin.get_role(cursor, "user")
+    try:
+        user = app.admin.add_user(cursor, name, "")
+    except IntegrityError:
+        error("A user called '%s' already exists" % name)
+
+    app.admin.add_assignment(cursor, user, role)
+    print "External user '%s' is added" % name
+
+def handle_external_sync(app, cursor, opts, args):
+    print "This command is not supported at this time."
+    return
+
+    try:
+        authenticatorname = args[0]
+    except IndexError:
+        error("AUTHENTICATOR name is required")
+
+    output_on = False
+    if len(args) > 1:
+        output_on = args[1].lower() in ("t", "true", "1")
+
+    users, conflicts, errors = \
+        app.authenticator.batch_import(authenticatorname, output_on)
+
+    print("Successfully imported %s users, %s conflicts" % (users, conflicts))
+    if errors:
+        print("Errors reported, check logs for details.")
+
+def handle_expunge_users(app, cursor, opts, args):
+
+    print("This will remove all users from Cumin's database.")
+    print("Hint: you may want to backup Cumin's user database "\
+          "with export-users first.\n")
+    try:
+        go = confirm( "Are you sure you want to do this?", resp=False)
+    except KeyboardInterrupt:
+        go = False
+
+    if go:
+        cls = app.model.com_redhat_cumin.User
+        cls.delete_selection(cursor)
+        print("\nAll users removed.")
+    else:
+        print("\nNo users removed.")
+    
+
+def handle_add_role(app, cursor, opts, args):
+    print("\nNot implemented.")
+    return
+    
+    # We may allow this later
+    try:
+        name = args[0]
+    except IndexError:
+        error("ROLE is required")
+
+    if app.admin.get_role(cursor, name):
+        error("A role called '%s' already exists" % name)
+
+    try:
+        app.admin.add_role(cursor, name)
+    except IntegrityError:
+        error("A role called '%s' already exists" % name)
+
+    print "Role '%s' is added" % name
+
+def handle_add_user(app, cursor, opts, args):
+    try:
+        name = args[0]
+    except IndexError:
+        error("USER is required")
+
+    # Don't make the user go through the pain of 
+    # providing a password at the prompt....
+    if app.admin.get_user(cursor, name):
+        error("A user called '%s' already exists" % name)
+
+    try:
+        password = args[1]
+    except IndexError:
+        password = prompt_password()
+    crypted = crypt_password(password)
+    role = app.admin.get_role(cursor, "user")
+    try:
+        user = app.admin.add_user(cursor, name, crypted)
+    except IntegrityError:
+        error("A user called '%s' already exists" % name)
+
+    app.admin.add_assignment(cursor, user, role)
+    print "User '%s' is added" % name
+
+def handle_export_users(app, cursor, opts, args):
+
+    try:
+        fname = args[0]
+    except IndexError:
+        error("Export file name is required")
+
+    try:
+        f = open(fname,"wb")
+    except:
+        error("Failed to open file " + fname)
+
+    users, roles_by_user_id = get_users(app, cursor)
+
+    w = csv.writer(f)
+    for user in users:
+        w.writerow([user.name, user.password] + roles_by_user_id[user._id])
+
+def handle_import_users(app, cursor, opts, args):
+
+    try:
+        fname = args[0]
+    except IndexError:
+        error("Import file name is required")
+
+    try:
+        f = open(fname,"rb")
+    except:
+        error("Failed to open file " + fname)
+
+    user_data = csv.reader(f)
+
+    # Before we make any changes, check the format to be nice
+    line = 0
+    for info in user_data:
+        line += 1
+
+        count = 0
+        for field in info:
+            # Don't suppose it's possible for data to be anything other than
+            # strings from csv, but this is where such type checking goes
+            if type(field) != str:
+                error("Data error, line %u, fields must be strings" % line)
+
+            # Empty password field is external auth indicator, allow it
+            if len(field) == 0 and count != 1:
+                error("Data error, line %u, field %u, importer "\
+                          "does not allow empty field" % (line, field+1))
+            count += 1
+
+        if len(info) < 2:
+            error("Data error, line %u, not enough fields. "\
+                  " User and password are required" % (line))
+
+    # Reset the reader
+    f.seek(0)
+    for info in user_data:
+        #name, password, [role, ...]
+        if app.admin.get_user(cursor, info[0]):
+            # Well, we might be extending an existing user database
+            # and there *might* be overlap between the two.  Check first
+            # before we get an integrity error
+            warn("A user called '%s' already exists, skipping" % info[0])
+            continue
+
+        try:
+            user = app.admin.add_user(cursor, info[0], info[1])
+        except IntegrityError:
+            error("Unable to add user")
+
+        for role_name in info[2:]:
+            role = app.admin.get_role(cursor, role_name)
+            if role != None:
+                app.admin.add_assignment(cursor, user, role)
+            else:
+                warn("Role '%s' does not exist, "\
+                     "skipping this role for user '%s'" % (role_name, info[0]))
+    
+def handle_remove_user(app, cursor, opts, args):
+    try:
+        name = args[0]
+    except IndexError:
+        error("USER is required")
+
+    user = app.admin.get_user(cursor, name)
+    if user is None:
+        print "No such user '%s'" % name
+    else:
+        user.delete(cursor)
+        print "User '%s' is removed" % name
+
+def handle_list_roles(app, cursor, opts, args):
+    cls = app.model.com_redhat_cumin.Role
+    roles = cls.get_selection(cursor)
+
+    print "  ID Name"
+    print "---- --------------------"
+
+    for role in roles:
+        print "%4i %-20s" % (role._id, role.name)
+
+    count = len(roles)
+
+    print
+    print "(%i user%s found)" % (count, ess(count))
+
+def handle_add_assignment(app, cursor, opts, args):
+    user, role = get_user_and_role(app, cursor, args)
+
+    app.admin.add_assignment(cursor, user, role)
+
+    print "User '%s' is assigned to role '%s'" % (user.name, role.name)
+
+def handle_remove_assignment(app, cursor, opts, args):
+    user, role = get_user_and_role(app, cursor, args)
+    assignment = app.admin.get_assignment(cursor, user, role)
+
+    if not assignment:
+        error("No such assignment found")
+
+    assignment.delete(cursor)
+
+    print "User '%s' is no longer assigned to role '%s'" % \
+        (user.name, role.name)
+
+def get_user_and_role(app, cursor, args):
+    try:
+        user_name = args[0]
+    except IndexError:
+        error("USER is required")
+
+    try:
+        role_name = args[1]
+    except IndexError:
+        error("ROLE is required")
+
+    user = app.admin.get_user(cursor, user_name)
+    role = app.admin.get_role(cursor, role_name)
+
+    if not user:
+        error("Specified user %s  does not exist" % user_name)
+    if not role:
+        error("Specified role %s  does not exist" % role_name)
+
+    return user, role
+
+def handle_change_password(app, cursor, opts, args):
+    try:
+        user_name = args[0]
+    except IndexError:
+        error("USER is required")
+
+    user = app.admin.get_user(cursor, user_name)
+
+    if not user:
+        error("User '%s' is not found" % user_name)
+    if user.password == "":
+        error("User '%s' is an external user, password cannot be changed "\
+              "through this mechanism" % user_name)
+    user.password = crypt_password(prompt_password())
+    user.save(cursor)
+    print "Password of user '%s' is changed" % user.name
+
+def handle_load_demo_data(app, cursor, opts, args):
+    cls = app.model.com_redhat_cumin.BrokerGroup
+
+    for name in ("Engineering", "Marketing", "Sales"):
+        group = cls.create_object(cursor)
+        group.name = name
+
+        group.fake_qmf_values()
+
+        group.save(cursor)
+
+    print "Demo data is loaded"
+
+if __name__ == "__main__":
+    main()

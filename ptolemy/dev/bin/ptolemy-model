@@ -1,0 +1,57 @@
+#!/usr/bin/python
+
+import os
+import sys
+
+home = os.environ.get("PTOLEMY_HOME", os.path.normpath("/usr/share/ptolemy"))
+sys.path.append(os.path.join(home, "lib", "python"))
+
+from ptolemy.harness import *
+
+def main():
+    setup_initial_logging()
+
+    harness = HarnessHarness(str(uuid4()), home)
+    harness.init()
+
+    for project_name in sorted(harness.model.projects_by_name):
+        project = harness.model.projects_by_name[project_name]
+
+        print project
+
+        for test_name in sorted(project.tests_by_name):
+            test = project.tests_by_name[test_name]
+
+            print " ", test
+
+            if test.required_tests:
+                reqs = [str(x) for x in test.required_tests]
+
+                for req in reqs:
+                    print "    requires %s" % req
+
+        for branch_name in sorted(project.branches_by_name):
+            branch = project.branches_by_name[branch_name]
+
+            print " ", branch
+
+            fn = lambda x: x.start_time
+            cycles = sorted(branch.cycles_by_id.values(), key=fn)
+
+            for cycle in cycles:
+                print "   ", cycle
+
+                for result in cycle.test_results_by_test.values():
+                    print "     ", result
+
+            # for env in harness.model.environments:
+            #     print "    ", repr(env)
+                
+            #     for cycle in branch.cycles_by_environment[env]:
+            #         print "      ", cycle
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

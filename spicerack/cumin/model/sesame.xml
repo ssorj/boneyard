@@ -1,0 +1,31 @@
+<schema package="com.redhat.sesame">
+
+  <class name="Sysimage">
+    <property name="uuid"    index="y" type="uuid" access="RC" desc="UUID of System Image"/>
+
+    <property name="osName"   type="sstr" access="RO" desc="Operating System Name"/>
+    <property name="nodeName" type="sstr" access="RO" desc="Node Name"/>
+    <property name="release"  type="sstr" access="RO"/>
+    <property name="version"  type="sstr" access="RO"/>
+    <property name="machine"  type="sstr" access="RO"/>
+    <property name="distro"   type="sstr" access="RO" optional="y"/>
+
+    <property name="memTotal"  type="uint32" access="RO" unit="kByte"/>
+    <property name="swapTotal" type="uint32" access="RO" unit="kByte"/>
+
+    The following statistics are gathered from /proc/meminfo
+
+    <statistic name="memFree"  type="uint32" unit="kByte"/>
+    <statistic name="swapFree" type="uint32" unit="kByte"/>
+
+    The following statistics are gathered from /proc/loadavg
+
+    <statistic name="loadAverage1Min"  type="float"/>
+    <statistic name="loadAverage5Min"  type="float"/>
+    <statistic name="loadAverage10Min" type="float"/>
+    <statistic name="procTotal"        type="uint32"/>
+    <statistic name="procRunning"      type="uint32"/>
+  </class>
+
+</schema>
+

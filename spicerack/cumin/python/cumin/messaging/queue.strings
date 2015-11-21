@@ -1,0 +1,83 @@
+[TopQueueSet.sql]
+select
+  q.id,
+  q.name,
+  v.broker_id,
+  (c.msg_total_enqueues - p.msg_total_enqueues) as enqueues
+from queue as q
+join vhost as v on v.id = q.vhost_id
+join queue_stats as c on c.id = q.stats_curr_id
+join queue_stats as p on p.id = q.stats_prev_id
+where p.qmf_update_time > now() - interval '60 seconds'
+order by enqueues desc
+limit 5
+
+[TopQueueSet.count_sql]
+--
+
+[QueueStatsGeneral.html]
+<table class="twocol">
+  <tbody>
+  <tr>
+    <td>
+      <h2>Input/Output</h2>
+      {io}
+
+      <h2>General</h2>
+      {general}
+    </td>
+    <td>
+      {enqdeq}
+      {depth}
+      {consumers}
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+[QueueStatsDurability.html]
+<table class="twocol">
+  <tbody>
+  <tr>
+    <td>
+      <h2>Durable Input/Output</h2>
+      {io}
+
+      <h2>Journal</h2>
+      {jrnl}
+    </td>
+    <td>
+      {enqdeq}
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+[JournalStats.html]
+<table id="{id}" class="StatSet">
+  <thead>
+    <tr>
+      <th style="width: 50%; text-align: left;">Statistic</th>
+      <th style="width: 25%;">Value</th>
+      <th style="width: 25%;">Per Second</th>
+    </tr>
+  </thead>
+  <tbody>
+    {items}
+  </tbody>
+</table>
+
+[QueueStatsTransactions.html]
+<table class="twocol">
+  <tbody>
+  <tr>
+    <td>
+      <h2>Transactional Input/Output</h2>
+      {io}
+    </td>
+    <td>
+      {enqdeq}
+    </td>
+  </tr>
+  </tbody>
+</table>

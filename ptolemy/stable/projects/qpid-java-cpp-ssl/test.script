@@ -1,0 +1,12 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid-java.bash
+
+script-init
+
+export ANT_OPTS="${ANT_OPTS} -Djavax.net.debug=ssl"
+
+cd "${SOURCE_PATH}/java"
+
+ant-test-external cpp.ssl

@@ -1,0 +1,14 @@
+[SubmitterOverview.html]
+<table class="twocol">
+  <tbody>
+  <tr>
+    <td>
+      <h2>General</h2>
+      {general}
+    </td>
+    <td>
+      {jobs}
+    </td>
+  </tr>
+  </tbody>
+</table>

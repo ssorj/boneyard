@@ -1,0 +1,11 @@
+#!/bin/bash -ex
+
+source ../common/library.bash
+source ../common/qpid.bash
+
+script-init
+
+cd "$SOURCE_PATH"
+
+svn-save-revision specs
+svn-save-changes specs

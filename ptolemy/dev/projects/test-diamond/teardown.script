@@ -1,0 +1,3 @@
+#!/bin/bash -ex
+
+echo "Tearing down this business"
