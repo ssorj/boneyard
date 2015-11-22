@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Issues</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="http://localhost:8000/transom/site.css" type="text/css"/>
+    <script type="text/javascript" src="http://localhost:8000/transom/site.js" defer="defer"></script>
+  </head>
+  <body>
+    <div id="-head">
+      <div id="-head-content">
+        <ul id="-path-navigation"><li><a href="http://localhost:8000/index.html">index.html</a></li><li>Issues</li></ul>
+      </div>
+    </div>
+    <div id="-body">
+      <div id="-body-content">
+        <script>
+<![CDATA[
+    "use strict";
+
+    var handler = function(data) {
+        var elem = $("#list");
+
+        for (var i = 0; i < data.length; i++) {
+            var child = document.createElement("li");
+            turret.appendChildLink(child, "", data[i].summary);
+            elem.appendChild(child);
+        }
+    };
+
+    turret.sendProcedureCall("list-issues", null, handler);
+]]>
+</script>
+        
+<h1>Issues</h1>
+
+<ul id="list">
+</ul>
+
+      </div>
+    </div>
+    <div id="-foot">
+      <div id="-foot-content">
+      </div>
+    </div>
+  </body>
+</html>

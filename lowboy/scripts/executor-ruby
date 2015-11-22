@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+require "lowboy"
+
+executor = Lowboy::Executor.new
+executor.unmarshal(STDIN)
+executor.execute

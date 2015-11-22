@@ -1,0 +1,11 @@
+#!/usr/bin/python
+
+import sys
+
+from lowboy.executor import *
+
+executor = Executor()
+
+executor.unmarshal(sys.stdin)
+
+executor.execute()

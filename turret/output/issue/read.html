@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title></title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="http://localhost:8000/transom/site.css" type="text/css"/>
+    <script type="text/javascript" src="http://localhost:8000/transom/site.js" defer="defer"></script>
+  </head>
+  <body>
+    <div id="-head">
+      <div id="-head-content">
+        <ul id="-path-navigation"><li><a href="http://localhost:8000/index.html">index.html</a></li><li></li></ul>
+      </div>
+    </div>
+    <div id="-body">
+      <div id="-body-content">
+        <script>
+<![CDATA[
+    "use strict";
+
+    var vars = turret.unmarshalQueryVars();
+    var id = vars["id"][0];
+    var handler = function(data) {
+        $("#summary").textContent = document.title = data.summary;
+        $("#description").textContent = data.description;
+        $("#keywords").textContent = data.keywords;
+    };
+
+    turret.sendProcedureCall("read-issue", {id: id}, handler);
+]]>
+</script>
+
+<h1 id="summary"></h1>
+
+<p id="description"></p>
+
+<p id="keywords"></p>
+
+      </div>
+    </div>
+    <div id="-foot">
+      <div id="-foot-content">
+      </div>
+    </div>
+  </body>
+</html>

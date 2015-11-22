@@ -1,0 +1,22 @@
+<h1>Create issue</h1>
+
+<form id="create-issue" method="post" action="/_procedures/create-issue">
+  <input type="hidden" name="redirect" value="/issue/list.html"/>
+
+  <div class="form-field">
+    <label for="summary">Summary</label>
+    <input type="text" name="summary" required="required" autofocus="autofocus"/>
+  </div>
+
+  <div class="form-field">
+    <label for="description">Description</label>
+    <textarea name="description" rows="10"></textarea>
+  </div>
+
+  <div class="form-field">
+    <label for="keywords">Keywords</label>
+    <input type="text" name="keywords"/>
+  </div>
+
+  <input type="submit"/>
+</form>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Create issue</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="http://localhost:8000/transom/site.css" type="text/css"/>
+    <script type="text/javascript" src="http://localhost:8000/transom/site.js" defer="defer"></script>
+  </head>
+  <body>
+    <div id="-head">
+      <div id="-head-content">
+        <ul id="-path-navigation"><li><a href="http://localhost:8000/index.html">index.html</a></li><li>Create issue</li></ul>
+      </div>
+    </div>
+    <div id="-body">
+      <div id="-body-content">
+        <h1>Create issue</h1>
+
+<form id="create-issue" method="post" action="/_procedures/create-issue">
+  <input type="hidden" name="redirect" value="/issue/list.html"/>
+
+  <div class="form-field">
+    <label for="summary">Summary</label>
+    <input type="text" name="summary" required="required" autofocus="autofocus"/>
+  </div>
+
+  <div class="form-field">
+    <label for="description">Description</label>
+    <textarea name="description" rows="10"></textarea>
+  </div>
+
+  <div class="form-field">
+    <label for="keywords">Keywords</label>
+    <input type="text" name="keywords"/>
+  </div>
+
+  <input type="submit"/>
+</form>
+
+      </div>
+    </div>
+    <div id="-foot">
+      <div id="-foot-content">
+      </div>
+    </div>
+  </body>
+</html>

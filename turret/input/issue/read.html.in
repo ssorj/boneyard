@@ -1,0 +1,21 @@
+<script>
+<![CDATA[
+    "use strict";
+
+    var vars = turret.unmarshalQueryVars();
+    var id = vars["id"][0];
+    var handler = function(data) {
+        $("#summary").textContent = document.title = data.summary;
+        $("#description").textContent = data.description;
+        $("#keywords").textContent = data.keywords;
+    };
+
+    turret.sendProcedureCall("read-issue", {id: id}, handler);
+]]>
+</script>
+
+<h1 id="summary"></h1>
+
+<p id="description"></p>
+
+<p id="keywords"></p>

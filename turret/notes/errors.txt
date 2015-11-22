@@ -1,0 +1,16 @@
+expire 2015-08-24 13:02:14,349 DEBU Expired 0 client sessions
+expire 2015-08-24 13:03:14,376 DEBU Expired 0 client sessions
+expire 2015-08-24 13:04:14,386 DEBU Expired 0 client sessions
+expire 2015-08-24 13:05:14,393 ERRO Unexpected error
+Traceback (most recent call last):
+  File "/home/jross/code/turret/install/lib/python3.4/site-packages/turret/application.py", line 285, in run
+    self.do_run()
+  File "/home/jross/code/turret/install/lib/python3.4/site-packages/turret/session.py", line 118, in do_run
+    self.expire_sessions()
+  File "/home/jross/code/turret/install/lib/python3.4/site-packages/turret/session.py", line 125, in expire_sessions
+    for session in self.app._sessions_by_id.values():
+RuntimeError: dictionary changed size during iteration
+expire 2015-08-24 13:05:15,395 DEBU Expired 0 client sessions
+expire 2015-08-24 13:06:15,456 DEBU Expired 0 client sessions
+expire 2015-08-24 13:07:15,485 DEBU Expired 0 client sessions
+

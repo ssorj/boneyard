@@ -1,0 +1,171 @@
+* {
+    margin: 0 0 1em 0;
+    padding: 0;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+*:last-child {
+    margin-bottom: 0;
+}
+
+body {
+    font: 14pt/19pt Roboto, sans-serif;
+    font-weight: 300;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    clear: left;
+    font-weight: 300;
+    line-height: 1em;
+    margin-bottom: 0.8em;
+}
+
+h2 {
+    font-size: 1.3em;
+}
+
+h3 {
+    font-size: 1.1em;
+}
+
+a {
+    text-decoration: none;
+}
+
+code, pre {
+    font-family: "Ubuntu Mono", monospace;
+    font-weight: 400;
+    color: #666;
+}
+
+blockquote, pre {
+    margin-left: 1.2em;
+}
+
+pre {
+    font-size: 0.9em;
+}
+
+ul {
+    padding-left: 2em;
+}
+
+li {
+    margin-bottom: 0;
+}
+
+input, textarea, button {
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: inherit;
+    padding: 0.4em;
+}
+
+.two-column {
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+}
+
+.three-column {
+    -webkit-column-count: 3;
+    -moz-column-count: 3;
+}
+
+.four-column {
+    -webkit-column-count: 4;
+    -moz-column-count: 4;
+}
+
+.form-field label, .form-field input, .form-field textarea {
+    margin-bottom: 0;
+    vertical-align: top;
+    padding: 0.4em;
+    
+}
+
+.form-field label {
+    display: inline-block;
+    padding-left: 0;
+    width: 8em;
+}
+
+.form-field input, .form-field textarea {
+    border: 1px solid #ccc;
+    width: 32em;
+}
+
+#-head {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 0;
+}
+
+#-head-content {
+    padding: 0.6em 1.8em;
+    margin: 0 auto;
+    max-width: 48em;
+}
+
+#-body {
+    margin-bottom: 0;
+}
+
+#-body-content {
+    padding: 1.6em 1.8em 1.8em 1.8em;
+    margin: 0 auto;
+    max-width: 48em;
+}
+
+#-foot {
+    border-top: 1px solid #ccc;
+}
+
+#-foot-content {
+    padding: 0.6em 1.8em;
+    margin: 0 auto;
+    max-width: 48em;
+}
+
+#-path-navigation {
+    font-size: 0.9em;
+    padding: 0;
+}
+
+#-path-navigation > li {
+    display: inline;
+}
+
+#-path-navigation > li:after {
+    content: " \003e\00a0";
+}
+
+#-path-navigation > li:last-child:after {
+    content: none;
+}
+
+@media screen and (max-width: 720px) {
+    .two-column, .three-column, .four-column {
+        -webkit-column-count: 2;
+        -moz-column-count: 2;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    body {
+        font-size: 12pt;
+    }
+
+    pre {
+        font-size: 0.9em;
+    }
+
+    .two-column, .three-column, .four-column {
+        -webkit-column-count: 1;
+        -moz-column-count: 1;
+    }    
+
+    #-head-content, #-body-content, #-foot-content {
+        padding-left: 0.8em;
+        padding-right: 0.8em;
+    }
+}

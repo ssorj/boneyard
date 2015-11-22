@@ -1,0 +1,22 @@
+<script>
+<![CDATA[
+    "use strict";
+
+    var handler = function(data) {
+        var elem = $("#list");
+
+        for (var i = 0; i < data.length; i++) {
+            var child = document.createElement("li");
+            turret.appendChildLink(child, "", data[i].summary);
+            elem.appendChild(child);
+        }
+    };
+
+    turret.sendProcedureCall("list-issues", null, handler);
+]]>
+</script>
+        
+<h1>Issues</h1>
+
+<ul id="list">
+</ul>
