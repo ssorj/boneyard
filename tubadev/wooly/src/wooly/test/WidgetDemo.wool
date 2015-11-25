@@ -1,0 +1,15 @@
+page p "Wooly Widget Demo" {
+    widget wooly.test.TestHeader h;
+
+    modes m {
+        label l "Label 1";
+        widget wooly.test.ToggleLinks t;
+    }
+
+    tabs t m {
+        l: label "Labels";
+        t: label "Toggle Links";
+    }
+
+    widget wooly.test.TestFooter f;
+}

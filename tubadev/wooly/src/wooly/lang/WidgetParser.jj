@@ -1,0 +1,225 @@
+options {
+    STATIC = false;
+}
+
+PARSER_BEGIN(WidgetParser)
+
+package wooly.lang;
+
+import java.io.*;
+import java.lang.reflect.*;
+import java.net.*;
+import java.util.*;
+import wooly.*;
+import wooly.widgets.*;
+
+public final class WidgetParser {
+//     /**
+//      * For testing.
+//      */
+//     public static final void main(final String[] args) throws ParseException {
+//         final WidgetParser parser = new WidgetParser(System.in);
+
+//         parser.parse().print();
+//     }
+
+    private static int m_count = 0;
+
+    static String dequote(final String quoted) {
+        return quoted.substring(0, quoted.length() - 1).substring(1);
+    }
+}
+
+PARSER_END(WidgetParser)
+
+SKIP:
+{
+    " "
+  | "\t"
+  | "\n"
+  | "\r"
+  | "\f"
+}
+
+TOKEN:
+{
+      <SEMI: ";">
+    | <COLON: ":">
+    | <LCURLY: "{">
+    | <RCURLY: "}">
+    | <LPAREN: "(">
+    | <RPAREN: ")">
+    | <TQUOTE: "\"\"\"">
+    | <INTEGER: (<DIGIT>)+>
+    | <BOOLEAN: "true" | "false">
+    | <WIDGET: "widget">
+    | <PAGE: "page">
+    | <TEXT: "text">
+    | <MODES: "modes">
+    | <TABS: "tabs">
+    | <TAB: "tab">
+    | <URL: "url">
+    | <STRING: "\"" (~["\""] | "\\\"")* "\"">
+    | <ID: (<CH> | <DIGIT> | <SEP>)+>
+    | <#DIGIT: ["0"-"9"]>
+    | <#CH: ["a"-"z", "A"-"Z"]>
+    | <#SEP: "_" | ".">
+}
+
+// Add reserved words
+
+SPECIAL_TOKEN:
+{
+    <COMMENT: "//" (~["\n", "\r"])* ("\n" | "\r" | "\r\n")>
+}
+
+Node parse(): {
+    Node node;
+} {
+    (node = Page() | node = Node(null)) <EOF>
+
+    {
+        return node;
+    }
+}
+
+String String(): {
+    String string;
+} {
+    token = <STRING>
+
+    {
+        string = dequote(token.image);
+        return string;
+    }
+}
+
+String Url(): {
+    String url;
+} {
+    <URL> <LPAREN> url = String() <RPAREN>
+
+    {
+        return url;
+    }
+}
+
+String Identifier(): {
+    String id;
+} {
+    token = <ID>
+
+    {
+        id = token.image;
+        return id;
+    }
+}
+
+PageNode Page(): {
+    final PageNode page = new PageNode();
+} {
+    <PAGE>
+    page.name = Identifier()
+    [page.title = String()]
+    (NodeBlock(page) | <SEMI>)
+
+    {
+        return page;
+    }
+}
+
+Node Node(final Node parent): {
+    final Node node;
+} {
+    (node = Text()
+     | node = ReflectionWidget()
+     | node = Modes()
+     | node = Tabs())
+
+    {
+        node.parent = parent;
+        parent.children.add(node);
+
+        return node;
+    }
+}
+
+void NodeBlock(final Node parent): {
+    Node node;
+} {
+    <LCURLY> (node = Node(parent))* <RCURLY>
+}
+
+TextNode Text(): {
+    final TextNode text = new TextNode();
+    text.name = "node" + m_count++;
+} {
+    <TEXT>
+    [text.name = Identifier()]
+    (text.text = String() | text.url = Url())
+    <SEMI>
+
+    {
+        return text;
+    }
+}
+
+ReflectionWidgetNode ReflectionWidget(): {
+    final ReflectionWidgetNode widget = new ReflectionWidgetNode();
+} {
+    <WIDGET>
+    widget.type = Identifier()
+    widget.name = Identifier()
+    (NodeBlock(widget) | <SEMI>)
+
+    {
+        return widget;
+    }
+}
+
+ModesNode Modes(): {
+    final ModesNode modes = new ModesNode();
+} {
+    <MODES>
+    modes.name = Identifier()
+    (NodeBlock(modes) | <SEMI>)
+
+    {
+        return modes;
+    }
+}
+
+TabsNode Tabs(): {
+    final TabsNode tabs = new TabsNode();
+} {
+    <TABS>
+    tabs.name = Identifier()
+    tabs.smodes = Identifier()
+    (<LCURLY> (Tab(tabs))* <RCURLY> | <SEMI>)
+
+    {
+        return tabs;
+    }
+}
+
+TabNode Tab(final TabsNode tabs): {
+    final TabNode tab = new TabNode();
+    String id;
+} {
+    id = Identifier()
+
+    {
+        tab.smode = tabs.smodes + "." + id;
+    }
+
+    <COLON>
+
+    tab.ntab = Node(tabs)
+
+    {
+        tab.parent = tabs;
+        tabs.children.add(tab);
+
+        return tab;
+    }
+}

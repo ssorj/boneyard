@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if test -z "$TUBA_HOME"
+then
+    echo "TUBA_HOME not set"
+    exit 1
+fi
+
+if test -z "$CLASSPATH"
+then
+    echo "CLASSPATH not set"
+    exit 1
+fi
+
+#echo -- CLASSPATH --
+#echo $CLASSPATH | tr ":" "\n"
+#echo -- TUBA_HOME --
+#echo $TUBA_HOME
+
+exec java -classpath $CLASSPATH -Dtuba.home="$TUBA_HOME" $*

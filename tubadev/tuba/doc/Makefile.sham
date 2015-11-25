@@ -1,0 +1,57 @@
+# You must run "source Profile" in the project base directory before
+# using this makefile
+
+javac := ${JAVA_HOME}/bin/javac -d build/classes
+java := ${JAVA_HOME}/bin/java -Djava.util.logging.config.file=etc/logging.properties
+javacc := ${JAVA_HOME}/bin/java javacc
+javadoc := ${JAVA_HOME}/bin/javadoc -d build/javadoc
+
+cedar_core_src += src/cedar/*.java
+wheaty_core_src += src/wheaty/*.java
+wheaty_core_src += src/wheaty/parameters/*.java
+
+wooly_core_src += src/wooly/*.java
+wooly_widgets_src += src/wooly/widgets/*.java
+wooly_lang_src += src/wooly/lang/*.java
+wooly_server_src += src/wooly/server/*.java
+wooly_debug_src += src/wooly/debug/*.java
+wooly_test_src += src/wooly/test/*.java
+
+.PHONY: test build clean
+
+build: clean
+	mkdir -p build/classes
+	${javac} ${cedar_core_src}
+	${javac} ${wheaty_core_src}
+	${javac} ${wooly_core_src}
+	${javac} ${wooly_widgets_src}
+	${javac} ${wooly_lang_src}
+	${javac} ${wooly_server_src}
+	${javac} ${wooly_debug_src}
+	${javac} ${wooly_test_src}
+	cp src/wooly/test/*.wool build/classes/wooly/test
+
+parser:
+	${javacc} -output_directory=src/wooly/lang src/wooly/lang/*.jj
+
+clean:
+	rm -rf build
+
+# build: clean
+# 	-mkdir build
+# 	-mkdir build/classes
+# 	-mkdir build/src-parade-lang
+# 	${javacc} -output_directory=build/src-parade-lang src/parade/lang/*.jj
+# 	${javac} ${wooly_core_src} build/src-parade-lang/*.java
+# 	-mkdir build/src-parade-test
+# 	${javacc} -output_directory=build/src-parade-test src/parade/test/*.jj
+# 	${javac} ${wooly_test_src} build/src-parade-test/*.java
+# 	install -D src/parade/test/* build/classes/parade/test
+
+#test: build
+#	${java} junit.textui.TestRunner parade.test.Test
+#	${java} parade.test.HostTest
+#	@echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#	${java} parade.test.SystemPropertiesTest
+#	${java} shy.test.Test
+

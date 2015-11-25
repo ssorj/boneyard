@@ -1,0 +1,68 @@
+#!/bin/bash
+
+shopt -s huponexit
+
+if [[ -z $TUBA_HOME ]]
+then
+    # XXX
+    TUBA_HOME="/usr/local/share/tuba"
+fi
+
+if (( $# != 3 ))
+then
+    echo "$0: Expected 3 arguments; found $#"
+    exit 1
+fi
+
+file=$1
+format=$2
+content=$3
+
+nice projectx -tom2p "$file"
+
+encode="exec nice mencoder -quiet -oac copy -ovc lavc -noautoexpand -of avi -ofps 30000/1001"
+hdopts="-lavcopts aspect=16/9:vqmin=2:vqmax=8:vbitrate=8208"
+hdscale="scale=684:384"
+sdopts="-lavcopts aspect=4/3:vqmin=2:vqmax=8:vbitrate=6144"
+sdscale="scale=512:384"
+m2p="$(dirname "$file")/$(basename "$file" ".stream").m2p"
+avi="$(dirname "$file")/$(basename "$file" ".stream").avi"
+
+case "$format" in
+    480i)
+        $encode $sdopts -vf pp=lb,crop=696:464,$sdscale \
+            -o "$avi" "$m2p" >/dev/null 2>&1
+        ;;
+    1080i)
+        if [[ $content == "hd" ]]
+        then
+            $encode $hdopts -vf pp=lb,crop=1920:1080,$hdscale \
+                -o "$avi" "$m2p" >/dev/null 2>&1
+        else
+            $encode $sdopts -vf pp=lb,crop=1392:1044,$sdscale \
+                -o "$avi" "$m2p" >/dev/null 2>&1
+        fi
+        ;;
+    720p)
+        # The softskip part of the filter is a workaround for a scaling bug
+
+        if [[ $content == "hd" ]]
+        then
+            $encode $hdopts -vf softskip,$hdscale \
+                -o "$avi" "$m2p" >/dev/null 2>&1
+        else
+            $encode $sdopts -vf softskip,crop=928:696,$sdscale \
+                -o "$avi" "$m2p" >/dev/null 2>&1
+        fi
+        ;;
+    *)
+        if [[ $content == "hd" ]]
+        then
+            $encode $hdopts -vf $hdscale \
+                -o "$avi" "$m2p" >/dev/null 2>&1
+        else
+            $encode $sdopts -vf $sdscale \
+                -o "$avi" "$m2p" >/dev/null 2>&1
+        fi
+        ;;
+esac

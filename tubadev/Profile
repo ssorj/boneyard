@@ -1,0 +1,29 @@
+export TUBADEV_HOME=$PWD
+export TUBADEV_BUILD=/tmp/tuba
+export TUBADEV_JAVAC="javac -d $TUBADEV_BUILD/classes"
+export TUBADEV_JAR="jar -C $TUBADEV_BUILD/classes"
+
+export TUBA_HOME=$TUBADEV_HOME/tuba0
+export JAVA_HOME=$PWD/../jdk
+
+# PATH
+
+if test -z "$TUBADEV_ORIG_PATH"; then
+    export TUBADEV_ORIG_PATH=$PATH
+fi
+
+export PATH=$JAVA_HOME/bin:$TUBA_HOME/bin:$TUBADEV_HOME/bin:$TUBADEV_ORIG_PATH
+
+# CLASSPATH
+
+if test -z "$TUBADEV_ORIG_CLASSPATH"; then
+    export TUBADEV_ORIG_CLASSPATH=$CLASSPATH
+fi
+
+CLASSPATH=$TUBADEV_ORIG_CLASSPATH
+
+for jar in $TUBADEV_HOME/jars/*.jar; do
+    CLASSPATH=$jar:$CLASSPATH
+done
+
+export CLASSPATH=$TUBA_HOME/classes:$CLASSPATH

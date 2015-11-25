@@ -1,0 +1,69 @@
+package tuba.runtime.model;
+
+class Program programs {
+    field Key id;
+    field SourceKey sid;
+    field Title title;
+    field Subtitle subtitle;
+    field Description description;
+    field OriginalAirDate original_air_date;
+    field Checksum checksum;
+    field SeriesKey series_id;
+    field Priority priority;
+
+    key Key programs_seq;
+}
+
+class Recording recordings {
+    field Key id;
+    field Filename file;
+    field Title title;
+    field Subtitle subtitle;
+    field Description description;
+    field OriginalAirDate original_air_date;
+    field ProgramSourceKey program_sid;
+    field ProgramChecksum program_checksum;
+    field StartTime start_time;
+    field EndTime end_time;
+    field CallSign call_sign;
+    field TransportFormat transport_format;
+    field ContentFormat content_format;
+
+    key Key recordings_seq;
+}
+
+class Encoding encodings {
+    field Key id;
+    field RecordingKey recording_id;
+    field Filename filename;
+
+    key Key encodings_seq;
+}
+
+class Series series {
+    field Key id;
+    field SourceKey sid;
+    field Title title;
+    field Priority priority;
+
+    key Key series_seq;
+}
+
+class Showing showings {
+    field ProgramKey program_id;
+    field StationKey station_id;
+    field StartTime start_time;
+    field EndTime end_time;
+    field ContentFormat content_format;
+}
+
+class Station stations {
+    field Key id;
+    field SourceKey sid;
+    field CallSign call_sign;
+    field FccChannel fcc_channel;
+    field TransportFormat transport_format;
+    field Priority priority;
+
+    key Key stations_seq;
+}

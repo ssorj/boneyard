@@ -1,0 +1,163 @@
+options {
+    STATIC = false;
+}
+
+PARSER_BEGIN(LentilParser)
+
+package lentil;
+
+import java.io.*;
+import java.lang.reflect.*;
+import java.net.*;
+import java.util.*;
+
+public class LentilParser {
+    public static final LentilPackage parse(final URL url) {
+        if (url == null) throw new IllegalArgumentException();
+
+        final LentilPackage lpackage;
+
+        try {
+            lpackage = parse(new InputStreamReader(url.openStream()));
+        } catch (IOException ioe) {
+            throw new IllegalStateException(ioe);
+        }
+
+        return lpackage;
+    }
+
+    public static final LentilPackage parse(final Reader reader) {
+        try {
+            return new LentilParser(reader).parse();
+        } catch (ParseException pe) {
+            throw new IllegalStateException(pe);
+        }
+    }
+
+    static String dequote(final String quoted) {
+        return quoted.substring(0, quoted.length() - 1).substring(1);
+    }
+}
+
+PARSER_END(LentilParser)
+
+SKIP:
+{
+    " "
+  | "\t"
+  | "\n"
+  | "\r"
+}
+
+TOKEN:
+{
+      <SEMI: ";">
+    | <COLON: ":">
+    | <LCURLY: "{">
+    | <RCURLY: "}">
+    | <LPAREN: "(">
+    | <RPAREN: ")">
+    | <INTEGER: (<DIGIT>)+>
+    | <BOOLEAN: "true" | "false">
+    | <PACKAGE: "package">
+    | <CLASS: "class">
+    | <FIELD: "field">
+    | <KEY: "key">
+    | <STRING: "\"" (~["\""] | "\\\"")* "\"">
+    | <ID: (<CH> | <DIGIT> | <SEP>)+>
+    | <#DIGIT: ["0"-"9"]>
+    | <#CH: ["a"-"z", "A"-"Z"]>
+    | <#SEP: "_" | ".">
+}
+
+// Add reserved words
+
+SPECIAL_TOKEN:
+{
+    <COMMENT: "//" (~["\n", "\r"])* ("\n" | "\r" | "\r\n")>
+}
+
+LentilPackage parse(): {
+    LentilPackage lpackage;
+} {
+    lpackage = jjPackage() <EOF>
+
+    {
+        return lpackage;
+    }
+}
+
+LentilPackage jjPackage(): {
+    LentilPackage lpackage;
+} {
+    <PACKAGE>
+
+    token = <ID> {
+        lpackage = LentilPackage.getPackage(token.image);
+    }
+
+    <SEMI>
+
+    (jjClass(lpackage))*
+
+    <EOF>
+
+    {
+        return lpackage;
+    }
+}
+
+void jjClass(final LentilPackage lpackage): {
+    LentilClass lclass;
+} {
+    <CLASS>
+
+    token = <ID> {
+        final Class jclass = lpackage.getJavaClass(token.image);
+        lclass = new LentilClass(jclass, lpackage);
+    }
+
+    token = <ID> {
+        lclass.setTable(token.image);
+    }
+
+    <LCURLY>
+
+    (jjField(lclass))*
+
+    [jjKey(lclass)]
+
+    <RCURLY>
+}
+
+void jjField(final LentilClass lclass): {
+    LentilField lfield;
+} {
+    <FIELD>
+
+    token = <ID> {
+        final Field jfield = lclass.getJavaField(token.image);
+        lfield = new LentilField(jfield, lclass);
+    }
+
+    token = <ID> {
+        lfield.setColumn(token.image);
+    }
+
+    <SEMI>
+}
+
+void jjKey(final LentilClass lclass): {
+} {
+    <KEY>
+
+    token = <ID> {
+        lclass.setKeyField(lclass.getField(token.image));
+    }
+
+    token = <ID> {
+        lclass.setKeySequence(token.image);
+    }
+
+    <SEMI>
+}

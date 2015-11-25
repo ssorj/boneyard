@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+    SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+    xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+    xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <tms:download xmlns:tms="urn:TMSWebServices">
+      <startTime xsi:type="tms:dateTime">{startTime}</startTime>
+      <endTime xsi:type="tms:dateTime">{endTime}</endTime>
+    </tms:download>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

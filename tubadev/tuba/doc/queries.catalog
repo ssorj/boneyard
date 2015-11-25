@@ -1,0 +1,148 @@
+[requests]
+select *
+from
+  series_requests sr
+  inner join series s on sr.series_sid = s.sid;
+
+[requested_showings]
+select
+  h.program_sid,
+  h.station_sid,
+  h.start_time,
+  h.end_time,
+  s.priority as series_priority
+from
+  showings h
+  inner join stations t on h.station_sid = t.sid
+  inner join programs p on h.program_sid = p.sid
+  inner join series s on p.series_sid = s.sid
+where
+  s.priority > 0
+  and p.captured_p = false
+order by h.start_time, h.end_time;
+
+[requested_showings_with_conflicts]
+select p.title, t.call_sign, h.start_time, h.end_time
+from
+  showings h
+  inner join stations t on h.station_sid = t.sid
+  inner join programs p on h.program_sid = p.sid
+  inner join series s on p.series_sid = s.sid
+  inner join series_requests sr on s.sid = sr.series_sid
+where
+  exists
+    (select 1
+     from showings ih
+     where
+       ((ih.start_time > h.start_time and ih.start_time < h.end_time)
+        or (ih.end_time > h.start_time and ih.end_time < h.end_time))
+       and ih.station_sid <> h.station_sid)
+order by h.start_time, h.end_time;
+
+[series_requests]
+update series
+set priority = 100
+where title in
+  ('Philosophy: A Guide to Happiness',
+   'Design e2',
+   'Everybody Hates Chris',
+   'Frasier',
+   'Frontline',
+   'Grey''s Anatomy',
+   'M*A*S*H',
+   'Malcolm in the Middle',
+   'Nova',
+   'The NewsHour with Jim Lehrer');
+
+update series
+set priority = 75
+where title in
+  ('NOW',
+   'Independent Lens',
+   'McLaughlin Group',
+   'American Experience',
+   'Law & Order',
+   'The Simpsons',
+   'ER',
+   'Stargate Atlantis',
+   'House',
+   'The Office',
+   'That ''70s Show');
+
+update series
+set priority = 50
+where title in
+  ('Mystery!',
+   'Roseanne',
+   'Cheers',
+   'This Old House',
+   'Victory Garden',
+   'Frontline/World',
+   'Ebert & Roeper',
+   'Law & Order: Criminal Intent');
+
+update series
+set priority = 25
+where title in
+  ('Nature',
+   'Seinfeld',
+   'Science in Focus',
+   'BBC World News',
+   'Star Trek: Enterprise',
+   'Ask This Old House');
+
+update stations
+set transport_format = '480i';
+update stations
+set transport_format = '1080i'
+where call_sign in ('WGBHDT2', 'WBZDT', 'WHDHDT', 'WSBKDT', 'WLVIDT');
+update stations
+set transport_format = '720p'
+where call_sign in ('WCVBDT', 'WFXTDT');
+
+[hmmm]
+select * from series where sid in
+  ('SH836068', 'SH812583', 'SH767410', 'SH754225', 'SH732283', 'SH726133',
+   'SH688359', 'SH666541', 'SH528920', 'SH529109', 'SH503110', 'SH446583',
+   'SH446173', 'SH393237', 'SH351374', 'SH317756', 'SH315789', 'SH284488',
+   'SH277598', 'SH167203', 'SH155564', 'SH115131', 'SH080939', 'SH018693',
+   'SH017617', 'SH016916', 'SH004662', 'SH004444', 'SH004188', 'SH003732',
+   'SH003671', 'SH003163', 'SH003054', 'SH003026', 'SH002944', 'SH002848',
+   'SH002710', 'SH001762', 'SH000882', 'SH000288');
+
+
+[load_candidates_old]
+select distinct
+  null as id,
+  null as file,
+  h.program_id,
+  h.start_time,
+  h.end_time,
+  h.content_format,
+  t.call_sign,
+  t.transport_format,
+  p.title,
+  p.subtitle,
+  p.description,
+  p.original_air_date,
+  p.sid program_sid,
+  p.checksum program_checksum,
+  p.original_air_date,
+  sr.priority
+from
+  showings h
+  inner join programs p on h.program_id = p.id
+  inner join stations t on h.station_id = t.id
+  inner join series s on p.series_id = s.id
+  inner join series_requests sr on s.id = sr.series_id
+where
+  not exists
+    (select 1
+     from recordings
+     where program_sid = p.sid and program_checksum = p.checksum)
+  and sr.priority =
+    (select max(priority) priority
+     from series_requests
+     where
+       series_id = s.id
+       and (station_id is null or station_id = t.id))

@@ -1,0 +1,48 @@
+#!/bin/bash
+
+shopt -s huponexit
+
+if [[ -z $TUBA_HOME ]]
+then
+    echo "$0: TUBA_HOME is not set"
+    exit 1
+fi
+
+if (( $# != 3 ))
+then
+    echo "$0: Expected 3 arguments; found $#"
+    exit 1
+fi
+
+callsign=$1
+file=$2
+duration=$3
+channels="$TUBA_HOME/etc/channels.conf"
+
+if ! mkdir -p "$(dirname "$file")"
+then
+    echo "$0: Could not create directory for file"
+    exit 1
+fi
+
+capture="mencoder -dvbin file=$channels -quiet -oac copy -ovc copy"
+
+# XXX mencoder seems to return no useful error codes, so the following
+# loop cannot distinguish "busy device" from "no such channel", for
+# instance
+
+until $capture -endpos 1 -o /dev/null dvb://"$callsign" >/dev/null 2>&1
+do
+    echo "Adapter busy; waiting 1 second before retrying"
+    sleep 1
+done
+
+echo "Capturing $callsign to '$file' for $duration seconds"
+
+if ! $capture -endpos $duration -o "$file".ts dvb://"$callsign" >/dev/null 2>&1
+then
+    echo "$0: Capture failed"
+    exit 1
+fi
+
+exit 0

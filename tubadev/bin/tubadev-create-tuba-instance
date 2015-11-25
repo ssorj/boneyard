@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if test -z "$1"; then
+    echo "Usage: tubadev-create-tuba-instance INSTANCE-NAME"
+    exit 1
+fi
+
+if test -z "$TUBADEV_BUILD"; then
+    echo "TUBADEV_BUILD is not set"
+    exit 1
+fi
+
+instance="$1"
+
+mkdir "$instance"
+mkdir "${instance}/conf"
+mkdir "${instance}/data"
+mkdir "${instance}/log"
+mkdir "${instance}/recordings"
+
+ln -s "${TUBADEV_BUILD}/bin" "${instance}/bin"
+ln -s "${TUBADEV_BUILD}/classes" "${instance}/classes"
+ln -s "${TUBADEV_BUILD}/jars" "${instance}/jars"
+ln -s "${TUBADEV_BUILD}/lib" "${instance}/lib"

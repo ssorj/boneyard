@@ -1,0 +1,4 @@
+ - test-tuner command
+
+ - introduce an opaque CaptureFile or CaptureOutput object instead of
+   File

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if test -z "$1"; then
+    url="$(tuba-config get runtime:jdbc_url)"
+else
+    url="$1"
+fi
+
+if test -z "$2"; then
+    user="$(tuba-config get runtime:jdbc_user)"
+else
+    user="$2"
+fi
+
+if test -z "$3"; then
+    driver="$(tuba-config get runtime:jdbc_driver)"
+else
+    driver="$3"
+fi
+
+exec tuba-java org.hsqldb.util.SqlTool \
+    --inlineRc "URL=${url},USER=${user},DRIVER=${driver}"

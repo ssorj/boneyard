@@ -1,0 +1,15 @@
+ - Add "am I all ready to start" checking for cases like no database
+
+ - Make linuxdvb driver support stuff other than 8VSB
+
+ - Implement ScriptCaptureAdapter
+
+ - Fix black band at top of hd recordings; the cropping is off
+
+ - Change Command.run so it no longer throws Exception, and then fix
+   up TubaServer accordingly
+
+ - Need to escape slashes in titles and subtitles, else we add
+   directories in output
+
+

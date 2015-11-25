@@ -1,0 +1,13 @@
+
+#binary:
+#	gcj -findirect-dispatch -lgcj -shared -o ${TUBA_HOME}/lib/tuba.so ${TUBA_HOME}/jars/tuba.jar
+#	gcj-dbtool -n ${TUBA_HOME}/lib/tuba.gcjdb
+#	gcj-dbtool -a ${TUBA_HOME}/lib/tuba.gcjdb ${TUBA_HOME}/jars/tuba.jar ${TUBA_HOME}/lib/tuba.so
+
+#	${PRAM_JAR} -cf ${PREFIX}/share/tuba/jars/tuba.jar tuba
+
+# dbfile := $(shell gcj-dbtool -p /usr/local)
+# install-gcjdb:
+# 	mkdir -p $(shell dirname ${dbfile})
+# 	gcj-dbtool -n ${dbfile}
+# 	gcj-dbtool -m ${dbfile} ${PREFIX}/lib/tuba/tuba.gcjdb ${dbfile}

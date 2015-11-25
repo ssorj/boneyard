@@ -1,0 +1,8 @@
+select p.title, t.call_sign, h.start_time, h.duration
+from showings h
+inner join stations t on h.station_sid = t.sid
+inner join programs p on h.program_sid = p.sid
+inner join series s on p.series_sid = s.sid
+where h.start_time >= 1152219600000 and h.end_time <= (1152219600000 + 1800000);
+
+new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");

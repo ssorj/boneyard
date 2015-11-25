@@ -1,0 +1,88 @@
+package smoky;
+
+import java.io.*;
+import java.util.*;
+import wheaty.*;
+
+public final class SmokySession extends WheatySession {
+    private final String m_name;
+    private final SmokyModule m_module;
+
+    private boolean m_open;
+    private final List m_requires;
+
+    protected SmokySession(final SmokyRuntime runtime) {
+        m_runtime = runtime;
+    }
+
+    public final String getRuntime() {
+        return m_runtime;
+    }
+
+    public final SmokyModule getModule() {
+        return m_module;
+    }
+
+    public final void require(final SmokySession session) {
+        m_requires.add(session);
+    }
+
+    public final void log(final Exception e) {
+        getModule().log(e);
+    }
+
+    public final void log(final String message) {
+        getModule().log(message);
+    }
+
+    public final void log(final int threshold, final String message) {
+        getModule().log(threshold, message);
+    }
+
+    public final boolean isOpen() {
+        return m_open;
+    }
+
+    public void open() {
+        log(1, "Opening session '" + getName() + "'");
+
+        if (isOpen()) {
+            throw new IllegalStateException("Session already opened");
+        }
+
+        final Iterator requires = m_requires.iterator();
+
+        while (requires.hasNext()) {
+            final SmokySession session = (SmokySession) requires.next();
+
+            if (!session.isOpen()) {
+                throw new IllegalStateException
+                    ("Required session '" + session.getName() + "' not open");
+            }
+        }
+
+        m_open = true;
+    }
+
+    public void close() {
+        log(1, "Closing session '" + getName() + "'");
+
+        if (!isOpen()) {
+            throw new IllegalStateException("Session already closed");
+        }
+
+        final Iterator requires = m_requires.iterator();
+
+        while (requires.hasNext()) {
+            final SmokySession session = (SmokySession) requires.next();
+
+            if (!session.isOpen()) {
+                throw new IllegalStateException
+                    ("Required session '" + session.getName() + "' " +
+                     "already closed");
+            }
+        }
+
+        m_open = false;
+    }
+}

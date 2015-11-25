@@ -1,0 +1,23 @@
+#! /bin/bash
+
+script=/tmp/fixup.sed
+
+cat <<EOF > $script
+1,/^ *package/ {
+    /^ *package/b
+    d
+}
+
+/versionId/,/;/d
+
+/^ *public.*class/,/;/ {
+    /^ *$/d
+}
+EOF
+
+#s/\@version.*$/\@version 0.1/
+
+find . -type f -name \*.java -print | while read i
+do
+   sed -f $script $i > $i.tmp && mv $i.tmp $i
+done

@@ -1,0 +1,57 @@
+mencoder -ofps 30000/1001 -oac mp3lame -lameopts preset=insane -ovc
+lavc -lavcopts
+vcodec=mpeg2video:threads=4:mbd=1:keyint=5:psnr:vbitrate=8000 -vf
+softskip,scale=720:-2 -o Fixed-ts.avi Input.ts
+
+you may wanna change that around a little, but its the bulk of
+it. just please realize what this is doing and why i wrote it this
+way. Im currently writing some software for *nix that takes a .tp
+stream and converts it, strips commercials, and stuff. this is the
+profile im using now to fix the hdtv stream. please note, im dropping
+the framerate from 60fps to 30fps (thats what softskip helps with...i
+find it works better then decimate for some reason), scalling it down
+to 720:-2 (the -2 autosizes it). 8000kbit/s maintains the bitrate
+pulled down by the stream (it can be lower then the 19mbit/s that it
+comes in at because im scalling it down enough...the bpp is actually
+higher in my encode then the original so i dont think your going to
+get any better). the mbd and keyint stuff are a little hardcore but
+thats because im doing ALOT of searching through the stream and having
+software interprit whats comming out so i like the ability to be able
+to be that accurate in the stream.
+
+tweak as you may want...but it works. ive thus far tested it on
+everything from a 720p recording of house and lost to a 480i recording
+of family guy (i reduced the scale to scale=-2:480 for that...no sense
+in blowing up the image right). also note i am running it into a 2
+channel mp3 audio track from the ac3 that its comming with. the
+preset=insane option locks it in at a 320kbps bitrate which to me is
+plenty enough.
+
+hope that helps
+morph166955 is offline          Reply With Quote
+
+----
+
+
+Hey all.
+I've been toying around with encoding HDTV, complete with AC3 streams. I 
+grabbed a large chunk (about 3.5 GB), and encoded it to xvid using the 
+following command:
+
+mencoder stream.ts -vf scale=1280:720,dsize=16/9,pp=h1/v1/dr/al/lb -sws 
+10 -oac copy -ovc xvid -xvidencopts 
+pass=2:bitrate=4000:me_quality=6:vhq=4:chroma_me:qpel -o stream.avi
+
+The "-oac copy" works, and I get an xvid file with ac3 audio.
+
+However, if I just want to make another mpeg file like so :
+
+mencoder stream.ts -oac copy -ovc copy -of mpeg -o stream_1.mpg
+
+there is no audio. Any idea why "-oac copy" works for xvid, but not 
+standard mpeg ? I've used "oac copy" for streams with mp2 audio with no 
+problems ...
+
+I'll appreciate any help.
+
+`

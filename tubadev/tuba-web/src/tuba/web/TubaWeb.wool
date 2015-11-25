@@ -1,0 +1,15 @@
+page p "Tuba Web" {
+    text url("file:///tmp/header.html");
+
+    tabs t .p.m {
+        a: text "Tab A";
+        b: text "Tab B";
+    }
+
+    modes m {
+        text a "Mode A";
+        text b "Mode B";
+    }
+
+    widget tuba.web.PageFooter f;
+}

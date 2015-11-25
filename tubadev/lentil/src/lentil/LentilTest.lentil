@@ -1,0 +1,9 @@
+package lentil;
+
+class Widget widgets {
+    field Key id;
+    field CallSign call_sign;
+    field TransportFormat transport_format;
+
+    key Key widgets_seq;
+}

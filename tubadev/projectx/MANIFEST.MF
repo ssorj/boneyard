@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Class-Path: commons-net-1.3.0.jar jakarta-oro-2.0.8.jar ProjectX.jar
+Main-Class: net.sourceforge.dvb.projectx.common.Start

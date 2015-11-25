@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <title>Penny</title>
+    <script type="text/javascript" src="file:///home/jross/penny.js"></script>
+    <style>
+      #chart {
+         width: 800px;
+         heigh: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="message"></div>
+
+    <canvas id="chart" width="1000" height="300">
+      Oh, no!
+    </canvas>
+
+    <form name="chartInputs" onsubmit="return updateChart(this);">
+      <div>Interest Rate <input name="interestRate" value="0.10"/></div>
+      <div>Initial Principal <input name="initialPrincipal" value="1000"/></div>
+      <div>Periods <input name="years" value="30"/></div>
+      <input type="submit"/>
+    </form>
+
+    <script>
+      var chart = $("chart");
+      var penny = new PennyChart(chart);
+
+      penny.init();
+      penny.draw();
+
+      function updateChart(form) {
+          penny.interestRate = Number(form.interestRate.value);
+          penny.initialPrincipal = Number(form.initialPrincipal.value);
+          penny.years = Number(form.years.value);
+
+          penny.redraw();
+
+          return false;
+      }
+    </script>
+  </body>
+</html>

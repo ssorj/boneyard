@@ -1,0 +1,18 @@
+ - Separate encoding
+ - Write a test script, tubadev-test
+   - Reinstate the tuba command
+   - Sample data?  Make it easy to load it.
+ - Fix the 0-byte stream bug
+   - Would it help to check tuner busy-ness?
+ - Make qam/atsc configurable
+   - Take conf from dvb.channels
+ - Mock capture mode?
+ - In schema, rename recordings.file to filename
+ - In log, indicate next scheduled capture
+ - Put content format in tuba file names (.480i.stream)
+ - Somehow move projectx remuxing into java code
+ - Basic web ui
+ - Somehow get rid of the withay stuff, or clear up its legality
+ - Having global static capture and update sessions is dubious
+ - Get rid of capture.recordings_dir
+ - Right now we just blow up if dvb.channels is missing
