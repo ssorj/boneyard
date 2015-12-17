@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+
+from topia.termextract import extract
+from haystack import *
+
+database_file = "data/data.sqlite"
+database = MessageDatabase(database_file)
+
+conn = database.connect()
+cursor = conn.cursor()
+extractor = extract.TermExtractor()
+sql = "select subject, content from messages order by date desc limit 10"
+
+try:
+    cursor.execute(sql)
+
+    for record in cursor.fetchall():
+        lines = list()
+        lines.append(record[0])
+
+        for line in record[1].splitlines():
+            if not line.startswith(">"):
+                lines.append(line)
+
+        results = extractor("\n".join(lines))
+
+        for result in results:
+            print(result)
+
+        print()
+finally:
+    conn.close()

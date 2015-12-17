@@ -1,0 +1,56 @@
+# -*- mode: html -*-
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+#   http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+[error_message]
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <title>{title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="/file/disco.css" type="text/css" async="async"/>
+    <link rel="stylesheet" href="/file/main.css" type="text/css" async="async"/>
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon"/>
+    <script type="text/javascript" src="/file/disco.js" defer="defer"/>
+    <script type="text/javascript" src="/file/main.js" defer="defer"/>
+  </head>
+  <body>
+    <div id="top">
+      {navigation}
+    </div>
+    <div id="middle">
+      <h1>{title}</h1>
+
+      <div id="error-summary">
+        {summary}
+      </div>
+
+      <div id="error-details" class="hidden">
+        {details}
+      </div>
+
+      <div id="error-details-link" class="button-group">
+        <a class="button" href="#" onclick="_showElement('error-details'); _hideElement('error-details-link');">Show details</a>
+      </div>
+    </div>
+    <div id="bottom">
+    </div>
+  </body>
+</html>
