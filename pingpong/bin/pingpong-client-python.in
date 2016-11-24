@@ -1,0 +1,87 @@
+#!/usr/bin/env python
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+#   http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+# -*- mode: python; -*-
+
+from __future__ import print_function
+
+import sys
+import time
+
+from proton import Message
+from proton.handlers import MessagingHandler
+from proton.reactor import Container
+
+def log(message, *args):
+    message = message.format(*args)
+    print("CLIENT: {}".format(message))
+
+class ClientHandler(MessagingHandler):
+    def __init__(self, url, max_count):
+        super(ClientHandler, self).__init__()
+
+        self.url = url
+        self.max_count = max_count
+
+        self.count = 0
+        self.sender = None
+        self.receiver = None
+    
+    def on_start(self, event):
+        log("Connecting to {}", self.url)
+        
+        conn = event.container.connect(self.url, sasl_enabled=False)
+        self.sender = event.container.create_sender(conn, "pingpong")
+        #self.receiver = event.container.create_receiver(conn, None, dynamic=True)
+
+        event.container.schedule(1.0, self)
+
+    def on_timer_task(self, event):
+        self.count += 1
+
+        request = Message(u"ping {}".format(self.count))
+        request.id = self.count
+        #request.reply_to = self.receiver.remote_source.address
+
+        if self.sender.credit:
+            log("Sending request {}", request)
+
+            self.sender.send(request)
+
+        if self.max_count != 0 and self.count >= self.max_count:
+            return
+
+        event.container.schedule(1.0, self)
+
+    def on_message(self, event):
+        log("Received response {}", event.message)
+
+        if self.max_count != 0 and self.count >= self.max_count:
+            log("Closing connection")
+            event.connection.close()
+
+url = sys.argv[1]
+count = int(sys.argv[2])
+handler = ClientHandler(url, count)
+container = Container(handler)
+
+try:
+    container.run()
+except KeyboardInterrupt:
+    pass
