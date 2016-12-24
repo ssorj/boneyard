@@ -1,0 +1,105 @@
+QPID-2572   0.7         Automatic loading of conflicting plug-ins  Alan Conway  Open      
+QPID-2571   0.7         Add plugin-search-path option for plug-in  Alan Conway  Open      
+QPID-2223   0.5         Controlling order of plug-in initializati  Alan Conway  Open      
+QPID-2674         0.7   heartbeats can cause seg faults under tcp  Andrew Stit  Open      
+QPID-2567   0.7         [c++] Timer - possible thread lock orderi  Andrew Stit  Open      
+QPID-2082               Put all of the C++ code in the source tre  Andrew Stit  Open      
+QPID-2004   0.5         On shutting down the broker, the connecti  Andrew Stit  Reopened  
+QPID-1198   M4    0.5   Changes for the solaris port               Andrew Stit  Open      
+QPID-1133   M3          Poller implementation based on the Solari  Andrew Stit  Open      
+QPID-1132   M3          Add support for Sun Studio compiler suite  Andrew Stit  Open      
+QPID-529                Support message priority                   Danushka Me  Open      
+QPID-2849   0.6         TTL not updated for messages on LVQs       Gordon Sim   Open      
+QPID-2552   0.7   0.7   broker memory leaks                        Gordon Sim   Open      
+QPID-2473   0.7         current libraries: new options needed to   Gordon Sim   Open      
+QPID-2324   0.5   0.7   message_cancel should throw 404 not-found  Gordon Sim   Open      
+QPID-2104   0.5         Improved LVQ implementation                Gordon Sim   Open      
+QPID-1909   0.5         Consumer with byte credit can get ignored  Gordon Sim   Open      
+QPID-1490   M3          Reject unroutable transfers for which the  Gordon Sim   Open      
+QPID-1265   M3          Don't hold SemanticState::ConsumerImpl::l  Gordon Sim   Open      
+QPID-686    M3          requeue and release should make messages   Gordon Sim   Open      
+QPID-530                Support selectors on consume               Gordon Sim   Open      
+QPID-49                 Add support for virtual hosts              Gordon Sim   Open      
+QPID-1838               Create ACL Plugin based on SELinux         Joshua Kram  Open      
+QPID-2916   0.7         C++ broker & Python client will silently   Ken Giusti   Open      
+QPID-1860   M4    0.5   Python verify file cannot contain comment  Martin Ritc  Ready To R
+QPID-1455   M4          Cannot specify browse-only capability ACL  Martin Ritc  Open      
+QPID-1353   M4          xa.FaultTest.testRollback failure with CP  Rafael H. S  Open      
+QPID-2108   0.5         ACL Enhancement to support queue limit po  Rajith Atta  Open      
+QPID-1575   M4          TimeToLiveTest fails against C++ broker    Rajith Atta  Open      
+QPID-1381   M4          ACL file reader does not reject file with  Rajith Atta  Open      
+QPID-1380   M4          certain Illegal ACL file formats results   Rajith Atta  Open      
+QPID-2420   0.6   0.7   Windows SQL-based persistence loses prepa  Steve Husto  Open      
+QPID-2180   0.6         Broker hangs on shutdown if Windows SQL-b  Steve Husto  Open      
+QPID-2017               Files for Async Store interface layer (NO  Steve Husto  Open      
+QPID-1423               Logging to Windows Event Log - needs spec  Steve Husto  Open      
+QPID-2905   0.7   0.7   Fixes for mingw cross-compilation (C++)    Ted Ross     Open      
+QPID-2517               Proposed change to QMF schema for the bro  Ted Ross     Open      
+QPID-2335   0.6         Arguments for a binding to an XML exchang  Ted Ross     Open      
+QPID-2129               GSSAPI auth. with broker issue             Ted Ross     Open      
+QPID-2124               QMF: add support for agent internal-store  Ted Ross     Open      
+QPID-2029   0.5   0.7   Clustering and Management don't work well  Ted Ross     Open      
+QPID-1772   0.5         Management - The "exclusive" attribute re  Ted Ross     Open      
+QPID-801    M3          Queue latency statistics added             Ted Ross     Open      
+QPID-2767   0.6         message transfer performance problem       Unassigned   Open      
+QPID-2713   0.6         persiste last node no use in cluster       Unassigned   Open      
+QPID-2630   0.6         Repeated declarations and deletions of th  Unassigned   Open      
+QPID-2616               Qpid C++ broker: disconnect client when h  Unassigned   Open      
+QPID-2592   0.7         Builds w/ TR1-capable compiler have some   Unassigned   Open      
+QPID-2574   0.6         Mismatch uint32_t / size_t generates many  Unassigned   Open      
+QPID-2549   0.6         Port qpid to FreeBSD                       Unassigned   Open      
+QPID-2535   0.7         checking against certificate revocation l  Unassigned   Open      
+QPID-2519               Allow Windows Broker to run as a Service   Unassigned   Open      
+QPID-2518               Qpid C++ broker can easily be blocked by   Unassigned   Open      
+QPID-2469               RFE: allow ssl cert database to be reload  Unassigned   Open      
+QPID-2462   0.6         Ignored return value in various files      Unassigned   Open      
+QPID-2461   0.6         Bashisms in test scripts                   Unassigned   Open      
+QPID-2457   0.6         configure.ac doesn't check all required h  Unassigned   Open      
+QPID-2440               clustered qpid: exchanges at 2nd broker n  Unassigned   Open      
+QPID-2393               Qpid C++ broker: request for feature to l  Unassigned   Open      
+QPID-2389   0.6         0.6 RC from SVN fails to build with "make  Unassigned   Open      
+QPID-2385               Qpid C++ broker: delivery property         Unassigned   Open      
+QPID-2377   0.6         ssl errors are not signalled correctly in  Unassigned   Open      
+QPID-2326   0.6         exchange.declare should throw a 404 - not  Unassigned   Open      
+QPID-2305               Remote IP authentication                   Unassigned   Open      
+QPID-2304   0.5         C++ broker produces error message when st  Unassigned   Open      
+QPID-2254   M4          Documentation: Review attached article fo  Unassigned   Open      
+QPID-2216   0.6         Error for missing ssl-cert-db option repo  Unassigned   Open      
+QPID-2199   0.5         Federation connections initiated from win  Unassigned   Open      
+QPID-2194               Universal store client test suite          Unassigned   Open      
+QPID-2182   0.6         Default exchange binding lost on broker r  Unassigned   Open      
+QPID-2146               Cluster must verify compatibility of opti  Unassigned   Open      
+QPID-2145               Need "exit immediately" flag for broker    Unassigned   Open      
+QPID-2143               Need clear "broker is ready" message       Unassigned   Open      
+QPID-2141         0.7   need consistent naming for broker entitie  Unassigned   Open      
+QPID-2140         0.7   need similar mechanisms for logging in al  Unassigned   Open      
+QPID-2139         0.7   Usability of log messages                  Unassigned   Open      
+QPID-2127   0.5         c++ update cmake with python test improve  Unassigned   Open      
+QPID-2057   0.5         qpidd --require-encryption forces SASL se  Unassigned   Open      
+QPID-1908               cluster_manager -- testing tool            Unassigned   Open      
+QPID-1896               No-auth Windows broker fails client conne  Unassigned   Open      
+QPID-1891               fix declaration problems with boost 1_33_  Unassigned   Open      
+QPID-1862   0.5         QueueBrowserAutoAckTest.testFailoverWithQ  Unassigned   Open      
+QPID-1855   M4          qpid-route -t rdma crashes C++ broker & c  Unassigned   Open      
+QPID-1847   M4          The framing codec code for clustering is   Unassigned   Open      
+QPID-1834   M4          Misconfiguration of config path for Debia  Unassigned   Open      
+QPID-1766               Implemention of selector using Xquery      Unassigned   Open      
+QPID-1759   0.5         Unit tests fail on Fedora 10 when gcc-deb  Unassigned   Open      
+QPID-1739               Add more auth mechanisms for Windows       Unassigned   Open      
+QPID-1726               Develop an ASF licensed, Qpid hosted stor  Unassigned   Open      
+QPID-1707               latest failover_soak code                  Unassigned   Open      
+QPID-1678               better cluster names in cluster_failover   Unassigned   Open      
+QPID-1674               failover_soak string-out-of-scope error    Unassigned   Open      
+QPID-1651               add editable broker argv to src/tests/Clu  Unassigned   Open      
+QPID-1555   M4          When run with -d option, C++ broker dies   Unassigned   Open      
+QPID-1553   M4          qpidd does not output an error when certa  Unassigned   Open      
+QPID-1442   M3          C++ broker performs smart completion of e  Unassigned   Reopened  
+QPID-1404   M4          Client-side failover                       Unassigned   Open      
+QPID-1402   M3          Support for AMQP 0-10 message fragmentati  Unassigned   Open      
+QPID-1355   M4          MessageRequeueTest fails                   Unassigned   Open      
+QPID-1317   M3          Memory leaks in C++ broker                 Unassigned   Open      
+QPID-684    M3          Use non-recursive mutexes for c++ qpid::s  Unassigned   Open      
+QPID-682    M4          The API for FieldTable needs to support t  Unassigned   Open      
+QPID-329    M1          Provide message replay functionality       Unassigned   Open      
+QPID-2617               make sasl-based tests config files reloca  michael j.   Reopened  
+QPID-1672   M4          Inter-broker links need full SASL support  michael j.   Open      
