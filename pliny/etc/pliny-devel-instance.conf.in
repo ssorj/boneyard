@@ -1,0 +1,8 @@
+[common]
+database-file: @source_dir@/var/lib/database.sqlite
+log-level: debug
+
+[web]
+ssl-cert: @source_dir@/etc/insecure.pem
+ssl-key: @source_dir@/etc/insecure.pem
+log-file: @source_dir@/var/log/web.log

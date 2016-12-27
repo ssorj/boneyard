@@ -1,0 +1,6 @@
+## Firewall
+
+        firewall-cmd --add-port=443/tcp
+        firewall-cmd --permanent --add-port=443/tcp
+
+        $ sudo firewall-cmd --add-port=8080/tcp # maybe add --permanent

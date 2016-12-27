@@ -1,0 +1,79 @@
+# -*- mode: html -*-
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+#   http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+[FormPage.body]
+<body class="{classes}">
+  <div id="top">
+  </div>
+  {result_message}
+  <div id="middle">
+    <form method="post" action="?">
+      {hidden_inputs}
+      {content_template}
+    </form>
+  </div>
+  <div id="bottom">
+  </div>
+</body>
+
+[FormPage.content]
+<h1>{title}</h1>
+
+{errors}
+{inputs}
+
+<div class="button-group">
+  {buttons}
+</div>
+
+[FormInput.main]
+<div class="{classes}">
+  <h2>{title}</h2>
+
+  {description}
+  {errors}
+  {content_template}
+</div>
+
+[FormInput.content]
+{content}
+
+[StringInput.content]
+<input id="{id}" type="{type}" name="{name}" value="{value}" tabindex="{tab_index}" {disabled_attr} {autofocus_attr}/>
+
+[DropdownSelector.content]
+<select id="{id}" name="{name}" tabindex="{tab_index}" {disabled_attr} {autofocus_attr}>
+  {options}
+</select>
+
+[RadioSelector.content]
+{inputs}
+
+[FormButton.main]
+<button id="{id}" type="submit" name="{name}" value="{value}" tabindex="{tab_index}" {disabled_attr} {autofocus_attr}>{title}</button>
+
+[ConfirmForm.content]
+<h1>{title}</h1>
+
+<p>Select <em>Exit</em> to go back</p>
+
+<div class="button-group">
+  {buttons}
+</div>

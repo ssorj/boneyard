@@ -1,0 +1,57 @@
+# -*- mode: html -*-
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+#   http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+[AccountView.content]
+<h1>{title}</h1>
+
+<div class="section">
+  {properties}
+
+  <div class="button-group">
+    <a class="button" href="{change_email_href}">Change email address</a>
+    <a class="button" href="{change_password_href}">Change password</a>
+  </div>
+</div>
+
+[AccountLogin.content]
+<h1>{title}</h1>
+
+{errors}
+
+{inputs}
+
+<div class="button-group">
+  {buttons}
+</div>
+
+<p>Don't have an account? <a href="{create_href}">Create one now</a></p>
+
+[AccountCreate.content]
+<h1>{title}</h1>
+
+{errors}
+
+{inputs}
+
+<div class="button-group">
+  {buttons}
+</div>
+
+<p>Already have an account? <a href="{login_href}">Log in now</a></p>

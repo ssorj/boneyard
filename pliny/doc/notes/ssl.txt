@@ -1,0 +1,11 @@
+http://www.akadia.com/services/ssh_test_certificate.html
+
+% openssl genpkey -algorithm RSA -aes-256-cbc -out selfsigned.key -pkeyopt rsa_keygen_bits:4096 -pass pass:hello
+% openssl req -new -key selfsigned.key -out selfsigned.csr
+% cp selfsigned.key selfsigned.key.orig
+% openssl rsa -in selfsigned.key.orig -out selfsigned.key
+% openssl x509 -req -days 365 -in selfsigned.csr -signkey selfsigned.key -out selfsigned.crt
+
+http://stackoverflow.com/questions/10175812/how-to-build-a-self-signed-certificate-with-openssl
+
+% openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes

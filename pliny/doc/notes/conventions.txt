@@ -1,0 +1,17 @@
+ - Parameter variables are named with the suffix '_param', as in
+   'alpha_param'.  The suffix helps avoid collisions for commonplace
+   things such as 'name'.  The parameter's name attribute, however,
+   remains unqualified, as in 'alpha'.
+
+   self.submit_param = SymbolParameter(self, "submit")
+
+ - Page variables are named with '_page', and frames with '_frame'.
+   Again, this is to avoid collisions.  The name attributes for the
+   respective constructors remain unqualified.
+
+   On frames:       self.view_page = AddressView(self, "view")
+   On application:  self.address_frame = AddressFrame(self, "address")
+
+
+
+
