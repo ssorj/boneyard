@@ -1,0 +1,29 @@
+include::global/document-attributes.adoc[]
+
+:my-title-a:
+:product-build:
+
+= {MyTitleABookName}
+
+[[chapter_1]]
+== Chapter 1
+
+// Include topic-1
+include::local/topic-1.adoc[leveloffset=+2]
+
+// Include topic-2
+include::local/topic-2.adoc[leveloffset=+2]
+
+[[chapter_2]]
+== Chapter 2 {ProductShortName}
+
+// Include topic-shared.adoc
+include::global/topic-shared-1.adoc[leveloffset=+2]
+
+[appendix]
+== Reference Material
+
+// **********************************
+// * Appendix: Revision Information *
+// **********************************
+include::global/revision-info.adoc[]

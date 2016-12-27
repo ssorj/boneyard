@@ -1,0 +1,30 @@
+[[topic_1]]
+= Topic 1
+
+This is a topic that talks about something.
+
+[[topic_1_section_1]]
+== Section 1
+
+This is a section within `Topic 1`. We give it a unique anchor so it does not conflict with a section of the same name in another topic  within the same book.
+
+[[topic_1_section_2]]
+== Section 2
+
+The following table describes xyz.
+
+.Table Describing XYZ
+[cols="30%,70%",options="header"]
+|====
+| Item
+| Description
+
+| item 1
+| description 1
+
+| item 2
+| description 2
+
+| item 3
+| description 3
+|====

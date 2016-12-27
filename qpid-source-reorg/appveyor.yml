@@ -1,0 +1,45 @@
+version: '{branch}.{build}'
+init:
+  - reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d 0 /f
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+#on_finish:
+#  - reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d 0 /f
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+install:
+#  - cinst -y swig
+#  - cinst -y ruby
+environment:
+  TOP_DIR: "%APPVEYOR_BUILD_FOLDER%"
+  PYTHON_SOURCE_DIR: "%APPVEYOR_BUILD_FOLDER%\\qpid\\python"
+  PYTHON_BUILD_DIR: "%APPVEYOR_BUILD_FOLDER%\\build\\python"
+  CPP_SOURCE_DIR: "%APPVEYOR_BUILD_FOLDER%\\qpid\\cpp"
+  CPP_BUILD_DIR: "%APPVEYOR_BUILD_FOLDER%\\build\\cpp"
+  BOOST_ROOT: C:\Libraries\boost_1_59_0
+  BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib32-msvc-14.0
+  PATH: "C:\\Libraries\\boost_1_59_0\\lib32-msvc-14.0;%APPVEYOR_BUILD_FOLDER%\\build\\python\\bin;%PATH%"
+  PYTHONPATH: "%APPVEYOR_BUILD_FOLDER%\\build\\python\\lib"
+before_build:
+  - echo %TOP_DIR%
+  - echo %PYTHON_SOURCE_DIR%
+  - echo %PYTHON_BUILD_DIR%
+  - echo %CPP_SOURCE_DIR%
+  - echo %CPP_BUILD_DIR%
+  - echo %BOOST_ROOT%
+  - echo %BOOST_LIBRARYDIR%
+  - echo %PYTHONPATH%
+  - echo %PATH%
+  - md %PYTHON_BUILD_DIR%
+  - md %CPP_BUILD_DIR%
+  - cd %CPP_BUILD_DIR%
+  - cmake %CPP_SOURCE_DIR% -G "Visual Studio 14 2015" -DBUILD_BINDING_DOTNET=OFF -DBOOST_ROOT=%BOOST_ROOT% -DBOOST_LIBRARYDIR=%BOOST_LIBRARYDIR%
+build_script:
+  - cd %PYTHON_SOURCE_DIR%
+  - "%CMD_IN_ENV% python setup.py build --build-base=%PYTHON_BUILD_DIR% --build-scripts=%PYTHON_BUILD_DIR%\\bin"
+  - cd %CPP_BUILD_DIR%
+  - cmake --build . --config RelWithDebInfo -- /m
+before_test:
+  - cd %TOP_DIR%
+  - PowerShell scripts\InstallSelfSignedCert.ps1
+test_script:
+  - cd %CPP_BUILD_DIR%
+  - ctest -VV --build-config RelWithDebInfo

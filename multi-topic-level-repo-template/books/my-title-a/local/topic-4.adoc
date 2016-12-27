@@ -1,0 +1,4 @@
+[[topic_4]]
+= Topic 4
+
+This is topic-4 with information about {ProductName}.
