@@ -1,0 +1,150 @@
+<h1 id="JMS-Client-0-8-Examples"><span class="header-section-number">1</span> Examples</h1>
+<p>The following programs shows how to send and receive messages using the Qpid JMS client. The first program illustrates a <em>point to point</em> example, the second, a pubish/subscribe example.</p>
+<p>Both examples show the use JNDI to obtain connection factory and destination objects which the application needs. In this way the configuration is kept separate from the application code itself.</p>
+<p>The example code will be straightforward for anyone familiar with Java JMS. Readers in need of an introduction are directed towards <a href="&amp;oracleJmsTutorial;">Oracle's JMS tutorial</a>.</p>
+<h1 id="JMS-Client-0-8-Examples-PTP"><span class="header-section-number">2</span> Point to point example</h1>
+<p>In this example, we illustrate point to point messaging. We create a JNDI context using a properties file, use the context to lookup a connection factory, create and start a connection, create a session, and lookup a destination (a queue) from the JNDI context. Then we create a producer and a consumer, send a message with the producer and receive it with the consumer.</p>
+<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">import javax.jms.*;</span>
+<span class="kw">import javax.naming.Context;</span>
+<span class="kw">import javax.naming.InitialContext;</span>
+<span class="kw">import java.util.Properties;</span>
+
+<span class="kw">public</span> <span class="kw">class</span> Hello {
+
+    <span class="kw">public</span> <span class="fu">Hello</span>() {
+    }
+
+    <span class="kw">public</span> <span class="dt">static</span> <span class="dt">void</span> <span class="fu">main</span>(String[] args) <span class="kw">throws</span> Exception {
+        Hello hello = <span class="kw">new</span> <span class="fu">Hello</span>();
+        hello.<span class="fu">runTest</span>();
+    }
+
+    <span class="kw">private</span> <span class="dt">void</span> <span class="fu">runTest</span>() <span class="kw">throws</span> Exception {
+      Properties properties = <span class="kw">new</span> Properties();
+      properties.<span class="fu">load</span>(<span class="kw">this</span>.<span class="fu">getClass</span>().<span class="fu">getResourceAsStream</span>(<span class="st">&quot;helloworld.properties&quot;</span>));  
+      Context context = <span class="kw">new</span> InitialContext(properties);                               
+
+      ConnectionFactory connectionFactory
+          = (ConnectionFactory) context.<span class="fu">lookup</span>(<span class="st">&quot;qpidConnectionFactory&quot;</span>);              
+      Connection connection = connectionFactory.<span class="fu">createConnection</span>();                   
+      connection.<span class="fu">start</span>();                                                             
+
+      Session session = connection.<span class="fu">createSession</span>(<span class="kw">true</span>, Session.<span class="fu">SESSION_TRANSACTED</span>);   
+      Queue queue = (Queue) context.<span class="fu">lookup</span>(<span class="st">&quot;myqueue&quot;</span>);                                
+
+      MessageConsumer messageConsumer = session.<span class="fu">createConsumer</span>(queue);                
+      MessageProducer messageProducer = session.<span class="fu">createProducer</span>(queue);                
+
+      TextMessage message = session.<span class="fu">createTextMessage</span>(<span class="st">&quot;Hello world!&quot;</span>);                
+      messageProducer.<span class="fu">send</span>(message);
+      session.<span class="fu">commit</span>();
+
+      message = (TextMessage)messageConsumer.<span class="fu">receive</span>();                               
+      session.<span class="fu">commit</span>();
+      System.<span class="fu">out</span>.<span class="fu">println</span>(message.<span class="fu">getText</span>());
+
+      connection.<span class="fu">close</span>();                                                             
+      context.<span class="fu">close</span>();                                                                
+    }
+}
+    </code></pre>
+<ul>
+<li><p>Loads the JNDI properties file, which specifies the connection factory, queues and topics. See ? for details.</p></li>
+<li><p>Creates the JNDI initial context.</p></li>
+<li><p>Looks up a JMS connection factory for Qpid.</p></li>
+<li><p>Creates a JMS connection. Creating the JMS connections establishes the connection to the Broker.</p></li>
+<li><p>Starts the connection, required for the consumption of messages.</p></li>
+<li><p>Creates a transactional session.</p></li>
+<li><p>Looks up a destination for the queue with JNDI name <em>myqueue</em>.</p></li>
+<li><p>Creates a consumer that reads messages from the queue<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</p></li>
+<li><p>Creates a producer that sends messages to the queue.</p></li>
+<li><p>Creates a new message of type <em>javax.jms.TextMessage</em>, publishes the message and commits the session.</p></li>
+<li><p>Reads the next available message (awaiting indefinitely if necessary) and commits the session.</p></li>
+<li><p>Closes the Connection. All sessions owned by the Connection along with their MessageConsumers and MessageProducers are automatically closed. The connection to the Broker is closed as this point.</p></li>
+<li><p>Closes the JNDI context.</p></li>
+</ul>
+<p>The contents of the <code>helloworld.properties</code> file are shown below.</p>
+<pre class="properties"><code>java.naming.factory.initial = org.apache.qpid.jndi.PropertiesFileInitialContextFactory
+connectionfactory.qpidConnectionFactory = amqp://guest:guest@clientid/?brokerlist=&#39;tcp://localhost:5672&#39; 
+queue.myqueue = queue1                                                                                   
+    </code></pre>
+<ul>
+<li><p>Defines a connection factory from which Connections can be created. The syntax of a ConnectionURL is given in ?.</p></li>
+<li><p>Defines a queue for which MessageProducers and/or MessageConsumers send and receive messages. The format of these entries is described in ?.</p></li>
+</ul>
+<h1 id="JMS-Client-0-8-Examples-PubSub"><span class="header-section-number">3</span> Publish/subscribe example</h1>
+<p>In this second example, we illustrate publish/subscribe messaging. Again, we create a JNDI context using a properties file, use the context to lookup a connection factory, create and start a connection, create a session, and lookup a destination (a topic) from the JNDI context. Then we create a producer and two durable subscribers , send a message with the producer. Both subscribers receive the same message.</p>
+<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">import javax.jms.*;</span>
+<span class="kw">import javax.naming.Context;</span>
+<span class="kw">import javax.naming.InitialContext;</span>
+
+<span class="kw">import java.util.Properties;</span>
+
+<span class="kw">public</span> <span class="kw">class</span> StocksExample {
+
+    <span class="kw">public</span> <span class="fu">StocksExample</span>() {
+    }
+
+    <span class="kw">public</span> <span class="dt">static</span> <span class="dt">void</span> <span class="fu">main</span>(String[] args) <span class="kw">throws</span> Exception {
+      StocksExample stocks = <span class="kw">new</span> <span class="fu">StocksExample</span>();
+      stocks.<span class="fu">runTest</span>();
+    }
+
+    <span class="kw">private</span> <span class="dt">void</span> <span class="fu">runTest</span>() <span class="kw">throws</span> Exception {
+      Properties properties = <span class="kw">new</span> Properties();
+      properties.<span class="fu">load</span>(<span class="kw">this</span>.<span class="fu">getClass</span>().<span class="fu">getResourceAsStream</span>(<span class="st">&quot;stocks.properties&quot;</span>));
+      Context context = <span class="kw">new</span> InitialContext(properties);
+
+      ConnectionFactory connectionFactory
+          = (ConnectionFactory) context.<span class="fu">lookup</span>(<span class="st">&quot;qpidConnectionFactory&quot;</span>);
+      Connection connection = connectionFactory.<span class="fu">createConnection</span>();
+      connection.<span class="fu">start</span>();
+
+      Session session = connection.<span class="fu">createSession</span>(<span class="kw">true</span>, Session.<span class="fu">SESSION_TRANSACTED</span>);
+      Topic priceTopic = (Topic) context.<span class="fu">lookup</span>(<span class="st">&quot;myprices&quot;</span>);                             
+
+      MessageConsumer subscriber1 = session.<span class="fu">createDurableSubscriber</span>(priceTopic, <span class="st">&quot;sub1&quot;</span>); 
+      MessageConsumer subscriber2 = session.<span class="fu">createDurableSubscriber</span>(priceTopic, <span class="st">&quot;sub2&quot;</span> <span class="co">/*, &quot;price &gt; 150&quot;, false*/</span> );
+      MessageProducer messageProducer = session.<span class="fu">createProducer</span>(priceTopic);
+
+      Message message = session.<span class="fu">createMessage</span>();
+      message.<span class="fu">setStringProperty</span>(<span class="st">&quot;instrument&quot;</span>, <span class="st">&quot;IBM&quot;</span>);
+      message.<span class="fu">setIntProperty</span>(<span class="st">&quot;price&quot;</span>, <span class="dv">100</span>);
+      messageProducer.<span class="fu">send</span>(message);
+      session.<span class="fu">commit</span>();
+
+      message = subscriber1.<span class="fu">receive</span>(<span class="dv">1000</span>);
+      session.<span class="fu">commit</span>();
+      System.<span class="fu">out</span>.<span class="fu">println</span>(<span class="st">&quot;Subscriber 1 received : &quot;</span> + message);
+
+      message = subscriber2.<span class="fu">receive</span>(<span class="dv">1000</span>);
+      session.<span class="fu">commit</span>();
+      System.<span class="fu">out</span>.<span class="fu">println</span>(<span class="st">&quot;Subscriber 2 received : &quot;</span> + message);
+
+      session.<span class="fu">unsubscribe</span>(<span class="st">&quot;sub1&quot;</span>);                                                       
+      session.<span class="fu">unsubscribe</span>(<span class="st">&quot;sub2&quot;</span>);
+      connection.<span class="fu">close</span>();
+      context.<span class="fu">close</span>();
+    }
+}
+    </code></pre>
+<ul>
+<li><p>Looks up a destination for the topic with JNDI name myprices.</p></li>
+<li><p>Creates two durable subscribers, <code>sub1</code> and <code>sub2</code>. Durable subscriptions retain messages for the client even when the client is disconnected, until the subscription is unsubscribed. Subscription 2 has a (commented out) message selector argument so you can conveniently experiement with the effect of those. <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></p></li>
+<li><p>Unsubscribes the two durable subscribers, permanently removing the knowledge of the subscriptions from the system. An application would normally <em>NOT</em> do this. The typical use-case for durable subsciption is one where the subscription exists over an extended period of time.</p></li>
+</ul>
+<p>The contents of the <code>stocks.properties</code> file are shown below.</p>
+<pre><code>java.naming.factory.initial = org.apache.qpid.jndi.PropertiesFileInitialContextFactory
+connectionfactory.qpidConnectionFactory = amqp://guest:guest@clientid/?brokerlist=&#39;tcp://localhost:5672&#39;
+topic.myprices = prices 
+    </code></pre>
+<ul>
+<li><p>Defines a topic for which MessageProducers and/or MessageConsumers send and receive messages. The format of this entry is described in ?.</p></li>
+</ul>
+<section class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Creating consumer will automatically create the queue on the Broker and bind it to an exchange. Specifically, in this case as the <code>queue.</code> form is used in the JNDI properties the effect will be to create a queue called <code>queue1</code> on the Broker, and create a binding between the <code>amq.direct</code> exchange and this queue using the queue's name. This process is described in detail in ?<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Each durable subscription is implemented as a queue on the Broker. See ? for details.<a href="#fnref2">↩</a></p></li>
+</ol>
+</section>

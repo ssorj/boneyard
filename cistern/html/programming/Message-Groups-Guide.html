@@ -1,0 +1,79 @@
+<h1 id="Message-Groups-Guide"><span class="header-section-number">1</span> Using Message Groups</h1>
+<p>This section describes how messaging applications can use the Message Group feature provided by the Broker.</p>
+<blockquote>
+<p><strong>Note</strong></p>
+The content of this section assumes the reader is familiar with the Message Group feature as described in the AMQP Messaging Broker user's guide. Please read the message grouping section in the Broker user's guide before using the examples given in this section.
+</blockquote>
+<h2 id="messagegroups-setup"><span class="header-section-number">1.1</span> Creating Message Group Queues</h2>
+<p>The following examples show how to create a message group queue that enforces ordered group consumption across multiple consumers.</p>
+<pre><code>sender = connection.session().sender(&quot;msg-group-q;&quot; +
+                                     &quot; {create:always, delete:receiver,&quot; +
+                                     &quot; node: {x-declare: {arguments:&quot; +
+                                     &quot; {&#39;qpid.group_header_key&#39;:&#39;THE-GROUP&#39;,&quot; +
+                                     &quot; &#39;qpid.shared_msg_group&#39;:1}}}}&quot;)
+      </code></pre>
+<pre><code>std::string addr(&quot;msg-group-q; &quot;
+                 &quot; {create:always, delete:receiver,&quot;
+                 &quot; node: {x-declare: {arguments:&quot;
+                 &quot; {qpid.group_header_key:&#39;THE-GROUP&#39;,&quot;
+                 &quot; qpid.shared_msg_group:1}}}}&quot;);
+Sender sender = session.createSender(addr);
+      </code></pre>
+<pre><code>Session s = c.createSession(false, Session.CLIENT_ACKNOWLEDGE);
+String addr = &quot;msg-group-q; {create:always, delete:receiver,&quot; +
+                             &quot; node: {x-declare: {arguments:&quot; +
+                             &quot; {&#39;qpid.group_header_key&#39;:&#39;THE-GROUP&#39;,&quot; +
+                             &quot; &#39;qpid.shared_msg_group&#39;:1}}}}&quot;;
+Destination d = (Destination) new AMQAnyDestination(addr);
+MessageProducer sender = s.createProducer(d);
+      </code></pre>
+<p>The example code uses the x-declare map to specify the message group configuration that should be used for the queue. See the AMQP Messaging Broker user's guide for a detailed description of these arguments. Note that the qpid.group_header_key's value MUST be a string type if using the C++ broker.</p>
+<h2 id="messagegroups-sending"><span class="header-section-number">1.2</span> Sending Grouped Messages</h2>
+<p>When sending grouped messages, the client must add a message property containing the group identifier to the outgoing message. If using the C++ broker, the group identifier must be a string type. The key used for the property must exactly match the value passed in the 'qpid.group_header_key' configuration argument.</p>
+<pre><code>group = &quot;A&quot;
+m = Message(content=&quot;some data&quot;, properties={&quot;THE-GROUP&quot;: group})
+sender.send(m)
+
+group = &quot;B&quot;
+m = Message(content=&quot;some other group&#39;s data&quot;, properties={&quot;THE-GROUP&quot;: group})
+sender.send(m)
+
+group = &quot;A&quot;
+m = Message(content=&quot;more data for group &#39;A&#39;&quot;, properties={&quot;THE-GROUP&quot;: group})
+sender.send(m)
+      </code></pre>
+<pre><code>
+const std::string groupKey(&quot;THE-GROUP&quot;);
+{
+    Message msg(&quot;some data&quot;);
+    msg.getProperties()[groupKey] = std::string(&quot;A&quot;);
+    sender.send(msg);
+}
+{
+    Message msg(&quot;some other group&#39;s data&quot;);
+    msg.getProperties()[groupKey] = std::string(&quot;B&quot;);
+    sender.send(msg);
+}
+{
+    Message msg(&quot;more data for group &#39;A&#39;&quot;);
+    msg.getProperties()[groupKey] = std::string(&quot;A&quot;);
+    sender.send(msg);
+}
+      </code></pre>
+<pre><code>String groupKey = &quot;THE-GROUP&quot;;
+
+TextMessage tmsg1 = s.createTextMessage(&quot;some data&quot;);
+tmsg1.setStringProperty(groupKey, &quot;A&quot;);
+sender.send(tmsg1);
+
+TextMessage tmsg2 = s.createTextMessage(&quot;some other group&#39;s data&quot;);
+tmsg2.setStringProperty(groupKey, &quot;B&quot;);
+sender.send(tmsg2);
+
+TextMessage tmsg3 = s.createTextMessage(&quot;more data for group &#39;A&#39;&quot;);
+tmsg3.setStringProperty(groupKey, &quot;A&quot;);
+sender.send(tmsg3);
+      </code></pre>
+<p>The examples above send two groups worth of messages to the queue created in the previous example. Two messages belong to group &quot;A&quot;, and one belongs to group &quot;B&quot;. Note that it is not necessary to complete sending one group's messages before starting another. Also note that there is no need to indicate to the broker when a new group is created or an existing group retired - the broker tracks group state automatically.</p>
+<h2 id="messagegroups-receiving"><span class="header-section-number">1.3</span> Receiving Grouped Messages</h2>
+<p>Since the broker enforces group policy when delivering messages, no special actions are necessary for receiving grouped messages from the broker. However, applications must adhere to the rules for message group consumption as described in the AMQP Messaging Broker user's guide.</p>

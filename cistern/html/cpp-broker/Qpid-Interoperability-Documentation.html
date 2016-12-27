@@ -1,0 +1,136 @@
+<h1 id="QpidInteroperabilityDocumentation-QpidInteroperabilityDocumentation"><span class="header-section-number">1</span> Qpid Interoperability Documentation</h1>
+<p>This page documents the various interoperable features of the Qpid clients.</p>
+<h2 id="QpidInteroperabilityDocumentation-SASL"><span class="header-section-number">1.1</span> SASL</h2>
+<h3 id="QpidInteroperabilityDocumentation-StandardMechanisms"><span class="header-section-number">1.1.1</span> Standard Mechanisms</h3>
+<p><a href="http://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer#SASL_mechanisms"></a></p>
+<p>This table list the various SASL mechanisms that each component supports. The version listed shows when this functionality was added to the product.</p>
+<table>
+<caption>SASL Mechanism Support</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Component</td>
+<td style="text-align: left;">ANONYMOUS</td>
+<td style="text-align: left;">CRAM-MD5</td>
+<td style="text-align: left;">DIGEST-MD5</td>
+<td style="text-align: left;">EXTERNAL</td>
+<td style="text-align: left;">GSSAPI/Kerberos</td>
+<td style="text-align: left;">PLAIN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C++ Broker</td>
+<td style="text-align: left;">M3[?]</td>
+<td style="text-align: left;">M3[?,?]</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">M3[?,?]</td>
+<td style="text-align: left;">M1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C++ Client</td>
+<td style="text-align: left;">M3[?]</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">M1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Java Broker</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">M1</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">M1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Java Client</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">M1</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">M1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">.Net Client</td>
+<td style="text-align: left;">M2</td>
+<td style="text-align: left;">M2</td>
+<td style="text-align: left;">M2</td>
+<td style="text-align: left;">M2</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">M2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Python Client</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">?</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ruby Client</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">?</td>
+</tr>
+</tbody>
+</table>
+<p>1: Support for these will be in M3 (currently available on trunk).</p>
+<p>2: C++ Broker uses <a href="http://freshmeat.net/projects/cyrussasl/">Cyrus SASL</a> which supports CRAM-MD5 and GSSAPI but these have not been tested yet</p>
+<h3 id="QpidInteroperabilityDocumentation-CustomMechanisms"><span class="header-section-number">1.1.2</span> Custom Mechanisms</h3>
+<p>There have been some custom mechanisms added to our implementations.</p>
+<table>
+<caption>SASL Custom Mechanisms</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Component</td>
+<td style="text-align: left;">AMQPLAIN</td>
+<td style="text-align: left;">CRAM-MD5-HASHED</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C++ Broker</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C++ Client</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Java Broker</td>
+<td style="text-align: left;">M1</td>
+<td style="text-align: left;">M2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Java Client</td>
+<td style="text-align: left;">M1</td>
+<td style="text-align: left;">M2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">.Net Client</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Python Client</td>
+<td style="text-align: left;">M2</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ruby Client</td>
+<td style="text-align: left;">M2</td>
+<td style="text-align: left;"> </td>
+</tr>
+</tbody>
+</table>
+<h4><span class="header-section-number">1.1.2.1</span> AMQPLAIN</h4>
+<h4><span class="header-section-number">1.1.2.2</span> CRAM-MD5-HASHED</h4>
+<p>The Java SASL implementations require that you have the password of the user to validate the incoming request. This then means that the user's password must be stored on disk. For this to be secure either the broker must encrypt the password file or the need for the password being stored must be removed.</p>
+<p>The CRAM-MD5-HASHED SASL plugin removes the need for the plain text password to be stored on disk. The mechanism defers all functionality to the build in CRAM-MD5 module the only change is on the client side where it generates the hash of the password and uses that value as the password. This means that the Java Broker only need store the password hash on the file system. While a one way hash is not very secure compared to other forms of encryption in environments where the having the password in plain text is unacceptable this will provide and additional layer to protect the password. In particular this offers some protection where the same password may be shared amongst many systems. It offers no real extra protection against attacks on the broker (the secret is now the hash rather than the password).</p>

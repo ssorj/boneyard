@@ -1,0 +1,74 @@
+<h1 id="Java-Broker-Appendix-System-Properties"><span class="header-section-number">1</span> System Properties</h1>
+<p>The following table describes the Java system properties used by the Broker to control various optional behaviours.</p>
+<p>The preferred method of enabling these system properties is using the <a href="#Java-Broker-Appendix-Environment-Variables-Qpid-Opts"><code>QPID_OPTS</code></a> environment variable described in the previous section.</p>
+<table>
+<caption>System properties</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">System property</th>
+<th style="text-align: left;">Default</th>
+<th style="text-align: left;">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">qpid.broker_heartbeat_timeout_factor</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Factor to determine the maximum length of that may elapse between heartbeats being received from the peer before a connection is deemed to have been broken.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">qpid.broker_dead_letter_exchange_suffix</td>
+<td style="text-align: left;">_DLE</td>
+<td style="text-align: left;">Used with the ? feature. Governs the suffix used when generating a name for a Dead Letter Exchange.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">qpid.broker_dead_letter_queue_suffix</td>
+<td style="text-align: left;">_DLQ</td>
+<td style="text-align: left;">Used with the ? feature. Governs the suffix used when generating a name for a Dead Letter Queue.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">qpid.broker_msg_auth</td>
+<td style="text-align: left;">false</td>
+<td style="text-align: left;"><p>If set true, the Broker ensures that the user id of each received message matches the user id of the producing connection. If this check fails, the message is returned to the producer's connection with a 403 (Access Refused) error code.</p>
+<p>This is check is currently not enforced when using AMQP 0-10 and 1-0 protocols.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">qpid.broker_status_updates</td>
+<td style="text-align: left;">true</td>
+<td style="text-align: left;"><p>If set true, the Broker will produce operational logging messages.</p></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">qpid.broker_default_supported_protocol_version_reply</td>
+<td style="text-align: left;">none</td>
+<td style="text-align: left;"><p>Used during protocol negotiation. If set, the Broker will offer this AMQP version to a client requesting an AMQP protocol that is not supported by the Broker. If not set, the Broker offers the highest protocol version it supports.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">qpid.broker_disabled_features</td>
+<td style="text-align: left;">none</td>
+<td style="text-align: left;"><p>Allows optional Broker features to be disabled. Currently understood feature names are: <code>qpid.jms-selector</code></p>
+<p>Feature names should be comma separated.</p></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">qpid.broker_frame_size</td>
+<td style="text-align: left;">65536</td>
+<td style="text-align: left;"><p>Maximum AMQP frame size supported by the Broker.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">qpid.broker_jmx_method_rights_infer_all_access</td>
+<td style="text-align: left;">true</td>
+<td style="text-align: left;"><p>Used when using <a href="#Java-Broker-Security-ACLs">ACLs</a> and the JMX management interface.</p>
+<p>If set true, the METHOD object permission is sufficient to allow the user to perform the operation. If set false, the user will require both the METHOD object permission and the underlying object permission too (for instance QUEUE object permission if performing management operations on a queue). If the user is not granted both permissions, the operation will be denied.</p></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">qpid.broker_jmx_use_custom_rmi_socket_factory</td>
+<td style="text-align: left;">true</td>
+<td style="text-align: left;"><p>Applicable to the JMX management interface. If true, the Broker creates a custom RMI socket factory that is secured from changes outside of the JVM. If false, a standard RMI socket factory is used.</p>
+<p>It is not recommended to change this property from its default value.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">qpid.broker_log_records_buffer_size</td>
+<td style="text-align: left;">4096</td>
+<td style="text-align: left;"><p>Controls the number of recent Broker log entries that remain viewable online via the HTTP Management interface.</p></td>
+</tr>
+</tbody>
+</table>

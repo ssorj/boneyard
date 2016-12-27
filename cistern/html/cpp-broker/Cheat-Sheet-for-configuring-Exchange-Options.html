@@ -1,0 +1,52 @@
+<h1><span class="header-section-number">1</span> Cheat Sheet for configuring Exchange Options</h1>
+<h2 id="CheatSheetforconfiguringExchangeOptions-ConfiguringExchangeOptions"><span class="header-section-number">1.1</span> Configuring Exchange Options</h2>
+<p>The C++ Broker M4 or later supports the following additional Exchange options in addition to the standard AMQP define options</p>
+<ul>
+<li><p>Exchange Level Message sequencing</p></li>
+<li><p>Initial Value Exchange</p></li>
+</ul>
+<p>Note that these features can be used on any exchange type, that has been declared with the options set.</p>
+<p>It also supports an additional option to the bind operation on a direct exchange</p>
+<ul>
+<li><p>Exclusive binding for key</p></li>
+</ul>
+<h3 id="CheatSheetforconfiguringExchangeOptions-ExchangeLevelMessagesequencing"><span class="header-section-number">1.1.1</span> Exchange Level Message sequencing</h3>
+<p>This feature can be used to place a sequence number into each message's headers, based on the order they pass through an exchange. The sequencing starts at 0 and then wraps in an AMQP int64 type.</p>
+<p>The field name used is &quot;qpid.msg_sequence&quot;</p>
+<p>To use this feature an exchange needs to be declared specifying this option in the declare</p>
+<pre><code>....
+    FieldTable args;
+    args.setInt(&quot;qpid.msg_sequence&quot;,1);
+
+...
+    // now declare the exchange
+    session.exchangeDeclare(arg::exchange=&quot;direct&quot;, arg::arguments=args);</code></pre>
+<p>Then each message passing through that exchange will be numbers in the application headers.</p>
+<pre><code>    unit64_t seqNo;
+    //after message transfer
+    seqNo = message.getHeaders().getAsInt64(&quot;qpid.msg_sequence&quot;);</code></pre>
+<h3 id="CheatSheetforconfiguringExchangeOptions-InitialValueExchange"><span class="header-section-number">1.1.2</span> Initial Value Exchange</h3>
+<p>This feature caches a last message sent to an exchange. When a new binding is created onto the exchange it will then attempt to route this cached messaged to the queue, based on the binding. This allows for topics or the creation of configurations where a new consumer can receive the last message sent to the broker, with matching routing.</p>
+<p>To use this feature an exchange needs to be declared specifying this option in the declare</p>
+<pre><code>....
+    FieldTable args;
+    args.setInt(&quot;qpid.ive&quot;,1);
+
+...
+    // now declare the exchange
+    session.exchangeDeclare(arg::exchange=&quot;direct&quot;, arg::arguments=args);</code></pre>
+<p>now use the exchange in the same way you would use any other exchange.</p>
+<h3 id="CheatSheetforconfiguringExchangeOptions-Exclusivebindingforkey"><span class="header-section-number">1.1.3</span> Exclusive binding for key</h3>
+<p>Direct exchanges in qpidd support a qpid.exclusive-binding option on the bind operation that causes the binding specified to be the only one for the given key. I.e. if there is already a binding at this exchange with this key it will be atomically updated to bind the new queue. This means that the binding can be changed concurrently with an incoming stream of messages and each message will be routed to exactly one queue.</p>
+<pre><code>....
+    FieldTable args;
+    args.setInt(&quot;qpid.exclusive-binding&quot;,1);
+
+    //the following will cause the only binding from amq.direct with &#39;my-key&#39; 
+    //to be the one to &#39;my-queue&#39;; if there were any previous bindings for that
+    //key they will be removed. This is atomic w.r.t message routing through the
+    //exchange.
+    session.exchangeBind(arg::exchange=&quot;amq.direct&quot;, arg::queue=&quot;my-queue&quot;,
+                         arg::bindingKey=&quot;my-key&quot;, arg::arguments=args);
+
+...</code></pre>

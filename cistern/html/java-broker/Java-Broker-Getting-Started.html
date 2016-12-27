@@ -1,0 +1,112 @@
+<h1 id="Java-Broker-Getting-Started"><span class="header-section-number">1</span> Getting Started</h1>
+<h1 id="Java-Broker-Getting-Started-Introduction"><span class="header-section-number">2</span> Introduction</h1>
+<p>This section describes how to start and stop the Java Broker, and outlines the various command line options.</p>
+<p>For additional details about the broker configuration store and related command line arguments see ?. The broker is fully configurable via its Web Management Console, for details of this see ?.</p>
+<h1 id="Java-Broker-Getting-Started-Starting-Stopping-Windows"><span class="header-section-number">3</span> Starting/Stopping the broker on Windows</h1>
+<p>Firstly change to the installation directory used during the <a href="#Java-Broker-Installation-InstallationWindows">installation</a> and ensure that the <a href="#Java-Broker-Installation-InstallationWindows-SettingQPIDWORK">QPID_WORK environment variable is set</a>.</p>
+<p>Now use the <code>qpid-server.bat</code> to start the server</p>
+<pre><code>bin\qpid-server.bat</code></pre>
+<p>Output similar to the following will be seen:</p>
+<pre><code>[Broker] BRK-1006 : Using configuration : C:\qpidwork\config.json
+[Broker] BRK-1007 : Using logging configuration : C:\qpid\WINDOWSEXTRACTEDBROKERDIRNAME\etc\log4j.xml
+[Broker] BRK-1001 : Startup : Version: QPIDCURRENTRELEASE Build: 1478262
+[Broker] BRK-1010 : Platform : JVM : Oracle Corporation version: 1.7.0_21-b11 OS : Windows 7 version: 6.1 arch: x86
+[Broker] BRK-1011 : Maximum Memory : 1,060,372,480 bytes
+[Broker] BRK-1002 : Starting : Listening on TCP port 5672
+[Broker] MNG-1001 : JMX Management Startup
+[Broker] MNG-1002 : Starting : RMI Registry : Listening on port 8999
+[Broker] MNG-1002 : Starting : JMX RMIConnectorServer : Listening on port 9099
+[Broker] MNG-1004 : JMX Management Ready
+[Broker] MNG-1001 : Web Management Startup
+[Broker] MNG-1002 : Starting : HTTP : Listening on port 8080
+[Broker] MNG-1004 : Web Management Ready
+[Broker] BRK-1004 : Qpid Broker Ready</code></pre>
+<p>The BRK-1004 message confirms that the Broker is ready for work. The MNG-1002 and BRK-1002 confirm the ports to which the Broker is listening (for HTTP/JMX management and AMQP respectively).</p>
+<p>To stop the Broker, use Control-C or use the Shutdown MBean from the <a href="#Java-Broker-Management-Channel-JMX">JMX management plugin</a>.</p>
+<h1 id="Java-Broker-Getting-Started-Starting-Stopping-Unix"><span class="header-section-number">4</span> Starting/Stopping the broker on Unix</h1>
+<p>Firstly change to the installation directory used during the <a href="#Java-Broker-Installation-InstallationUnix">installation</a> and ensure that the <a href="#Java-Broker-Installation-InstallationUnix-SettingQPIDWORK">QPID_WORK environment variable is set</a>.</p>
+<p>Now use the <code>qpid-server</code> script to start the server:</p>
+<pre><code>bin/qpid-server</code></pre>
+<p>Output similar to the following will be seen:</p>
+<pre><code>[Broker] BRK-1006 : Using configuration : /var/qpidwork/config.json
+[Broker] BRK-1007 : Using logging configuration : /usr/local/qpid/UNIXEXTRACTEDBROKERDIRNAME/etc/log4j.xml
+[Broker] BRK-1001 : Startup : Version: QPIDCURRENTRELEASE Build: exported
+[Broker] BRK-1010 : Platform : JVM : Sun Microsystems Inc. version: 1.6.0_32-b05 OS : Linux version: 3.6.10-2.fc16.x86_64 arch: amd64
+[Broker] BRK-1011 : Maximum Memory : 1,065,025,536 bytes
+[Broker] BRK-1002 : Starting : Listening on TCP port 5672
+[Broker] MNG-1001 : Web Management Startup
+[Broker] MNG-1002 : Starting : HTTP : Listening on port 8080
+[Broker] MNG-1004 : Web Management Ready
+[Broker] MNG-1001 : JMX Management Startup
+[Broker] MNG-1002 : Starting : RMI Registry : Listening on port 8999
+[Broker] MNG-1002 : Starting : JMX RMIConnectorServer : Listening on port 9099
+[Broker] MNG-1004 : JMX Management Ready
+[Broker] BRK-1004 : Qpid Broker Ready</code></pre>
+<p>The BRK-1004 message confirms that the Broker is ready for work. The MNG-1002 and BRK-1002 confirm the ports to which the Broker is listening (for HTTP/JMX management and AMQP respectively).</p>
+<p>To stop the Broker, use Control-C from the controlling shell, use the <code>bin/qpid.stop</code> script, use <code>kill -TERM &lt;pid&gt;</code>, or the Shutdown MBean from the <a href="#Java-Broker-Management-Channel-JMX">JMX management plugin</a>.</p>
+<h1 id="Java-Broker-Getting-Started-LogFile"><span class="header-section-number">5</span> Log file</h1>
+<p>The Java Broker writes a log file to record both details of its normal operation and any exceptional conditions. By default the log file is written within the log subdirectory beneath the work directory - <code>$QPID_WORK/log/qpid.log</code> (UNIX) and <code>%QPID_WORK%\log\qpid.log</code> (Windows).</p>
+<p>For details of how to control the logging, see ?</p>
+<h1 id="Java-Broker-Getting-Started-CommandLine"><span class="header-section-number">6</span> Using the command line</h1>
+<p>The Java Broker understands a number of command line options which may be used to customise the configuration.</p>
+<p>For additional details about the broker configuration and related command line arguments see ?. The broker is fully configurable via its Web Management Console, for details of this see ?.</p>
+<p>To see usage information for all command line options, use the <code>--help</code> option</p>
+<pre><code>bin/qpid-server --help</code></pre>
+<pre><code>usage: Qpid [-cic &lt;path&gt;] [-h] [-icp &lt;path&gt;] [-l &lt;file&gt;] [-mm] [-mmhttp &lt;port&gt;]
+            [-mmjmx &lt;port&gt;] [-mmpass &lt;password&gt;] [-mmqv] [-mmrmi &lt;port&gt;] [-os]
+            [-sp &lt;path&gt;] [-st &lt;type&gt;] [-v] [-w &lt;period&gt;]
+ -cic &lt;path&gt;                                    Create a copy of the initial config
+ --create-initial-config &lt;path&gt;                 file, either to an optionally specified
+                                                file path, or as initial-config.json
+                                                in the current directory
+
+ -h,                                            Print this message
+ --help
+
+ -icp  &lt;path&gt;                                   Set the location of initial JSON config
+ --initial-config-path &lt;path&gt;                   to use when creating/overwriting a
+                                                broker configuration store
+
+ -l &lt;file&gt;                                      Use the specified log4j xml configuration
+ --logconfig &lt;file&gt;                             file. By default looks for a file named
+                                                etc/log4j.xml in the same directory as
+                                                the configuration file
+
+ -mm                                            Start broker in management mode,
+ --management-mode                              disabling the AMQP ports
+
+ -mmhttp &lt;port&gt;                                 Override http management port in
+ --management-mode-http-port &lt;port&gt;             management mode
+
+ -mmjmx                                         Override jmx connector port in
+ --management-mode-jmx-connector-port &lt;port&gt;    management mode
+
+ -mmpass  &lt;password&gt;                            Set the password for the management
+ --management-mode-password &lt;password&gt;          mode user mm_admin
+
+ -mmqv                                          Make virtualhosts stay in the quiesced
+ --management-mode-quiesce-virtualhosts         state during management mode.
+
+ -mmrmi &lt;port&gt;                                  Override jmx rmi registry port in
+ --management-mode-rmi-registry-port &lt;port&gt;     management mode
+
+ -os                                            Overwrite the broker configuration store
+ --overwrite-store                              with the current initial configuration
+
+ -prop &quot;&lt;name=value&gt;&quot;                           Set a configuration property to use when
+ --config-property &quot;&lt;name=value&gt;&quot;               resolving variables in the broker
+                                                configuration store, with format
+                                                &quot;name=value&quot;
+
+ -sp &lt;path&gt;                                     Use given configuration store location
+ --store-path &lt;path&gt;
+
+ -st &lt;type&gt;                                     Use given broker configuration store type
+ --store-type &lt;type&gt;
+
+ -v                                             Print the version information and exit
+ --version
+
+ -w &lt;period&gt;                                    Monitor the log file configuration file
+ --logwatch &lt;period&gt;                            for changes. Units are seconds. Zero
+                                                means do not check for changes.</code></pre>

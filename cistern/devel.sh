@@ -1,0 +1,1 @@
+export CISTERN_HOME=$PWD

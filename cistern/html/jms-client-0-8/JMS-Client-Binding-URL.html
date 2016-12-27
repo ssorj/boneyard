@@ -1,0 +1,125 @@
+<h1 id="JMS-Client-0-8-Binding-URL"><span class="header-section-number">1</span> Binding URL</h1>
+<p>The <em>Binding URL</em> syntax for addressing<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. It allows the specification of the bindings between a queue and an exchange, queue and exchange creation arguments and some ancillary options.</p>
+<p>The format for a <em>Binding URL</em> is provided below</p>
+<pre><code>&lt;Exchange Class&gt;://&lt;Exchange Name&gt;/[&lt;Destination&gt;]/[&lt;Queue&gt;][?&lt;option&gt;=&#39;&lt;value&gt;&#39;[&amp;&lt;option&gt;=&#39;&lt;value&gt;&#39;]]
+    </code></pre>
+<p>where</p>
+<ul>
+<li><p><em>Exchange Class</em>, specifies the type of the exchange, for example, <em>direct</em>,<em>topic</em>,<em>fanout</em>, etc.</p></li>
+<li><p><em>Exchange Name</em>, specifies the name of the exchange, for example, <em>amq.direct</em>,<em>amq.topic</em>, etc.</p></li>
+<li><p><em>Destination</em>, is an optional part of <em>Binding URL</em>. It can be used to specify a routing key with the non direct exchanges if an option <em>routingkey</em> is not specified. If both <em>Destination</em> and option <em>routingkey</em> are specified, then option <em>routingkey</em> has precedence.</p></li>
+<li><p><em>Queue</em>, is an optional part of <em>Binding URL</em> to specify a queue name for JMS queue destination. It is ignored in JMS topic destinations. Queue names may consist of any mixture of digits, letters, and underscores</p></li>
+<li><p><em>Options</em>, key-value pairs separated by '=' character specifying queue and exchange creation arguments, routing key, client behaviour, etc.</p></li>
+</ul>
+<blockquote>
+<p><strong>Important</strong></p>
+<p>Take care with the quoting surrounding option values. Each option value <em>must</em> be surrounded with single quotes (').</p>
+</blockquote>
+<p>The following <em>Binding URL</em> options are currently defined:</p>
+<table>
+<caption>Binding URL options</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Option</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><p>durable</p></td>
+<td style="text-align: left;"><p>boolean</p></td>
+<td style="text-align: left;"><p>Queue durability flag. If it is set to <em>true</em>, a durable queue is requested to create. The durable queue should be stored on the Broker and remained there after Broker restarts until it is explicitly deleted. This option has no meaning for JMS topic destinations, as by nature a topic destination only exists when a subscriber is connected. If durability is required for topic destinations, the durable subscription should be created.</p></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>exclusive</p></td>
+<td style="text-align: left;"><p>boolean</p></td>
+<td style="text-align: left;"><p>Queue exclusivity flag. The client cannot use a queue that was declared as exclusive by another still-open connection.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><p>autodelete</p></td>
+<td style="text-align: left;"><p>boolean</p></td>
+<td style="text-align: left;"><p>Queue auto-deletion flag. If it is set to <em>true</em> on queue creation, the queue is deleted if there are no remaining subscribers.</p></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>exchangeautodelete</p></td>
+<td style="text-align: left;"><p>boolean</p></td>
+<td style="text-align: left;"><p>Exchange auto-deletion flag.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><p>exchangedurable</p></td>
+<td style="text-align: left;"><p>boolean</p></td>
+<td style="text-align: left;"><p>Exchange durability flag. If it is set to <em>true</em> when creating a new exchange, the exchange will be marked as durable. Durable exchanges should remain active after Broker restarts. Non-durable exchanges are deleted on following Broker restart.</p></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>routingkey</p></td>
+<td style="text-align: left;"><p>string</p></td>
+<td style="text-align: left;"><p>Defines the value of the binding key to bind a queue to the exchange. It is always required to specify for JMS topic destinations. If routing key option is not set in <em>Binding URL</em> and direct exchange class is specified, the queue name is used as a routing key. <em>MessagePublisher</em> uses routing key to publish messages onto exchange.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><p>browse</p></td>
+<td style="text-align: left;"><p>boolean</p></td>
+<td style="text-align: left;"><p>If set to <em>true</em> on a destination for a message consumer, such consumer can only read messages on the queue but cannot consume them. The consumer behaves like a queue browser in this case.</p></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>rejectbehaviour</p></td>
+<td style="text-align: left;"><p>string</p></td>
+<td style="text-align: left;"><p>Defines the reject behaviour for the re-delivered messages. If set to 'SERVER' the client delegates the requeue/DLQ decision to the server. If this option is not specified, the messages won't be moved to the DLQ (or dropped) when delivery count exceeds the maximum.</p></td>
+</tr>
+</tbody>
+</table>
+<h1 id="JMS-Client-0-8-Binding-URL-Examples"><span class="header-section-number">2</span> Binding URL Examples</h1>
+<h2 id="JMS-Client-0-8-Binding-URL-JMS-Queues"><span class="header-section-number">2.1</span> Binding URLs for declaring of JMS Queues</h2>
+<p>The Qpid client Binding URLs for JMS queue destinations can be declared using direct exchange (Mostly it is a pre-defined exchange with a name &quot;amq.direct&quot;. Also, custom direct exchanges can be used.):</p>
+<pre><code>direct://amq.direct//&lt;Queue Name&gt;
+         </code></pre>
+<p>The Binding URLs for destinations created with calls to <em>Session.createQueue(String)</em> can be expressed as</p>
+<pre><code>direct://amq.direct//&lt;Queue Name&gt;?durable=&#39;true&#39;
+         </code></pre>
+<p>The durability flag is set to <em>true</em> in such destinations.</p>
+<pre><code>direct://amq.direct//myNonDurableQueue
+direct://amq.direct//myDurableQueue?durable=&#39;true&#39;
+direct://amq.direct//myAnotherQueue?durable=&#39;true&#39;&amp;routingkey=&#39;myqueue&#39;
+direct://amq.direct//myQueue?durable=&#39;true&#39;&amp;routingkey=&#39;myqueue&#39;&amp;rejectbehaviour=&#39;server&#39;
+direct://custom.direct//yetAnotherQueue
+        </code></pre>
+<h2 id="JMS-Client-0-8-Binding-URL-JMS-Topics"><span class="header-section-number">2.2</span> Binding URLs for declaring of JMS Topics</h2>
+<p>The Binding URLs for JMS queue destinations can be declared using topic exchange (A pre-defined exchange having name &quot;amq.topic&quot; is used mainly. However, custom topic exchanges can be used as well):</p>
+<pre><code>topic://amq.topic//&lt;Queue name&gt;?routingkey=&#39;&lt;Topic Name&gt;&#39;&amp;exclusive=&#39;true&#39;&amp;autodelete=&#39;true&#39;
+         </code></pre>
+<p>The Binding URLs for a topic destination created with calls to <em>Session.createTopic(&quot;hello&quot;)</em> is provided below:</p>
+<pre><code>topic://amq.topic/hello/tmp_127_0_0_1_36973_1?routingkey=&#39;hello&#39;&amp;exclusive=&#39;true&#39;&amp;autodelete=&#39;true&#39;
+        </code></pre>
+<h2 id="JMS-Client-0-8-Binding-URL-Topics-Wildcards"><span class="header-section-number">2.3</span> Wildcard characters in routing keys for topic destinations</h2>
+<p>AMQP exchanges of class <em>topic</em> can route messages to the queues using special matches containing wildcard characters (a &quot;#&quot; matches one or more words, a &quot;*&quot; matches a single word). The routing keys words are separated with a &quot;.&quot; delimiter to distinguish words for matching. Thus, if a consumer application specifies a routing key in the destination like &quot;usa.#&quot;, it should receive all the messages matching to that routing key. For example, &quot;usa.boston&quot;, &quot;usa.new-york&quot;, etc.</p>
+<p>The examples of the <em>Binding URLs</em> having routing keys with wildcards characters are provided below:</p>
+<pre><code>topic://amq.topic?routingkey=&#39;stocks.#&#39;
+topic://amq.topic?routingkey=&#39;stocks.*.ibm&#39;
+topic://amq.topic?routingkey=&#39;stocks.nyse.ibm&#39;
+        </code></pre>
+<h2 id="JMS-Client-0-8-Binding-URL-Extra-Examples"><span class="header-section-number">2.4</span> More Examples</h2>
+<table>
+<caption>Binding URL examples</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Binding URL</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><p>fanout://amq.fanout//myQueue</p></td>
+<td style="text-align: left;"><p>Binding URL binding queue &quot;myQueue&quot; to predefined &quot;amq.fanout&quot; exchange of class &quot;fanout&quot;</p></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>topic://custom.topic//anotherQueue?routingkey='aq'</p></td>
+<td style="text-align: left;"><p>Binding URL binding queue &quot;anotherQueue&quot; to the exchange with name &quot;custom.topic&quot; of class &quot;topic&quot; using binding key &quot;aq&quot;.</p></td>
+</tr>
+</tbody>
+</table>
+<section class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>The client also supports the ADDR format. This is documented in <a href="&amp;qpidProgrammingBook;">Programming in Apache Qpid</a>.<a href="#fnref1">↩</a></p></li>
+</ol>
+</section>

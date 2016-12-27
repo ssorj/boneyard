@@ -1,0 +1,46 @@
+<h1 id="Java-Broker-Backup-And-Recovery"><span class="header-section-number">1</span> Backup And Recovery</h1>
+<h1 id="Java-Broker-Backup-And-Recovery-Broker"><span class="header-section-number">2</span> Broker</h1>
+<p>To perform a complete backup whilst the Broker is shutdown, simply copy all the files the exist beneath <code>${QPID_WORK}</code>, assuming all virtualhost nodes and virtualhost are in their standard location, this will copy all configuration and persistent message data.</p>
+<p>There is currently no safe mechanism to take a complete copy of the entire Broker whilst it is running.</p>
+<h1 id="Java-Broker-Backup-And-Recovery-Virtualhost-Node"><span class="header-section-number">3</span> Virtualhost Node</h1>
+<p>To perform a complete backup of a Virtualhost node whilst it is stopped (or Broker down), simply copy all the files the exist beneath <code>${QPID_WORK}/&lt;nodename&gt;/config</code>, assuming the virtualhost node is in the standard location. This will copy all configuration that belongs to that virtualhost node.</p>
+<p>The technique for backing up a virtualhost node whilst it is running depends on its type.</p>
+<h2 id="Java-Broker-Backup-And-Recovery-Virtualhost-Node-BDB"><span class="header-section-number">3.1</span> BDB</h2>
+<p>Qpid Broker distribution includes the &quot;hot&quot; backup utility <code>backup.sh</code> which can be found at broker bin folder. This utility can perform the backup when broker is running.</p>
+<p><code>backup.sh</code> script invokes <code>org.apache.qpid.server.store.berkeleydb.BDBBackup</code> to do the job.</p>
+<p>You can also run this class from command line like in an example below:</p>
+java
+-cp qpid-bdbstore-QPIDCURRENTRELEASE.jar
+org.apache.qpid.server.store.berkeleydb.BDBBackup
+-fromdir
+${QPID_WORK}/&lt;nodename&gt;/config
+-todir
+path/to/backup/folder
+<p>In the example above BDBBackup utility is called from qpid-bdbstore-QPIDCURRENTRELEASE.jar to backup the store at <code>${QPID_WORK}/&lt;nodename&gt;/config</code> and copy store logs into <code>path/to/backup/folder</code>.</p>
+<p>Linux and Unix users can take advantage of <code>backup.sh</code> bash script by running this script in a similar way.</p>
+backup.sh
+-fromdir
+${QPID_WORK}/&lt;nodename&gt;/config
+-todir
+path/to/backup/folder
+<h2 id="Java-Broker-Backup-And-Recovery-Virtualhost-Node-BDB-HA"><span class="header-section-number">3.2</span> BDB-HA</h2>
+<p>See ?</p>
+<h2 id="Java-Broker-Backup-And-Recovery-Virtualhost-Node-Derby"><span class="header-section-number">3.3</span> Derby</h2>
+<p>Not yet supported</p>
+<h2 id="Java-Broker-Backup-And-Recovery-Virtualhost-Node-JDBC"><span class="header-section-number">3.4</span> JDBC</h2>
+<p>The responsibility for backup is delegated to the database server itself. See the documentation accompanying it. Any technique that takes a consistent snapshot of the database is acceptable.</p>
+<h2 id="Java-Broker-Backup-And-Recovery-Virtualhost-Node-JSON"><span class="header-section-number">3.5</span> JSON</h2>
+<p>JSON stores its config in a single text file. It can be safely backed up using standard command line tools.</p>
+<h1 id="Java-Broker-Backup-And-Recovery-Virtualhost"><span class="header-section-number">4</span> Virtualhost</h1>
+<p>To perform a complete backup of a Virtualhost whilst it is stopped (or Broker down), simply copy all the files the exist beneath <code>${QPID_WORK}/&lt;name&gt;/messages</code>, assuming the virtualhost is in the standard location. This will copy all messages that belongs to that virtualhost.</p>
+<p>The technique for backing up a virtualhost whilst it is running depends on its type.</p>
+<h2 id="Java-Broker-Backup-And-Recovery-Virtualhost-BDB"><span class="header-section-number">4.1</span> BDB</h2>
+<p>Use the same backup utility described above, but use the path <code>${QPID_WORK}/&lt;name&gt;/messages</code> instead.</p>
+<h2 id="Java-Broker-Backup-And-Recovery-Virtualhost-Derby"><span class="header-section-number">4.2</span> Derby</h2>
+<p>Not yet supported</p>
+<h2 id="Java-Broker-Backup-And-Recovery-Virtualhost-JDBC"><span class="header-section-number">4.3</span> JDBC</h2>
+<p>The responsibility for backup is delegated to the database server itself. See the documentation accompanying it. Any technique that takes a consistent snapshot of the database is acceptable.</p>
+<h2 id="Java-Broker-Backup-And-Recovery-Virtualhost-Provided"><span class="header-section-number">4.4</span> Provided</h2>
+<p>The contents of the virtualhost will be backed up as part of virtualhost node that contains it.</p>
+<h2 id="Java-Broker-Backup-And-Recovery-Virtualhost-BDBHA"><span class="header-section-number">4.5</span> BDB-HA</h2>
+<p>The contents of the virtualhost will be backed up as part of virtualhost node that contains it.</p>

@@ -1,0 +1,72 @@
+<h1><span class="header-section-number">1</span> Cheat Sheet for configuring Queue Options</h1>
+<h2 id="CheatSheetforconfiguringQueueOptions-ConfiguringQueueOptions"><span class="header-section-number">1.1</span> Configuring Queue Options</h2>
+<p>The C++ Broker M4 or later supports the following additional Queue constraints.</p>
+<ul>
+<li><p>?</p></li>
+<li><ul>
+<li><p>?</p></li>
+<li><p>?</p></li>
+<li><p>?</p></li>
+<li><ul>
+<li><p>?</p></li>
+</ul></li>
+<li><p>?</p></li>
+</ul></li>
+</ul>
+<p>The 0.10 C++ Broker supports the following additional Queue configuration options:</p>
+<ul>
+<li><p>?</p></li>
+</ul>
+<h3 id="CheatSheetforconfiguringQueueOptions-ApplyingQueueSizingConstraints"><span class="header-section-number">1.1.1</span> Applying Queue Sizing Constraints</h3>
+<p>This allows to specify how to size a queue and what to do when the sizing constraints have been reached. The queue size can be limited by the number messages (message depth) or byte depth on the queue.</p>
+<p>Once the Queue meets/ exceeds these constraints the follow policies can be applied</p>
+<ul>
+<li><p>REJECT - Reject the published message</p></li>
+<li><p>FLOW_TO_DISK - Flow the messages to disk, to preserve memory</p></li>
+<li><p>RING - start overwriting messages in a ring based on sizing. If head meets tail, advance head</p></li>
+<li><p>RING_STRICT - start overwriting messages in a ring based on sizing. If head meets tail, AND the consumer has the tail message acquired it will reject</p></li>
+</ul>
+<p>Examples:</p>
+<p>Create a queue an auto delete queue that will support 100 000 bytes, and then REJECT</p>
+<pre><code>#include &quot;qpid/client/QueueOptions.h&quot;
+
+    QueueOptions qo;
+    qo.setSizePolicy(REJECT,100000,0);
+
+    session.queueDeclare(arg::queue=queue, arg::autoDelete=true, arg::arguments=qo);</code></pre>
+<p>Create a queue that will support 1000 messages into a RING buffer</p>
+<pre><code>#include &quot;qpid/client/QueueOptions.h&quot;
+
+    QueueOptions qo;
+    qo.setSizePolicy(RING,0,1000);
+
+    session.queueDeclare(arg::queue=queue, arg::arguments=qo);</code></pre>
+<h3 id="CheatSheetforconfiguringQueueOptions-ChangingtheQueueorderingBehaviors-28FIFO-2FLVQ-29"><span class="header-section-number">1.1.2</span> Changing the Queue ordering Behaviors (FIFO/LVQ)</h3>
+<p>The default ordering in a queue in Qpid is FIFO. However additional ordering semantics can be used namely LVQ (Last Value Queue). Last Value Queue is define as follows.</p>
+<p>If I publish symbols RHT, IBM, JAVA, MSFT, and then publish RHT before the consumer is able to consume RHT, that message will be over written in the queue and the consumer will receive the last published value for RHT.</p>
+<p>Example:</p>
+<pre><code>#include &quot;qpid/client/QueueOptions.h&quot;
+
+    QueueOptions qo;
+    qo.setOrdering(LVQ);
+
+    session.queueDeclare(arg::queue=queue, arg::arguments=qo);
+
+    .....
+    string key;
+    qo.getLVQKey(key);
+
+    ....
+    for each message, set the into application headers before transfer
+    message.getHeaders().setString(key,&quot;RHT&quot;);
+    </code></pre>
+<p>Notes:</p>
+<ul>
+<li><p>Messages that are dequeued and the re-queued will have the following exceptions. a.) if a new message has been queued with the same key, the re-queue from the consumer, will combine these two messages. b.) If an update happens for a message of the same key, after the re-queue, it will not update the re-queued message. This is done to protect a client from being able to adversely manipulate the queue.</p></li>
+<li><p>Acquire: When a message is acquired from the queue, no matter it's position, it will behave the same as a dequeue</p></li>
+<li><p>LVQ does not support durable messages. If the queue or messages are declared durable on an LVQ, the durability will be ignored.</p></li>
+</ul>
+<p>A fully worked ? can be found here</p>
+<h3 id="CheatSheetforconfiguringQueueOptions-Settingadditionalbehaviors"><span class="header-section-number">1.1.3</span> Setting additional behaviors</h3>
+<h3 id="CheatSheetforconfiguringQueueOptions-OtherClients"><span class="header-section-number">1.1.4</span> Other Clients</h3>
+<p>Note that these options can be set from any client. QueueOptions just correctly formats the arguments passed to the QueueDeclare() method.</p>

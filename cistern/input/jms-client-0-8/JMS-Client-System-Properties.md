@@ -1,0 +1,404 @@
+# <span class="header-section-number">1</span> System Properties
+
+The following system properties affect the behaviour of the Qpid JMS
+client. System properties are global in nature so affect all Qpid
+interactions made from within the same JVM. For many options, there are
+equivalent [Connection URL](#JMS-Client-0-8-Connection-URL) options
+allowing the option to be controlled at the level of the Connection.
+
+<table>
+<caption>System Properties Affecting Connection Behaviour</caption>
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Property Name</th>
+<th align="left">Type</th>
+<th align="left">Default Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">qpid.amqp.version</td>
+<td align="left">string</td>
+<td align="left">0-10</td>
+<td align="left"><p>Sets the AMQP version to be used - currently supports one of {0-8,0-9,0-91,0-10}.</p>
+<p>The client will begin negotiation at the specified version and only negotiate downwards if the Broker does not support the specified version.</p></td>
+</tr>
+<tr class="even">
+<td align="left">qpid.heartbeat</td>
+<td align="left">int</td>
+<td align="left"><p>Defaults to the heartbeat value suggested by the Broker, if any.</p></td>
+<td align="left">Frequency of heartbeat messages (in seconds). A value of 0 disables heartbeating.
+<p>Two consecutive missed heartbeats will result in the connection timing out.</p>
+<p>This can also be set per connection using the <a href="#JMS-Client-0-8-Connection-URL-BrokerOptions-Heartbeat">Connection URL</a> options.</p>
+<p>For compatibility with old client configuration, the synonym <code>amqj.heartbeat.delay</code> is supported.</p></td>
+</tr>
+<tr class="odd">
+<td align="left">ignore_setclientID</td>
+<td align="left">boolean</td>
+<td align="left">false</td>
+<td align="left">If a client ID is specified in the connection URL it's used or else an ID is generated. If an ID is specified after it's been set Qpid will throw an exception.
+<p>Setting this property to 'true' will disable that check and allow you to set a client ID of your choice later on.</p></td>
+</tr>
+<tr class="even">
+<td align="left">qpid.connection_ssl_verify_hostname</td>
+<td align="left">boolean</td>
+<td align="left">true</td>
+<td align="left">This property is used to turn on/off broker host name verification on SSL negotiation if SSL transport is used. It is set to 'true' by default.
+<p>Setting this property to 'false' will disable that check and allow you to ignore host name errors.</p></td>
+</tr>
+<tr class="odd">
+<td align="left">qpid.connection_compress_messages</td>
+<td align="left">Boolean</td>
+<td align="left">false</td>
+<td align="left"><p>Controls whether the client will compress messages before they they are sent.</p></td>
+</tr>
+<tr class="even">
+<td align="left">qpid.message_compression_threshold_size</td>
+<td align="left">Integer</td>
+<td align="left">102400</td>
+<td align="left"><p>The payload size beyond which the client will start to compress message payloads.</p></td>
+</tr>
+</tbody>
+</table>
+
+<table>
+<caption>Config Options For Session Behaviour</caption>
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Property Name</th>
+<th align="left">Type</th>
+<th align="left">Default Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">qpid.dest_syntax</td>
+<td align="left">String</td>
+<td align="left">ADDR</td>
+<td align="left"><p>Addressing syntax: ADDR (Address format) or BURL (Binding URL)</p></td>
+</tr>
+<tr class="even">
+<td align="left">max_prefetch</td>
+<td align="left">int</td>
+<td align="left">500</td>
+<td align="left"><p>Maximum number of pre-fetched messages per Session. This can also be defaulted for sessions created on a particular connection using the <a href="#JMS-Client-0-8-Connection-URL-ConnectionOptions-Maxprefetch">Connection URL</a> options.</p></td>
+</tr>
+<tr class="odd">
+<td align="left">qpid.use_legacy_map_message</td>
+<td align="left">boolean</td>
+<td align="left">false</td>
+<td align="left"><p>If set will use the old map message encoding. By default the Map messages are encoded using the 0-10 map encoding.</p>
+<p>This can also be set per connection using the <a href="#JMS-Client-0-8-Connection-URL-ConnectionOptions-UseLegacyMap">Connection URL</a> options.</p></td>
+</tr>
+<tr class="even">
+<td align="left">qpid.jms.daemon.dispatcher</td>
+<td align="left">boolean</td>
+<td align="left">false</td>
+<td align="left"><p>Controls whether the Session dispatcher thread is a daemon thread or not. If this system property is set to true then the Session dispatcher threads will be created as daemon threads. This setting is introduced in version 0.16.</p></td>
+</tr>
+</tbody>
+</table>
+
+<table>
+<caption>Config Options For Consumer Behaviour</caption>
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Property Name</th>
+<th align="left">Type</th>
+<th align="left">Default Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">qpid.declare_exchanges</td>
+<td align="left">Boolean</td>
+<td align="left">true</td>
+<td align="left"><p>If true, creating a consumer will also declare the exchange on the Broker (specified within the Binding URL associated with the Destination), creating it if is does not already exist.</p></td>
+</tr>
+<tr class="even">
+<td align="left">qpid.declare_queues</td>
+<td align="left">Boolean</td>
+<td align="left">true</td>
+<td align="left"><p>If true, creating a consumer will also declare the queue on the Broker (specified within the Binding URL associated with the Destination), creating it if is does not already exist.</p></td>
+</tr>
+<tr class="odd">
+<td align="left">qpid.bind_queues</td>
+<td align="left">Boolean</td>
+<td align="left">true</td>
+<td align="left"><p>If true, creating a consumer will also bind the queue to the to the exchange using the routing key as a binding key. The exchange name, queue name and routing key are taken from the Binding URL associated with the Destination.</p></td>
+</tr>
+<tr class="even">
+<td align="left">qpid.reject.behaviour</td>
+<td align="left">String</td>
+<td align="left">NORMAL</td>
+<td align="left"><p>Used with the maximum delivery count feature. See ? for details.</p></td>
+</tr>
+</tbody>
+</table>
+
+<table>
+<caption>Config Options For Producer Behaviour</caption>
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Property Name</th>
+<th align="left">Type</th>
+<th align="left">Default Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">qpid.default_mandatory</td>
+<td align="left">Boolean</td>
+<td align="left">True</td>
+<td align="left"><p>If true, messages sent to Queue destinations for which cannot be routed to at least one queue on the Broker, will be returned to the application. See ? for more details.</p></td>
+</tr>
+<tr class="even">
+<td align="left">qpid.default_mandatory_topic</td>
+<td align="left">Boolean</td>
+<td align="left">False</td>
+<td align="left"><p>If true, messages sent to Topic destinations for which cannot be routed to at least one queue on the Broker, will be returned to the application. See ? for more details..</p></td>
+</tr>
+<tr class="odd">
+<td align="left">qpid.default_immediate</td>
+<td align="left">Boolean</td>
+<td align="left">False</td>
+<td align="left"><p>If true, the message will be returned to the application unless the Broker is able to route the message to at least one queue with a consumer attached. See ? for more details.</p></td>
+</tr>
+<tr class="even">
+<td align="left">qpid.flow_control_wait_failure</td>
+<td align="left">Long</td>
+<td align="left">60000</td>
+<td align="left"><p>Used with ?. The amount of time (in milliseconds) to wait before timing out.</p></td>
+</tr>
+<tr class="odd">
+<td align="left">qpid.flow_control_wait_notify_period</td>
+<td align="left">Long</td>
+<td align="left">5000</td>
+<td align="left"><p>Used with ?. The frequency at which the log message informing that the producer is flow controlled .</p></td>
+</tr>
+<tr class="even">
+<td align="left">sync_publish</td>
+<td align="left">string</td>
+<td align="left">&quot;&quot; (disabled)</td>
+<td align="left"><p>If 'all' is set then messages will be sent synchronously.</p>
+<p>This can also be set per connection using the <a href="#JMS-Client-0-8-Connection-URL-ConnectionOptions-SyncPublish">Connection URL</a> options.</p></td>
+</tr>
+</tbody>
+</table>
+
+<table>
+<caption>Config Options For Threading</caption>
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Property Name</th>
+<th align="left">Type</th>
+<th align="left">Default Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">qpid.thread_factory</td>
+<td align="left">string</td>
+<td align="left">org.apache.qpid.thread.DefaultThreadFactory</td>
+<td align="left"><p>Specifies the thread factory to use.</p>
+<p>If using a real time JVM, you need to set the above property to <code>org.apache.qpid.thread.RealtimeThreadFactory</code>.</p></td>
+</tr>
+<tr class="even">
+<td align="left">qpid.rt_thread_priority</td>
+<td align="left">int</td>
+<td align="left">20</td>
+<td align="left"><p>Specifies the priority (1-99) for Real time threads created by the real time thread factory.</p></td>
+</tr>
+</tbody>
+</table>
+
+<table>
+<caption>Config Options For I/O</caption>
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Property Name</th>
+<th align="left">Type</th>
+<th align="left">Default Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">qpid.sync_op_timeout</td>
+<td align="left">long</td>
+<td align="left">60000</td>
+<td align="left"><p>The length of time (in milliseconds) to wait for a synchronous operation to complete.</p>
+<p>For compatibility with older clients, the synonym <code>amqj.default_syncwrite_timeout</code> is supported.</p></td>
+</tr>
+<tr class="even">
+<td align="left">qpid.tcp_nodelay</td>
+<td align="left">boolean</td>
+<td align="left">true</td>
+<td align="left"><p>Sets the TCP_NODELAY property of the underlying socket. The default was changed to true as of Qpid 0.14.</p>
+<p>This can also be set per connection using the Connection URL broker option<a href="#JMS-Client-0-8-Connection-URL-BrokerOptions-TcpNoDelay"><code>tcp_nodelay</code>.</a> options.</p>
+<p>For compatibility with older clients, the synonym <code>amqj.tcp_nodelay</code> is supported.</p></td>
+</tr>
+<tr class="odd">
+<td align="left">qpid.send_buffer_size</td>
+<td align="left">integer</td>
+<td align="left">65535</td>
+<td align="left"><p>Sets the SO_SNDBUF property of the underlying socket. Added in Qpid 0.16.</p>
+<p>For compatibility with older clients, the synonym <code>amqj.sendBufferSize</code> is supported.</p></td>
+</tr>
+<tr class="even">
+<td align="left">qpid.receive_buffer_size</td>
+<td align="left">integer</td>
+<td align="left">65535</td>
+<td align="left"><p>Sets the SO_RCVBUF property of the underlying socket. Added in Qpid 0.16.</p>
+<p>For compatibility with older clients, the synonym <code>amqj.receiveBufferSize</code> is supported.</p></td>
+</tr>
+<tr class="odd">
+<td align="left">qpid.failover_method_timeout</td>
+<td align="left">long</td>
+<td align="left">60000</td>
+<td align="left"><p>During failover, this is the timeout for each attempt to try to re-establish the connection. If a reconnection attempt exceeds the timeout, the entire failover process is aborted.</p>
+<p>It is only applicable for AMQP 0-8/0-9/0-9-1 clients.</p></td>
+</tr>
+</tbody>
+</table>
+
+<table>
+<caption>Config Options For Security - Using SSL for securing connections or using EXTERNAL as the SASL mechanism.</caption>
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Property Name</th>
+<th align="left">Type</th>
+<th align="left">Default Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">qpid.ssl_timeout</td>
+<td align="left">long</td>
+<td align="left">60000</td>
+<td align="left"><p>Timeout value used by the Java SSL engine when waiting on operations.</p></td>
+</tr>
+<tr class="even">
+<td align="left">qpid.ssl.KeyManagerFactory.algorithm</td>
+<td align="left">string</td>
+<td align="left">-</td>
+<td align="left"><p>The key manager factory algorithm name. If not set, defaults to the value returned from the Java runtime call <code>KeyManagerFactory.getDefaultAlgorithm()</code></p>
+<p>For compatibility with older clients, the synonym <code>qpid.ssl.keyStoreCertType</code> is supported.</p></td>
+</tr>
+<tr class="odd">
+<td align="left">qpid.ssl.TrustManagerFactory.algorithm</td>
+<td align="left">string</td>
+<td align="left">-</td>
+<td align="left"><p>The trust manager factory algorithm name. If not set, defaults to the value returned from the Java runtime call <code>TrustManagerFactory.getDefaultAlgorithm()</code></p>
+<p>For compatibility with older clients, the synonym <code>qpid.ssl.trustStoreCertType</code> is supported.</p></td>
+</tr>
+</tbody>
+</table>
+
+<table>
+<caption>Config Options For Security - Standard JVM properties needed when Using SSL for securing connections or using EXTERNAL as the SASL mechanism.<span id="fnref1"><a href="#fn1"><sup>1</sup></a></span></caption>
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Property Name</th>
+<th align="left">Type</th>
+<th align="left">Default Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">javax.net.ssl.keyStore</td>
+<td align="left">string</td>
+<td align="left">jvm default</td>
+<td align="left"><p>Specifies the key store path.</p>
+<p>This can also be set per connection using the <a href="#JMS-Client-0-8-Connection-URL">Connection URL</a> options.</p></td>
+</tr>
+<tr class="even">
+<td align="left">javax.net.ssl.keyStorePassword</td>
+<td align="left">string</td>
+<td align="left">jvm default</td>
+<td align="left"><p>Specifies the key store password.</p>
+<p>This can also be set per connection using the <a href="#JMS-Client-0-8-Connection-URL">Connection URL</a> options.</p></td>
+</tr>
+<tr class="odd">
+<td align="left">javax.net.ssl.trustStore</td>
+<td align="left">string</td>
+<td align="left">jvm default</td>
+<td align="left"><p>Specifies the trust store path.</p>
+<p>This can also be set per connection using the <a href="#JMS-Client-0-8-Connection-URL">Connection URL</a> options.</p></td>
+</tr>
+<tr class="even">
+<td align="left">javax.net.ssl.trustStorePassword</td>
+<td align="left">string</td>
+<td align="left">jvm default</td>
+<td align="left"><p>Specifies the trust store password.</p>
+<p>This can also be set per connection using the <a href="#JMS-Client-0-8-Connection-URL">Connection URL</a> options.</p></td>
+</tr>
+</tbody>
+</table>
+
+------------------------------------------------------------------------
+
+1.  <div id="fn1">
+
+    </div>
+
+    Qpid allows you to have per connection key and trust stores if
+    required. If specified per connection, the JVM arguments are
+    ignored.[↩](#fnref1)
+
+

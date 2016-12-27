@@ -1,0 +1,23 @@
+<h1 id="JMS-Client-0-8-JNDI-Properties-Format"><span class="header-section-number">1</span> JNDI Properties Format</h1>
+<p>The Qpid JMS Client comes with own JNDI context factory <code>org.apache.qpid.jndi.PropertiesFileInitialContextFactory</code> which utilises a Java properties file for declaring the JMS administered objects: connection factories, queues, topics and destinations. It uses the following syntax:</p>
+<pre><code>connectionfactory.&lt;jndi name&gt;=&lt;connection url&gt;
+queue.&lt;jndi name&gt;=&lt;queue name&gt;
+topic.&lt;jndi name&gt;=&lt;topic name&gt;
+destination.&lt;jndi name&gt;=&lt;binding url&gt;</code></pre>
+<p>An arbitrary number of connection factories, queues, topics, queues or destinations or can be declared in the JNDI properties file. Each JNDI name must be unique.</p>
+<p>The application looks up the objects via an InitialContext. This lookup and an example JNDI properties file is provided in ?</p>
+<p>We now consider each JMS administered object type in turn.</p>
+<h1 id="JMS-Client-0-8-JNDI-Properties-Format-ConnectionFactory"><span class="header-section-number">2</span> ConnectionFactory</h1>
+<p><code>connectionfactory.</code><em>name</em> declares a <a href="&amp;oracleJeeDocUrl;javax/jms/ConnectionFactory.html">ConnectionFactory</a> with the given JNDI name. The value must be a legal Connection URL.</p>
+<p>See ? for format of the URL and its permitted options.</p>
+<h1 id="JMS-Client-0-8-JNDI-Properties-Format-Queue"><span class="header-section-number">3</span> Queue</h1>
+<p><code>queue.</code><em>name</em> declares a <a href="&amp;oracleJeeDocUrl;javax/jms/Queue.html">Queue</a> with the given JNDI name. The value is simple queue name. This is the name of the queue as known by the Broker.</p>
+<p>The <code>queue.</code> form is a short hand for declaring a destination:</p>
+<pre><code>destination.name=direct://amq.direct//&lt;queue name&gt;?routingkey=’&lt;queue name&gt;’&amp;durable=’true’</code></pre>
+<h1 id="JMS-Client-0-8-JNDI-Properties-Format-Topic"><span class="header-section-number">4</span> Topic</h1>
+<p><code>topic.</code><em>name</em> declares a <a href="&amp;oracleJeeDocUrl;javax/jms/Topic.html">Topic</a> with the given JNDI name. The value is topic name. This topic name is used on the Broker as a binding key between the <code>amq.topic</code> exchange and the queue corresponding to the topic subscriber.</p>
+<p>The <code>topic.</code> form is a short hand for declaring a destination:</p>
+<pre><code>destination.name=topic://amq.topic/&lt;topic name&gt;/?routingkey=&lt;topic name&gt;</code></pre>
+<h1 id="JMS-Client-0-8-JNDI-Properties-Format-Destination"><span class="header-section-number">5</span> Destination</h1>
+<p><code>destination.</code><em>name</em> declares either a <a href="&amp;oracleJeeDocUrl;javax/jms/Queue.html">Queue</a> or <a href="&amp;oracleJeeDocUrl;javax/jms/Topic.html">Topic</a> (depending on the class) with the given JNDI name. The value must be a Binding URL.</p>
+<p>See ? for format of the URL and its permitted options.</p>

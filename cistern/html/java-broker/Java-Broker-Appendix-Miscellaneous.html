@@ -1,0 +1,42 @@
+<h1 id="Java-Broker-Miscellaneous"><span class="header-section-number">1</span> Miscellaneous</h1>
+<h1 id="Java-Broker-Miscellaneous-JVM-Verification"><span class="header-section-number">2</span> JVM Installation verification</h1>
+<h2 id="Java-Broker-Miscellaneous-JVM-Verification-Windows"><span class="header-section-number">2.1</span> Verify JVM on Windows</h2>
+<p>Firstly confirm that the JAVA_HOME environment variable is set correctly by typing the following at the command prompt:</p>
+<pre><code>echo %JAVA_HOME%</code></pre>
+<p>If JAVA_HOME is set you will see something similar to the following:</p>
+<pre><code>c:&quot;\PROGRA~1&quot;\Java\jdk1.7.0_60\
+      </code></pre>
+<p>Then confirm that a Java installation (1.7 or higher) is available:</p>
+<pre><code>java -version</code></pre>
+<p>If java is available on the path, output similar to the following will be seen:</p>
+<pre><code>java version &quot;1.7.0_60&quot;
+Java(TM) SE Runtime Environment (build 1.7.0_60-b19)
+Java HotSpot(TM) 64-Bit Server VM (build 24.60-b09, mixed mode)</code></pre>
+<h2 id="Java-Broker-Miscellaneous-JVM-Verification-Unix"><span class="header-section-number">2.2</span> Verify JVM on Unix</h2>
+<p>Firstly confirm that the JAVA_HOME environment variable is set correctly by typing the following at the command prompt:</p>
+<pre><code>echo $JAVA_HOME</code></pre>
+<p>If JAVA_HOME is set you will see something similar to the following:</p>
+<pre><code>/usr/java/jdk1.7.0_60
+      </code></pre>
+<p>Then confirm that a Java installation (1.7 or higher) is available:</p>
+<pre><code>java -version</code></pre>
+<p>If java is available on the path, output similar to the following will be seen:</p>
+<pre><code>java version &quot;1.7.0_60&quot;
+Java(TM) SE Runtime Environment (build 1.7.0_60-b19)
+Java HotSpot(TM) 64-Bit Server VM (build 24.60-b09, mixed mode)</code></pre>
+<h1 id="Java-Broker-Miscellaneous-Installing-External-JDBC-Driver"><span class="header-section-number">3</span> Installing External JDBC Driver</h1>
+<p>In order to use a JDBC Virtualhost Node or a JDBC Virtualhost, you must make the Database's JDBC 4.0 compatible drivers available on the Broker's classpath. To do this copy the driver's JAR file into the <code>${QPID_HOME}/lib/opt</code> folder.</p>
+<pre><code>Unix:
+cp driver.jar qpid-broker-QPIDCURRENTRELEASE/lib/opt</code></pre>
+<pre><code>Windows:
+copy driver.jar qpid-broker-QPIDCURRENTRELEASE\lib\opt</code></pre>
+<h1 id="Java-Broker-Miscellaneous-Installing-Oracle-BDB-JE"><span class="header-section-number">4</span> Installing Oracle BDB JE</h1>
+<p>The Oracle BDB JE is not distributed with Apache Qpid owing to license considerations..</p>
+<p>If you wish to use a BDB Virtualhost Node, BDB Virtualhost, or BDB HA Virtualhost Node you must make the BDB JE's JAR available on the Broker's classpath.</p>
+<p>Download the Oracle BDB JE ORACLEBDBPRODUCTVERSION release <a href="&amp;oracleJeDownloadUrl;">from the Oracle website.</a></p>
+<p>The download has a name in the form je-ORACLEBDBPRODUCTVERSION.tar.gz. It is recommended that you confirm the integrity of the download by verifying the MD5.</p>
+<p>Copy the je-ORACLEBDBPRODUCTVERSION.jar from within the release into <code>${QPID_HOME}/lib/opt</code> folder.</p>
+<pre><code>Unix:
+cp je-ORACLEBDBPRODUCTVERSION.jar qpid-broker-QPIDCURRENTRELEASE/lib/opt</code></pre>
+<pre><code>Windows:
+copy je-ORACLEBDBPRODUCTVERSION.jar qpid-broker-QPIDCURRENTRELEASE\lib\opt</code></pre>

@@ -1,0 +1,27 @@
+<h1 id="Java-Broker-Introduction"><span class="header-section-number">1</span> Introduction</h1>
+<p>The Java Broker is a powerful open-source message broker that implements all versions of the <a href="http://www.amqp.org">Advanced Message Queuing Protocol (AMQP)</a>. The Java Broker is actually one of two message brokers provided by the <a href="http://qpid.apache.org">Apache Qpid project</a>: the Java Broker and the C++ Broker.</p>
+<p>This document relates to the Java Broker. The <a href="&amp;qpidCppBook;">C++ Broker is described separately</a>.</p>
+<p><em>Headline features</em></p>
+<ul>
+<li><p>100% Java implementation - runs on any platform supporting Java 1.7 or higher</p></li>
+<li><p>Messaging clients support in Java, C++, Python.</p></li>
+<li><p>JMS 1.1 compliance (Java client).</p></li>
+<li><p>Persistent and non-persistent (transient) message support</p></li>
+<li><p>Supports for all common messaging patterns (point-to-point, publish/subscribe, fan-out etc).</p></li>
+<li><p>Transaction support including XA<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p></li>
+<li><p>Supports for all versions of the AMQP protocol</p></li>
+<li><p>Automatic message translation, allowing clients using different AMQP versions to communicate with each other.</p></li>
+<li><p>Pluggable authentication architecture with out-of-the-box support for Kerberos, LDAP, External, and file-based authentication mechanisms.</p></li>
+<li><p>Pluggable storage architecture with implementations including <a href="http://db.apache.org/derby/">Apache Derby</a>, <a href="&amp;oracleBdbProductOverviewUrl;">Oracle BDB JE</a><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>, and External Database</p></li>
+<li><p>Web based management interface and programmatic management interfaces via REST and JMX APIs.</p></li>
+<li><p>SSL support</p></li>
+<li><p>High availability (HA) support.<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></p></li>
+</ul>
+<section class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>XA provided when using AMQP 0-10<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Oracle BDB JE must be downloaded separately.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>HA currently only available to users of the optional BDB JE HA based message store.<a href="#fnref3">↩</a></p></li>
+</ol>
+</section>

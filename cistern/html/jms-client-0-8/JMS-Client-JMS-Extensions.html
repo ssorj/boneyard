@@ -1,0 +1,42 @@
+<h1 id="JMS-Client-0-8-Appendix-JMS-Extensions"><span class="header-section-number">1</span> JMS Extensions</h1>
+<p>This section illustrates using Qpid specific extentions to JMX for the managament of queues, exchanges and bindings.</p>
+<blockquote>
+<p><strong>Important</strong></p>
+<p>It is not recommended that these extensions are generally used. These interfaces are subject to change and will not be supported in this form for AMQP 1.0. Instead, the reader is directed towards the Managment interfaces of the Broker.</p>
+</blockquote>
+<h1 id="JMS-Client-0-8-Appendix-JMS-Extensions-Queue"><span class="header-section-number">2</span> Queue Management</h1>
+<p>These extensions allow queues to be created or removed.</p>
+<h2 id="JMS-Client-0-8-Appendix-JMS-Extensions-Queue-Creation"><span class="header-section-number">2.1</span> Queue creation</h2>
+<p>The following example illustrates the creation of the a LVQ queue from a javax.jms.Session object. Note that this utilises a Qpid specific extension to JMS and involves casting the session object back to its Qpid base-class.</p>
+<pre><code>Map&lt;String,Object&gt; arguments = new HashMap&lt;String, Object&gt;();
+arguments.put(&quot;qpid.last_value_queue_key&quot;,&quot;ISIN&quot;);
+AMQDestination amqQueue = (AMQDestination) context.lookup(&quot;myqueue&quot;);
+((AMQSession&lt;?,?&gt;) session).createQueue(
+        AMQShortString.valueOf(amqQueue.getQueueName()),
+        amqQueue.isAutoDelete(),
+        amqQueue.isDurable(),
+        amqQueue.isExclusive(),
+        arguments);</code></pre>
+<h1 id="JMS-Client-0-8-Appendix-JMS-Extensions-Binding"><span class="header-section-number">3</span> Binding Management</h1>
+<p>These extensions allow bindings to be created or removed.</p>
+<h2 id="JMS-Client-0-8-Appendix-JMS-Extensions-Binding-Creation"><span class="header-section-number">3.1</span> Binding creation</h2>
+<p>The following example illustrates the creation of queue binding to topic exchange with JMS client.</p>
+<pre><code>ConnectionFactory connectionFactory = ...
+Connection connection = connectionFactory.createConnection();
+AMQSession&lt;?, ?&gt; session = (AMQSession&lt;?,?&gt;)connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+
+...
+
+AMQShortString queueName = new AMQShortString(&quot;testQueue&quot;);
+AMQShortString routingKey = new AMQShortString(&quot;testRoutingKey&quot;);
+AMQDestination destination = (AMQDestination) session.createQueue(queueName.asString());
+
+...
+
+// binding arguments
+Map&lt;String, Object&gt; arguments = new HashMap&lt;String, Object&gt;();
+arguments.put(&quot;x-filter-jms-selector&quot;, &quot;application=&#39;app1&#39;&quot;);
+
+// create binding
+session.bindQueue(queueName, routingKey, FieldTable.convertToFieldTable(arguments),
+    new AMQShortString(&quot;amq.topic&quot;), destination);</code></pre>

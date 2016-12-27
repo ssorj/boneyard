@@ -1,0 +1,44 @@
+body {
+    width: 48em;
+    margin: 0 auto;
+    background-color: #efefef;
+    font-size: 12pt;
+}
+
+div.content {
+    float: left;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    padding: 1.6em 2.4em;
+    width: 100%;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+pre {
+    overflow: auto;
+    background-color: #efefef;
+    padding: 0.8em 1.6em;
+    max-width: 44em;
+}
+
+code {
+    font-size: 0.8em;
+}
+
+table {
+    border-collapse: collapse;
+    min-width: 50%;
+}
+
+table td, table th {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0.2em 0.8em 0.2em 0;
+}
+
+table caption {
+    margin: 0 0 0.8em 0;
+    font-style: italic;
+}

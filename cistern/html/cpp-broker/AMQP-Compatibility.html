@@ -1,0 +1,284 @@
+<h1 id="AMQP-Compatibility"><span class="header-section-number">1</span> AMQP compatibility</h1>
+<p>Qpid provides the most complete and compatible implementation of AMQP. And is the most aggressive in implementing the latest version of the specification.</p>
+<p>There are two brokers:</p>
+<ul>
+<li><p>C++ with support for AMQP 0-10</p></li>
+<li><p>Java with support for AMQP 0-8 and 0-9 (0-10 planned)</p></li>
+</ul>
+<p>There are client libraries for C++, Java (JMS), .Net (written in C#), python and ruby.</p>
+<ul>
+<li><p>All clients support 0-10 and interoperate with the C++ broker.</p></li>
+</ul>
+<ul>
+<li><p>The JMS client supports 0-8, 0-9 and 0-10 and interoperates with both brokers.</p></li>
+</ul>
+<ul>
+<li><p>The python and ruby clients will also support all versions, but the API is dynamically driven by the specification used and so differs between versions. To work with the Java broker you must use 0-8 or 0-9, to work with the C++ broker you must use 0-10.</p></li>
+</ul>
+<ul>
+<li><p>There are two separate C# clients, one for 0-8 that interoperates with the Java broker, one for 0-10 that inteoperates with the C++ broker.</p></li>
+</ul>
+<p>QMF Management is supported in Ruby, Python, C++, and via QMan for Java JMX &amp; WS-DM.</p>
+<h2 id="AMQPcompatibility-AMQPCompatibilityofQpidreleases-3A"><span class="header-section-number">1.1</span> AMQP Compatibility of Qpid releases:</h2>
+<p>Qpid implements the AMQP Specification, and as the specification has progressed Qpid is keeping up with the updates. This means that different Qpid versions support different versions of AMQP. Here is a simple guide on what use.</p>
+<p>Here is a matrix that describes the different versions supported by each release. The status symbols are interpreted as follows:</p>
+<dl>
+<dt>Y</dt>
+<dd><p>supported</p>
+</dd>
+<dt>N</dt>
+<dd><p>unsupported</p>
+</dd>
+<dt>IP</dt>
+<dd><p>in progress</p>
+</dd>
+<dt>P</dt>
+<dd><p>planned</p>
+</dd>
+</dl>
+<table>
+<caption>AMQP Version Support by Qpid Release</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Component</td>
+<td style="text-align: left;">Spec</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">M2.1</td>
+<td style="text-align: left;">M3</td>
+<td style="text-align: left;">M4</td>
+<td style="text-align: left;">0.5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">java client</td>
+<td style="text-align: left;">0-10</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">0-9</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">0-8</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">java broker</td>
+<td style="text-align: left;">0-10</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">P</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">0-9</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">0-8</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">c++ client/broker</td>
+<td style="text-align: left;">0-10</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">0-9</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">python client</td>
+<td style="text-align: left;">0-10</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">0-9</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">0-8</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ruby client</td>
+<td style="text-align: left;">0-10</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">0-8</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C# client</td>
+<td style="text-align: left;">0-10</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">0-8</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+</tbody>
+</table>
+<h2 id="AMQPcompatibility-InteroptablebyAMQPspecificationversion"><span class="header-section-number">1.2</span> Interop table by AMQP specification version</h2>
+<p>Above table represented in another format.</p>
+<table>
+<caption>AMQP Version Support - alternate format</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">release</td>
+<td style="text-align: left;">0-8</td>
+<td style="text-align: left;">0-9</td>
+<td style="text-align: left;">0-10</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">java client</td>
+<td style="text-align: left;">M3 M4 0.5</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">java client</td>
+<td style="text-align: left;">M2.1</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">N</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">java broker</td>
+<td style="text-align: left;">M3 M4 0.5</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">N</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">java broker</td>
+<td style="text-align: left;">trunk</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">P</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">java broker</td>
+<td style="text-align: left;">M2.1</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">N</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">c++ client/broker</td>
+<td style="text-align: left;">M3 M4 0.5</td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">c++ client/broker</td>
+<td style="text-align: left;">M2.1</td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">N</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">python client</td>
+<td style="text-align: left;">M3 M4 0.5</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">python client</td>
+<td style="text-align: left;">M2.1</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">N</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ruby client</td>
+<td style="text-align: left;">M3 M4 0.5</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">N</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ruby client</td>
+<td style="text-align: left;">trunk</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">P</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C# client</td>
+<td style="text-align: left;">M3 M4 0.5</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left;">N</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C# client</td>
+<td style="text-align: left;">trunk</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left;">Y</td>
+</tr>
+</tbody>
+</table>

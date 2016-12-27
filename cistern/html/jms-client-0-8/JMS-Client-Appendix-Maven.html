@@ -1,0 +1,30 @@
+<h1 id="JMS-Client-0-8-Appendix-Maven"><span class="header-section-number">1</span> Minimal Maven POM</h1>
+<p>The following is a minimal Maven POM required to use the Qpid Client. It is suitable for use with the <a href="#JMS-Client-0-8-Examples">examples</a> included in this book.</p>
+<pre><code>    
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+  &lt;groupId&gt;test&lt;/groupId&gt;
+  &lt;artifactId&gt;test&lt;/artifactId&gt;
+  &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;&lt;/groupId&gt;
+      &lt;artifactId&gt;&lt;/artifactId&gt;
+      &lt;version&gt;&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+      &lt;artifactId&gt;slf4j-log4j12&lt;/artifactId&gt;
+      &lt;version&gt;1.6.4&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.apache.geronimo.specs&lt;/groupId&gt;
+      &lt;artifactId&gt;geronimo-jms_1.1_spec&lt;/artifactId&gt;
+      &lt;version&gt;1.1.1&lt;/version&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/project&gt;
+    
+  </code></pre>
+<p>Note: We use the SLF4J Binding for Log4J12 here, but any SLF4J Binding could be used instead. Similarly, Geronimo JMS Spec is used, but any dependency that provides the JMS 1.1 specification could be subsituted.</p>

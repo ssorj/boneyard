@@ -1,0 +1,78 @@
+<h1 id="JMS-Client-0-8-Appendix-Tomcat-JNDI-Integration"><span class="header-section-number">1</span> How to bind Qpid destinations and connection factories into Tomcat JNDI</h1>
+<p>Qpid client destinations and connection factories can be registered in external JNDI containers, for example, Tomcat JNDI implementation.</p>
+<p><code>org.apache.qpid.jndi.ObjectFactory</code> implements <a href="&amp;oracleJdkDocUrl;javax/naming/spi/ObjectFactory.html">javax.naming.spi.ObjectFactory</a> allowing it to create instances of <code>AMQConnectionFactory</code>, <code>PooledConnectionFactory</code>, <code>AMQConnection</code>, <code>AMQQueue</code> and <code>AMQTopic</code> in external JNDI container from <a href="&amp;oracleJdkDocUrl;javax/naming/Reference.html">javax.naming.Reference</a>s.</p>
+<p>Additionally, <code>AMQConnectionFactory</code>, <code>PooledConnectionFactory</code> and <code>AMQDestination</code> (parent of <code>AMQQueue</code> and <code>AMQTopic</code>) implement <a href="&amp;oracleJdkDocUrl;javax/naming/Referenceable.html">javax.naming.Referenceable</a> allowing creation of <a href="&amp;oracleJdkDocUrl;javax/naming/Reference.html">javax.naming.Reference</a> objects for binding in external JNDI implementations.</p>
+<p><code>org.apache.qpid.jndi.ObjectFactory</code> allows the creation of:</p>
+<ul>
+<li><p>an instance of <code>ConnectionFactory</code> from a <code>Reference</code> containing reference address (<a href="&amp;oracleJdkDocUrl;javax/naming/RefAddr.html">javax.naming.RefAddr</a>) <code>connectionURL</code> with content set to a <a href="#JMS-Client-0-8-Connection-URL">Connection URL</a>.</p></li>
+<li><p>an instance of <code>PooledConnectionFactory</code> from a <code>Reference</code> containing reference address (<a href="&amp;oracleJdkDocUrl;javax/naming/RefAddr.html">javax.naming.RefAddr</a>) <code>connectionURL</code> with content set to a <a href="#JMS-Client-0-8-Connection-URL">Connection URL</a>.</p></li>
+<li><p>an instance of <code>AMQConnection</code> from a <code>Reference</code> containing reference address (<a href="&amp;oracleJdkDocUrl;javax/naming/RefAddr.html">javax.naming.RefAddr</a>) <code>connectionURL</code> with content set to a <a href="#JMS-Client-0-8-Connection-URL">Connection URL</a>.</p></li>
+<li><p>an instance of <code>AMQQueue</code> from a <code>Reference</code> containing reference address (<a href="&amp;oracleJdkDocUrl;javax/naming/RefAddr.html">javax.naming.RefAddr</a>) <code>address</code> with content set to either <a href="&amp;qpidProgrammingBook;">Address</a> or <a href="#JMS-Client-0-8-Binding-URL">Binding URL</a>.</p></li>
+<li><p>an instance of <code>AMQTopic</code> from a <code>Reference</code> containing reference address (<a href="&amp;oracleJdkDocUrl;javax/naming/RefAddr.html">javax.naming.RefAddr</a>) <code>address</code> with content set to either <a href="&amp;qpidProgrammingBook;">Address</a> or <a href="#JMS-Client-0-8-Binding-URL">Binding URL</a>.</p></li>
+</ul>
+<blockquote>
+<p><strong>Note</strong></p>
+<p>For <code>AMQQueue</code> and <code>AMQTopic</code> prefix <code>BURL:</code> need to be specified for <a href="#JMS-Client-0-8-Binding-URL">Binding URL</a>. Otherwise, client will try to parse content using <a href="&amp;qpidProgrammingBook;">Address</a> format.</p>
+</blockquote>
+<p>An example below demonstrates how to create JNDI resources in the Tomcat container using Resource declarations in context.xml (A Tomcat specific web application configuration file usually added into war under /META-INF/context.xml).</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;?xml</span> version=&#39;1.0&#39; encoding=&#39;utf-8&#39;<span class="kw">?&gt;</span>
+<span class="dt">&lt;!DOCTYPE </span>xml<span class="dt">&gt;</span>
+<span class="kw">&lt;Context&gt;</span>
+
+  <span class="kw">&lt;Resource</span><span class="ot"> name=</span><span class="st">&quot;jms/connectionFactory&quot;</span><span class="ot"> auth=</span><span class="st">&quot;Container&quot;</span>
+<span class="ot">            type=</span><span class="st">&quot;org.apache.qpid.client.AMQConnectionFactory&quot;</span>
+<span class="ot">            factory=</span><span class="st">&quot;org.apache.qpid.jndi.ObjectFactory&quot;</span>
+<span class="ot">            connectionURL=</span><span class="st">&quot;amqp://guest:guest@clientid/?brokerlist=&#39;localhost:5672&#39;&quot;</span><span class="kw">/&gt;</span>
+
+  <span class="kw">&lt;Resource</span><span class="ot"> name=</span><span class="st">&quot;jms/pooledConnectionFactory&quot;</span><span class="ot"> auth=</span><span class="st">&quot;Container&quot;</span>
+<span class="ot">            type=</span><span class="st">&quot;org.apache.qpid.client.PooledConnectionFactory&quot;</span>
+<span class="ot">            factory=</span><span class="st">&quot;org.apache.qpid.jndi.ObjectFactory&quot;</span>
+<span class="ot">            connectionURL=</span><span class="st">&quot;amqp://guest:guest@clientid/?brokerlist=&#39;localhost:5672&#39;&quot;</span>
+<span class="ot">            maxPoolSize=</span><span class="st">&quot;20&quot;</span><span class="ot"> connectionTimeout=</span><span class="st">&quot;60000&quot;</span><span class="kw">/&gt;</span>
+
+  <span class="kw">&lt;Resource</span><span class="ot"> name=</span><span class="st">&quot;jms/queue&quot;</span><span class="ot"> auth=</span><span class="st">&quot;Container&quot;</span>
+<span class="ot">            type=</span><span class="st">&quot;org.apache.qpid.client.AMQQueue&quot;</span>
+<span class="ot">            factory=</span><span class="st">&quot;org.apache.qpid.jndi.ObjectFactory&quot;</span>
+<span class="ot">            address=</span><span class="st">&quot;BURL:direct://amq.direct//myQueue?durable=&#39;true&#39;&quot;</span><span class="kw">/&gt;</span>
+
+  <span class="kw">&lt;Resource</span><span class="ot"> name=</span><span class="st">&quot;jms/topic&quot;</span><span class="ot"> auth=</span><span class="st">&quot;Container&quot;</span>
+<span class="ot">            type=</span><span class="st">&quot;org.apache.qpid.client.AMQTopic&quot;</span>
+<span class="ot">            factory=</span><span class="st">&quot;org.apache.qpid.client.AMQConnectionFactory&quot;</span>
+<span class="ot">            address=</span><span class="st">&quot;BURL:topic://amq.topic//myTopic?routingkey=&#39;myTopic&#39;&quot;</span><span class="kw">/&gt;</span>
+
+<span class="kw">&lt;/Context&gt;</span></code></pre>
+<p>In the example above <code>AMQConnectionFactory</code> would be registered under JNDI name &quot;jms/connectionFactory&quot;, <code>PooledConnectionFactory</code> would be registered under JNDI name &quot;jms/pooledConnectionFactory&quot;, <code>Queue</code> &quot;myQueue&quot; would be registered under JNDI name &quot;jms/queue&quot; and JMS <code>Topic</code> destination &quot;myTopic&quot; would be registered under JNDI name &quot;jms/topic&quot;. (All resources will be bound under &quot;java:comp/env&quot;). On declaration of <code>PooledConnectionFactory</code> optional maxPoolSize and connectionTimeout are set to 20 and 60000 milliseconds accordingly.</p>
+<p>The client application can find the resources declared in Tomcat context.xml using the code below:</p>
+<pre class="sourceCode java"><code class="sourceCode java">    Context context = <span class="kw">new</span> InitialContext();
+    Context environmentContext = (Context)context.<span class="fu">lookup</span>(<span class="st">&quot;java:comp/env&quot;</span>);
+    ...
+    ConnectionFactory connectionFactory = (ConnectionFactory) environmentContext.<span class="fu">lookup</span>(<span class="st">&quot;jms/connectionFactory&quot;</span>);
+    ...
+    Queue queue = (Queue)environmentContext.<span class="fu">lookup</span>(<span class="st">&quot;jms/queue&quot;</span>);
+    ...
+    Topic topic = (Topic)environmentContext.<span class="fu">lookup</span>(<span class="st">&quot;jms/topic&quot;</span>);
+    ...</code></pre>
+<blockquote>
+<p><strong>Note</strong></p>
+<p>In order to support backward compatibility <code>AMQConnectionFactory</code> continues to implement <a href="&amp;oracleJdkDocUrl;javax/naming/spi/ObjectFactory.html">javax.naming.spi.ObjectFactory</a> and can be used to instantiate JNDI resources from <a href="&amp;oracleJdkDocUrl;javax/naming/Reference.html">javax.naming.Reference</a>s. However, its method <code>getObjectInstance</code> is marked as <code>Deprecated</code> and will be removed in future version of client. For backward compatibility, Qpid JNDI resources can be declared using fully qualified class names as addresses. That will became unsupported in future version as well. An example of Tomcat context.xml with declarations of JNDI resources using deprecated factory and addresses is provided below.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;?xml</span> version=&#39;1.0&#39; encoding=&#39;utf-8&#39;<span class="kw">?&gt;</span>
+<span class="dt">&lt;!DOCTYPE </span>xml<span class="dt">&gt;</span>
+<span class="kw">&lt;Context&gt;</span>
+
+  <span class="kw">&lt;Resource</span><span class="ot"> name=</span><span class="st">&quot;jms/queue&quot;</span><span class="ot"> auth=</span><span class="st">&quot;Container&quot;</span>
+<span class="ot">            type=</span><span class="st">&quot;org.apache.qpid.client.AMQQueue&quot;</span>
+<span class="ot">            factory=</span><span class="st">&quot;org.apache.qpid.client.AMQConnectionFactory&quot;</span>
+<span class="ot">            org.apache.qpid.client.AMQQueue=</span><span class="st">&quot;direct://amq.direct//myDurableQueue?durable=&#39;true&#39;&quot;</span><span class="kw">/&gt;</span>
+
+  <span class="kw">&lt;Resource</span><span class="ot"> name=</span><span class="st">&quot;jms/topic&quot;</span><span class="ot"> auth=</span><span class="st">&quot;Container&quot;</span>
+<span class="ot">            type=</span><span class="st">&quot;org.apache.qpid.client.AMQTopic&quot;</span>
+<span class="ot">            factory=</span><span class="st">&quot;org.apache.qpid.client.AMQConnectionFactory&quot;</span>
+<span class="ot">            org.apache.qpid.client.AMQTopic=</span><span class="st">&quot;topic://amq.topic//myTopic?routingkey=&#39;myTopic&#39;&quot;</span><span class="kw">/&gt;</span>
+
+  <span class="kw">&lt;Resource</span><span class="ot"> name=</span><span class="st">&quot;jms/connectionFactory&quot;</span><span class="ot"> auth=</span><span class="st">&quot;Container&quot;</span>
+<span class="ot">            type=</span><span class="st">&quot;org.apache.qpid.client.AMQConnectionFactory&quot;</span>
+<span class="ot">            factory=</span><span class="st">&quot;org.apache.qpid.client.AMQConnectionFactory&quot;</span>
+<span class="ot">            org.apache.qpid.client.AMQConnectionFactory=</span><span class="st">&quot;amqp://guest:guest@clientid/?brokerlist=&#39;localhost:5672&#39;&quot;</span><span class="kw">/&gt;</span>
+
+<span class="kw">&lt;/Context&gt;</span></code></pre>
+</blockquote>

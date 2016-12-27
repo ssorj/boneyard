@@ -1,0 +1,32 @@
+<h1 id="JMS-Client-0-8-Appendix-PooledConnecytionFactory"><span class="header-section-number">1</span> PooledConnectionFactory</h1>
+<p>Qpid client provides <code>PooledConnectionFactory</code> which is a special implementation of <a href="&amp;oracleJeeDocUrl;javax/jms/ConnectionFactory.html">ConnectionFactory</a> supporting <a href="&amp;oracleJeeDocUrl;javax/jms/Connection.html">Connection</a> pooling.</p>
+<p>The <code>PooledConnectionFactory</code> caches a predefined number of connections thus saving an application which connects frequently time. The <code>Connection</code> instance is taken from the pool whenever method <code>PooledConnectionFactory#createConnection()</code> is invoked and returned into the pool when method <code>Connection#close()</code> is called.</p>
+<p>A user can configure a maximum allowed number of connections to remain in pool (10 by default) by calling <code>PooledConnectionFactory#setMaxPoolSize(int)</code>. When number of connections exceeds the value set for maximum pool size, <code>PooledConnectionFactory</code> starts to work as a normal <a href="&amp;oracleJeeDocUrl;javax/jms/ConnectionFactory.html">ConnectionFactory</a> and creates a new connection every time method <code>PooledConnectionFactory#createConnection()</code> is invoked.</p>
+<p>The <a href="#JMS-Client-0-8-Connection-URL">Connection URL</a> is set by invoking method <code>PooledConnectionFactory#setConnectionURLString(String)</code>.</p>
+<p>A user can specify the maximum time a connection may remain idle in pool by calling <code>PooledConnectionFactory#setConnectionTimeout(long)</code> passing a value in milliseconds. If connection is not used within the specified interval it is closed automatically.</p>
+<p>This implementation can be useful in <em>Spring JMS</em> based applications. An example below demonstrates how to configure <code>PooledConnectionFactory</code> in the Spring xml configuration.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;bean</span><span class="ot"> id=</span><span class="st">&quot;pooledConnectionFactory&quot;</span><span class="ot"> class=</span><span class="st">&quot;org.apache.qpid.client.PooledConnectionFactory&quot;</span><span class="kw">&gt;</span>
+  <span class="co">&lt;!-- set maximum number of pool connections to 20--&gt;</span>
+  <span class="kw">&lt;property</span><span class="ot"> name=</span><span class="st">&quot;maxPoolSize&quot;</span><span class="ot"> value=</span><span class="st">&quot;20&quot;</span><span class="kw">&gt;&lt;/property&gt;</span>
+  <span class="co">&lt;!-- set the timeout for connection to remain open in pool without being used --&gt;</span>
+  <span class="kw">&lt;property</span><span class="ot"> name=</span><span class="st">&quot;connectionTimeout&quot;</span><span class="ot"> value=</span><span class="st">&quot;60000&quot;</span><span class="kw">&gt;&lt;/property&gt;</span>
+  <span class="co">&lt;!-- set connection URL as String --&gt;</span>
+  <span class="kw">&lt;property</span><span class="ot"> name=</span><span class="st">&quot;connectionURLString&quot;</span><span class="ot"> value=</span><span class="st">&quot;amqp://guest:guest@clientid/default?brokerlist=&#39;tcp://localhost:5672?retries=&#39;300&#39;</span><span class="dv">&amp;amp;</span><span class="st">failover=&#39;nofailover&#39;&#39;</span><span class="dv">&amp;amp;</span><span class="st">maxprefetch=&#39;0&#39;&quot;</span><span class="kw">&gt;&lt;/property&gt;</span>
+<span class="kw">&lt;/bean&gt;</span></code></pre>
+<p><em>PooledConnectionFactory</em> spring bean can be configured with such <em>spring-jms</em> beans like <em>DefaultMessageListenerContainer</em> and <em>JmsTemplate</em>. The example below demonstrates how to do that</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;bean</span><span class="ot"> id=</span><span class="st">&quot;jmsProducerTemplate&quot;</span><span class="ot"> class=</span><span class="st">&quot;org.springframework.jms.core.JmsTemplate&quot;</span><span class="kw">&gt;</span>
+    <span class="co">&lt;!-- set reference to pooledConnectionFactory bean --&gt;</span>
+    <span class="kw">&lt;property</span><span class="ot"> name=</span><span class="st">&quot;connectionFactory&quot;</span><span class="ot"> ref=</span><span class="st">&quot;pooledConnectionFactory&quot;</span><span class="kw">&gt;&lt;/property&gt;</span>
+    <span class="kw">&lt;property</span><span class="ot"> name=</span><span class="st">&quot;defaultDestination&quot;</span><span class="ot"> ref=</span><span class="st">&quot;destination&quot;</span> <span class="kw">/&gt;</span>
+<span class="kw">&lt;/bean&gt;</span>
+
+<span class="kw">&lt;bean</span><span class="ot"> id=</span><span class="st">&quot;jmsContainer&quot;</span><span class="ot"> class=</span><span class="st">&quot;org.springframework.jms.listener.DefaultMessageListenerContainer&quot;</span><span class="kw">&gt;</span>
+    <span class="co">&lt;!-- set reference to pooledConnectionFactory bean --&gt;</span>
+    <span class="kw">&lt;property</span><span class="ot"> name=</span><span class="st">&quot;connectionFactory&quot;</span><span class="ot"> ref=</span><span class="st">&quot;pooledConnectionFactory&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;property</span><span class="ot"> name=</span><span class="st">&quot;destination&quot;</span><span class="ot"> ref=</span><span class="st">&quot;destination&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;property</span><span class="ot"> name=</span><span class="st">&quot;messageListener&quot;</span><span class="ot"> ref=</span><span class="st">&quot;messageListener&quot;</span> <span class="kw">/&gt;</span>
+<span class="kw">&lt;/bean&gt;</span></code></pre>
+<blockquote>
+<p><strong>Note</strong></p>
+<p>If using <code>DefaultMessageListenerContainer</code> with <code>cacheLevel</code> set to <code>NONE</code> it is important that <code>maxConcurrentConsumer</code> does not exceed the value of maximum pool size set on <code>PooledConnectionFactory</code> bean. If this is not the case, once the number of in-use connections reaches the the <em>PooledConnectionFactory#maxPoolSize</em> a new connection will be opened for each and every message receipt i.e. a connection per message anti-pattern.</p>
+</blockquote>

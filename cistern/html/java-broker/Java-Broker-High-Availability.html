@@ -1,0 +1,184 @@
+<h1 id="Java-Broker-High-Availability"><span class="header-section-number">1</span> High Availability</h1>
+<h1 id="Java-Broker-High-Availability-GeneralIntroduction"><span class="header-section-number">2</span> General Introduction</h1>
+<p>The term High Availability (HA) usually refers to having a number of instances of a service such as a Message Broker available so that should a service unexpectedly fail, or requires to be shutdown for maintenance, users may quickly connect to another instance and continue their work with minimal interruption. HA is one way to make a overall system more resilient by eliminating a single point of failure from a system.</p>
+<p>HA offerings are usually categorised as <strong>Active/Active</strong> or <strong>Active/Passive</strong>. An Active/Active system is one where all nodes within the group are usually available for use by clients all of the time. In an Active/Passive system, one only node within the group is available for use by clients at any one time, whilst the others are in some kind of standby state, awaiting to quickly step-in in the event the active node becomes unavailable.</p>
+<h1 id="Java-Broker-High-Availability-OverviewOfHA"><span class="header-section-number">3</span> Overview of HA within the Java Broker</h1>
+<p>The Java Broker provides a HA implementation offering an <strong>Active/Passive</strong> mode of operation. When using HA, many instances of the Java Broker work together to form an high availability group of two or more nodes.</p>
+<p>The remainder of this section now talks about the specifics of how HA is achieved in terms of the <a href="#Java-Broker-Concepts">concepts</a> introduced earlier in this book.</p>
+<p>The <a href="#Java-Broker-Concepts-Virtualhosts">Virtualhost</a> is the unit of replication. This means that any <em>durable</em> queues, exchanges, and bindings belonging to that virtualhost, any <em>persistent</em> messages contained within the queues and any attribute settings applied to the virtualhost itself are automatically replicated to all nodes within the group.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
+<p>It is the <a href="#Java-Broker-Concepts-Virtualhost-Nodes">Virtualhost Nodes</a> (from different Broker instances) that join together to form a group. The virtualhost nodes collectively to coordinate the group: they organise replication between the master and replicas and conduct elections to determine who becomes the new master in the event of the old failing.</p>
+<p>When a virtualhost node is in the <em>master</em> role, the virtualhost beneath it is available for messaging work. Any write operations sent to the virtualhost are automatically replicated to all other nodes in group.</p>
+<p>When a virtualhost node is in the <em>replica</em> role, the virtualhost beneath it is always unavailable for message work. Any attempted connections to a virtualhost in this state are automatically turned away, allowing a messaging client to discover where the master currently resides. When in replica role, the node sole responsibility is to consume a replication stream in order that it remains up to date with the master.</p>
+<p>Messaging clients discover the active virtualhost.This can be achieved using a static technique (for instance, a failover url (a feature of a Qpid Java Client)), or a dynamic one utilising some kind of proxy or virtual IP (VIP).</p>
+<p>The figure that follows illustrates a group formed of three virtualhost nodes from three separate Broker instances. A client is connected to the virtualhost node that is in the master role. The two virtualhost nodes <code>weather1</code> and <code>weather3</code> are replicas and are receiving a stream of updates.</p>
+<p><img src="images/HA-Overview.png" alt=" Diagram showing a 3 node group deployed across three Brokers " /></p>
+<p>Currently, the only virtualhost/virtualhost node type offering HA is BDB HA. Internally, this leverages the HA capabilities of the Berkeley DB JE edition. BDB JE is an <a href="#Java-Broker-Miscellaneous-Installing-Oracle-BDB-JE">optional dependency</a> of the Broker.</p>
+<blockquote>
+<p><strong>Note</strong></p>
+<p>The Java Broker HA solution is incompatible with the HA solution offered by the CPP Broker. It is not possible to co-locate Java and CPP Brokers within the same group.</p>
+</blockquote>
+<h1 id="Java-Broker-High-Availability-CreatingGroup"><span class="header-section-number">4</span> Creating a group</h1>
+<p>This section describes how to create a group. At a high level, creating a group involves first creating the first node standalone, then creating subsequent nodes referencing the first node so the nodes can introduce themselves and gradually the group is built up.</p>
+<p>A group is created through either <a href="#Java-Broker-Management-Channel-Web-Console">Web Management</a> or the <a href="#Java-Broker-Management-Channel-REST-API">REST API</a>. These instructions presume you are using Web Management. To illustrate the example it builds the group illustrated in figure ?</p>
+<ol type="1">
+<li><p>Install a Broker on each machine that will be used to host the group. As messaging clients will need to be able to connect to and authentication to all Brokers, it usually makes sense to choose a common authentication mechanism e.g. Simple LDAP Authentication, External with SSL client authentication or Kerberos.</p></li>
+<li><p>Select one Broker instance to host the first node instance. This choice is an arbitrary one. The node is special only whilst creating group. Once creation is complete, all nodes will be considered equal.</p></li>
+<li><p>Click the <code>Add</code> button on the Virtualhost Panel on the Broker tab.</p>
+<ol type="1">
+<li><p>Give the Virtualhost node a unique name e.g. <code>weather1</code>. The name must be unique within the group and unique to that Broker. It is best if the node names are chosen from a different nomenclature than the machine names themselves.</p></li>
+<li><p>Choose <code>BDB_HA</code> and select <code>New group</code></p></li>
+<li><p>Give the group a name e.g. <code>weather</code>. The group name must be unique and will be the name also given to the virtualhost, so this is the name the messaging clients will use in their connection url.</p></li>
+<li><p>Give the address of this node. This is an address on this node's host that will be used for replication purposes. The hostname <em>must</em> be resolvable by all the other nodes in the group. This is separate from the address used by messaging clients to connect to the Broker. It is usually best to choose a symbolic name, rather than an IP address.</p></li>
+<li><p>Now add the node addresses of all the other nodes that will form the group. In our example we are building a three node group so we give the node addresses of <code>chaac:5000</code> and <code>indra:5000</code>.</p></li>
+<li><p>Click Add to create the node. The virtualhost node will be created with the virtualhost. As there is only one node at this stage, the role will be master.</p></li>
+</ol>
+<p>Creating 1st node in a group</p></li>
+<li><p>Now move to the second Broker to be the group. Click the <code>Add</code> button on the Virtualhost Panel on the Broker tab of the second Broker.</p>
+<ol type="1">
+<li><p>Give the Virtualhost node a unique name e.g. <code>weather2</code>.</p></li>
+<li><p>Choose <code>BDB_HA</code> and choose <code>Existing group</code></p></li>
+<li><p>Give the details of the <em>existing node</em>. Following our example, specify <code>weather</code>, <code>weather1</code> and <code>thor:5000</code></p></li>
+<li><p>Give the address of this node.</p></li>
+<li><p>Click Add to create the node. The node will use the existing details to contact it and introduce itself into the group. At this stage, the group will have two nodes, with the second node in the replica role.</p></li>
+<li><p>Repeat these steps until you have added all the nodes to the group.</p></li>
+</ol>
+<p>Adding subsequent nodes to the group</p></li>
+</ol>
+<p>The group is now formed and is ready for us. Looking at the virtualhost node of any of the nodes shows a complete view of the whole group. View of group from one node</p>
+<h1 id="Java-Broker-High-Availability-Behaviour"><span class="header-section-number">5</span> Behaviour of the Group</h1>
+<p>This section first describes the behaviour of the group in its default configuration. It then goes on to talk about the various controls that are available to override it. It describes the controls available that affect the <a href="http://en.wikipedia.org/wiki/ACID#Durability">durability</a> of transactions and the data consistency between the master and replicas and thus make trade offs between performance and reliability.</p>
+<h2 id="Java-Broker-High-Availability-Behaviour-Default-Behaviour"><span class="header-section-number">5.1</span> Default Behaviour</h2>
+<p>Let's first look at the behaviour of a group in default configuration.</p>
+<p>In the default configuration, for any messaging work to be done, there must be at least <em>quorum</em> nodes present. This means for example, in a three node group, this means there must be at least two nodes available.</p>
+<p>When a messaging client sends a transaction, it can be assured that, before the control returns back to his application after the commit call that the following is true:</p>
+<ul>
+<li><p>At the master, the transaction is <em>written to disk and OS level caches are flushed</em> meaning the data is on the storage device.</p></li>
+<li><p>At least quorum minus 1 replicas, <em>acknowledge the receipt of transaction</em>. The replicas will write the data to the storage device sometime later.</p></li>
+</ul>
+<p>If there were to be a master failure immediately after the transaction was committed, the transaction would be held by at least quorum minus one replicas. For example, if we had a group of three, then we would be assured that at least one replica held the transaction.</p>
+<p>In the event of a master failure, if quorum nodes remain, those nodes hold an election. The nodes will elect master the node with the most recent transaction. If two or more nodes have the most recent transaction the group makes an arbitrary choice. If quorum number of nodes does not remain, the nodes cannot elect a new master and will wait until nodes rejoin. You will see later that manual controls are available allow service to be restored from fewer than quorum nodes and to influence which node gets elected in the event of a tie.</p>
+<p>Whenever a group has fewer than quorum nodes present, the virtualhost will be unavailable and messaging connections will be refused. If quorum disappears at the very moment a messaging client sends a transaction that transaction will fail.</p>
+<p>You will have noticed the difference in the synchronization policies applied the master and the replicas. The replicas send the acknowledgement back before the data is written to disk. The master synchronously writes the transaction to storage. This is an example of a trade off between durability and performance. We will see more about how to control this trade off later.</p>
+<h2 id="Java-Broker-High-Availability-Behaviour-SynchronizationPolicy"><span class="header-section-number">5.2</span> Synchronization Policy</h2>
+<p>The <em>synchronization policy</em> dictates what a node must do when it receives a transaction before it acknowledges that transaction to the rest of the group.</p>
+<p>The following options are available:</p>
+<ul>
+<li><p><em>SYNC</em>. The node must write the transaction to disk and flush any OS level buffers before sending the acknowledgement. SYNC is offers the highest durability but offers the least performance.</p></li>
+<li><p><em>WRITE_NO_SYNC</em>. The node must write the transaction to disk before sending the acknowledgement. OS level buffers will be flush as some point later. This typically provides an assurance against failure of the application but not the operating system or hardware.</p></li>
+<li><p><em>NO_SYNC</em>. The node immediately sends the acknowledgement. The transaction will be written and OS level buffers flushed as some point later. NO_SYNC offers the highest performance but the lowest durability level. This synchronization policy is sometimes known as <em>commit to the network</em>.</p></li>
+</ul>
+<p>It is possible to assign a one policy to the master and a different policy to the replicas. These are configured as <a href="#Java-Broker-Management-Managing-Virtualhost-Attributes">attributes on the virtualhost</a>. By default the master uses <em>SYNC</em> and replicas use <em>NO_SYNC</em>.</p>
+<h2 id="Java-Broker-High-Availability-Behaviour-NodePriority"><span class="header-section-number">5.3</span> Node Priority</h2>
+<p>Node priority can be used to influence the behaviour of the election algorithm. It is useful in the case were you want to favour some nodes over others. For instance, if you wish to favour nodes located in a particular data centre over those in a remote site.</p>
+<p>The following options are available:</p>
+<ul>
+<li><p><em>Highest</em>. Nodes with this priority will be more favoured. In the event of two or more nodes having the most recent transaction, the node with this priority will be elected master. If two or more nodes have this priority the algorithm will make an arbitrary choice.</p></li>
+<li><p><em>High</em>. Nodes with this priority will be favoured but not as much so as those with Highest.</p></li>
+<li><p><em>Normal</em>. This is default election priority.</p></li>
+<li><p><em>Never</em>. The node will never be elected <em>even if the node has the most recent transaction</em>. The node will still keep up to date with the replication stream and will still vote itself, but can just never be elected.</p></li>
+</ul>
+<p>Node priority is configured as an <a href="#Java-Broker-Management-Managing-Virtualhost-Nodes-Attributes">attribute on the virtualhost node</a> and can be changed at runtime and is effective immediately.</p>
+<blockquote>
+<p><strong>Important</strong></p>
+<p>Use of the Never priority can lead to transaction loss. For example, consider a group of three where replica-2 is marked as Never. If a transaction were to arrive and it be acknowledged only by Master and Replica-2, the transaction would succeed. Replica 1 is running behind for some reason (perhaps a full-GC). If a Master failure were to occur at that moment, the replicas would elect Replica-1 even though Replica-2 had the most recent transaction.</p>
+<p>Transaction loss is reported by message <a href="#Java-Broker-Appendix-Operation-Logging-Message-HA-1014">HA-1014</a>.</p>
+</blockquote>
+<h2 id="Java-Broker-High-Availability-Behaviour-MinimumNumberOfNodes"><span class="header-section-number">5.4</span> Required Minimum Number Of Nodes</h2>
+<p>This controls the required minimum number of nodes to complete a transaction and to elect a new master. By default, the required number of nodes is set to <em>Default</em> (which signifies quorum).</p>
+<p>It is possible to reduce the required minimum number of nodes. The rationale for doing this is normally to temporarily restore service from fewer than quorum nodes following an extraordinary failure.</p>
+<p>For example, consider a group of three. If one node were to fail, as quorum still remained, the system would continue work without any intervention. If the failing node were the master, a new master would be elected.</p>
+<p>What if a further node were to fail? Quorum no longer remains, and the remaining node would just wait. It cannot elect itself master. What if we wanted to restore service from just this one node?</p>
+<p>In this case, Required Number of Nodes can be reduced to 1 on the remain node, allowing the node to elect itself and service to be restored from the singleton. Required minimum number of nodes is configured as an <a href="#Java-Broker-Management-Managing-Virtualhost-Nodes-Attributes">attribute on the virtualhost node</a> and can be changed at runtime and is effective immediately.</p>
+<blockquote>
+<p><strong>Important</strong></p>
+<p>The attribute must be used cautiously. Careless use will lead to lost transactions and can lead to a <a href="http://en.wikipedia.org/wiki/Split-brain_(computing)">split-brain</a> in the event of a network partition. If used to temporarily restore service from fewer than quorum nodes, it is <em>imperative</em> to revert it to the Default value as the failed nodes are restored.</p>
+<p>Transaction loss is reported by message <a href="#Java-Broker-Appendix-Operation-Logging-Message-HA-1014">HA-1014</a>.</p>
+</blockquote>
+<h2 id="Java-Broker-High-Availability-Behaviour-DesignatedPrimary"><span class="header-section-number">5.5</span> Designated Primary</h2>
+<p>This attribute applies to the groups of two only.</p>
+<p>In a group of two, if a node were to fail then in default configuration work will cease as quorum no longer exists. A single node cannot elect itself master.</p>
+<p>The designated primary flag allows a node in a two node group to elect itself master and to operate sole. Designated Primary is configured as an <a href="#Java-Broker-Management-Managing-Virtualhost-Nodes-Attributes">attribute on the virtualhost node</a> and can be changed at runtime and is effective immediately.</p>
+<p>For example, consider a group of two where the master fails. Service will be interrupted as the remaining node cannot elect itself master. To allow it to become master, apply the designated primary flag to it. It will elect itself master and work can continue, albeit from one node.</p>
+<blockquote>
+<p><strong>Important</strong></p>
+<p>It is imperative not to allow designated primary to be set on both nodes at once. To do so will mean, in the event of a network partition, a <a href="http://en.wikipedia.org/wiki/Split-brain_(computing)">split-brain</a> will occur.</p>
+<p>Transaction loss is reported by message <a href="#Java-Broker-Appendix-Operation-Logging-Message-HA-1014">HA-1014</a>.</p>
+</blockquote>
+<h1 id="Java-Broker-High-Availability-NodeOperations"><span class="header-section-number">6</span> Node Operations</h1>
+<h2 id="Java-Broker-High-Availability-NodeOperations-Lifecycle"><span class="header-section-number">6.1</span> Lifecycle</h2>
+<p>Virtualhost nodes can be stopped, started and deleted.</p>
+<ul>
+<li><p><em>Stop</em></p>
+<p>Stopping a master node will cause the node to temporarily leave the group. Any messaging clients will be disconnected and any in-flight transaction rollbacked. The remaining nodes will elect a new master if quorum number of nodes still remains.</p>
+<p>Stopping a replica node will cause the node to temporarily leave the group too. Providing quorum still exists, the current master will continue without interruption. If by leaving the group, quorum no longer exists, all the nodes will begin waiting, disconnecting any messaging clients, and the virtualhost will become unavailable.</p>
+<p>A stopped virtualhost node is still considered to be a member of the group.</p></li>
+<li><p><em>Start</em></p>
+<p>Starting a virtualhost node allows it to rejoin the group.</p>
+<p>If the group already has a master, the node will catch up from the master and then become a replica once it has done so.</p>
+<p>If the group did not have quorum and so had no master, but the rejoining of this node means quorum now exists, an election will take place. The node with the most up to date transaction will become master unless influenced by the priority rules described above.</p>
+<blockquote>
+<p><strong>Note</strong></p>
+<p>The length of time taken to catch up will depend on how long the node has been stopped. The worst case is where the node has been stopped for more than one hour. In this case, the master will perform an automated <code>network restore</code>. This involves streaming all the data held by the master over to the replica. This could take considerable time.</p>
+</blockquote></li>
+<li><p><em>Delete</em></p>
+<p>A virtualhost node can be deleted. Deleting a node permanently removes the node from the group. The data stored locally is removed but this does not affect the data held by the remainder of the group.</p>
+<blockquote>
+<p><strong>Note</strong></p>
+<p>The names of deleted virtualhost node cannot be reused within a group.</p>
+</blockquote></li>
+</ul>
+<p>It is also possible to add nodes to an existing group using the procedure described above.</p>
+<h2 id="Java-Broker-High-Availability-NodeOperations-TransferMaster"><span class="header-section-number">6.2</span> Transfer Master</h2>
+<p>This operation allows the mastership to be moved from node to node. This is useful for restoring a business as usual state after a failure.</p>
+<p>When using this function, the following occurs.</p>
+<ol type="1">
+<li><p>The system first gives time for the chosen new master to become reasonable up to date.</p></li>
+<li><p>It then suspends transactions on the old master and allows the chosen node to become up to date.</p></li>
+<li><p>The suspended transactions are aborted and any messaging clients connected to the old master are disconnected.</p></li>
+<li><p>The chosen master becomes the new master. The old master becomes a replica.</p></li>
+<li><p>Messaging clients reconnect the new master.</p></li>
+</ol>
+<h1 id="Java-Broker-High-Availability-ClientFailover"><span class="header-section-number">7</span> Client failover</h1>
+<p>As mentioned above, the clients need to be able to find the location of the active virtualhost within the group.</p>
+<p>Clients can do this using a static technique, for example , utilising the <a href="&amp;qpidjmsdocClientConectionUrl;">failover feature of the Qpid connection url</a> where the client has a list of all the nodes, and tries each node in sequence until it discovers the node with the active virtualhost.</p>
+<p>Another possibility is a dynamic technique utilising a proxy or Virtual IP (VIP). These require other software and/or hardware and are outside the scope of this document.</p>
+<h1 id="Java-Broker-High-Availability-JMXAPI"><span class="header-section-number">8</span> Qpid JMX API for HA</h1>
+<p>The Qpid JMX API for HA is now deprecated. New users are recommended to use the <a href="#Java-Broker-Management-Channel-REST-API">REST API.</a></p>
+<h1 id="Java-Broker-High-Availability-DiskSpace"><span class="header-section-number">9</span> Disk space requirements</h1>
+<p>In the case where node in a group are down, the master must keep the data they are missing for them to allow them to return to the replica role quickly.</p>
+<p>By default, the master will retain up to 1hour of missed transactions. In a busy production system, the disk space occupied could be considerable.</p>
+<p>This setting is controlled by virtualhost context variable <code>je.rep.repStreamTimeout</code>.</p>
+<h1 id="Java-Broker-High-Availability-Network-Requirements"><span class="header-section-number">10</span> Network Requirements</h1>
+<p>The HA Cluster performance depends on the network bandwidth, its use by existing traffic, and quality of service.</p>
+<p>In order to achieve the best performance it is recommended to use a separate network infrastructure for the Qpid HA Nodes which might include installation of dedicated network hardware on Broker hosts, assigning a higher priority to replication ports, installing a group in a separate network not impacted by any other traffic.</p>
+<h1 id="Java-Broker-High-Availability-Security"><span class="header-section-number">11</span> Security</h1>
+<p>The replication stream between the master and the replicas is insecure and can be intercepted by anyone having access to the replication network.</p>
+<p>In order to reduce the security risks the entire HA group is recommended to run in a separate network protected from general access and/or utilise SSH-tunnels/IPsec.</p>
+<h1 id="Java-Broker-High-Availability-Backup"><span class="header-section-number">12</span> Backups</h1>
+<p>It is recommend to use the hot backup script to periodically backup every node in the group. ?.</p>
+<h1 id="Java-Broker-High-Availability-Reset-Group-Infomational"><span class="header-section-number">13</span> Reset Group Information</h1>
+<p>BDB JE internally stores details of the group within its database. There are some circumstances when resetting this information is useful.</p>
+<ul>
+<li><p>Copying data between environments (e.g. production to UAT)</p></li>
+<li><p>Some disaster recovery situations where a group must be recreated on new hardware</p></li>
+</ul>
+<p>This is not an normal operation and is not usually required</p>
+<p>The following command replaces the group table contained within the JE logs files with the provided information.</p>
+java
+-cp je-ORACLEBDBPRODUCTVERSION.jar
+com.sleepycat.je.rep.util.DbResetRepGroup
+-h
+path/to/jelogfiles
+-groupName
+newgroupname
+-nodeName
+newnodename
+-nodeHostPort
+newhostname:5000
+<p>The modified log files can then by copied into <code>${QPID_WORK}/&lt;nodename&gt;/config</code> directory of a target Broker. Then start the Broker, and add a BDB HA Virtualhost node specify the same group name, node name and node address. You will then have a group with a single node, ready to start re-adding additional nodes as described above.</p>
+<section class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Transient messages and messages on non-durable queues are not replicated.<a href="#fnref1">↩</a></p></li>
+</ol>
+</section>

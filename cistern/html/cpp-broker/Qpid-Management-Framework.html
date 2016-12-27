@@ -1,0 +1,367 @@
+<h1><span class="header-section-number">1</span> Qpid Management Framework</h1>
+<ul>
+<li><p>?</p></li>
+<li><p>?</p></li>
+<li><p>?</p></li>
+<li><ul>
+<li><p>?</p></li>
+<li><p>?</p></li>
+<li><p>?</p></li>
+</ul></li>
+<li><p>?</p></li>
+<li><p>?</p></li>
+<li><p>?</p></li>
+</ul>
+<p>Please visit the ? for information about the future of QMF.</p>
+<h2 id="QpidManagementFramework-WhatIsQMF"><span class="header-section-number">1.1</span> What Is QMF</h2>
+<p>QMF (Qpid Management Framework) is a general-purpose management bus built on Qpid Messaging. It takes advantage of the scalability, security, and rich capabilities of Qpid to provide flexible and easy-to-use manageability to a large set of applications.</p>
+<h2 id="QpidManagementFramework-GettingStartedwithQMF"><span class="header-section-number">1.2</span> Getting Started with QMF</h2>
+<p>QMF is used through two primary APIs. The <em>console</em> API is used for console applications that wish to access and manipulate manageable components through QMF. The <em>agent</em> API is used for application that wish to be managed through QMF.</p>
+<p>The fastest way to get started with QMF is to work through the &quot;How To&quot; tutorials for consoles and agents. For a deeper understanding of what is happening in the tutorials, it is recommended that you look at the <em>Qmf Concepts</em> section.</p>
+<h2 id="QpidManagementFramework-QMFConcepts"><span class="header-section-number">1.3</span> QMF Concepts</h2>
+<p>This section introduces important concepts underlying QMF.</p>
+<h3 id="QpidManagementFramework-Console-2CAgent-2CandBroker"><span class="header-section-number">1.3.1</span> Console, Agent, and Broker</h3>
+<p>The major architectural components of QMF are the Console, the Agent, and the Broker. Console components are the &quot;managing&quot; components of QMF and agent components are the &quot;managed&quot; parts. The broker is a central (possibly distributed, clustered and fault-tolerant) component that manages name spaces and caches schema information.</p>
+<p>A console application may be a command-line utility, a three-tiered web-based GUI, a collection and storage device, a specialized application that monitors and reacts to events and conditions, or anything else somebody wishes to develop that uses QMF management data.</p>
+<p>An agent application is any application that has been enhanced to allow itself to be managed via QMF.</p>
+<pre><code>       +-------------+    +---------+    +---------------+    +-------------------+
+       | CLI utility |    | Web app |    | Audit storage |    | Event correlation |
+       +-------------+    +---------+    +---------------+    +-------------------+
+              ^                ^                 ^                ^          |
+              |                |                 |                |          |
+              v                v                 v                v          v
+    +---------------------------------------------------------------------------------+
+    |                Qpid Messaging Bus (with QMF Broker capability)                  |
+    +---------------------------------------------------------------------------------+
+                    ^                     ^                     ^
+                    |                     |                     |
+                    v                     v                     v
+           +----------------+    +----------------+    +----------------+
+           | Manageable app |    | Manageable app |    | Manageable app |
+           +----------------+    +----------------+    +----------------+</code></pre>
+<p>In the above diagram, the <em>Manageable apps</em> are agents, the <em>CLI utility</em>, <em>Web app</em>, and <em>Audit storage</em> are consoles, and <em>Event correlation</em> is both a console and an agent because it can create events based on the aggregation of what it sees.</p>
+<h3 id="QpidManagementFramework-Schema"><span class="header-section-number">1.3.2</span> Schema</h3>
+<p>A <em>schema</em> describes the structure of management data. Each <em>agent</em> provides a schema that describes its management model including the object classes, methods, events, etc. that it provides. In the current QMF distribution, the agent's schema is codified in an XML document. In the near future, there will also be ways to programatically create QMF schemata.</p>
+<h4 id="QpidManagementFramework-Package"><span class="header-section-number">1.3.2.1</span> Package</h4>
+<p>Each agent that exports a schema identifies itself using a <em>package</em> name. The package provides a unique namespace for the classes in the agent's schema that prevent collisions with identically named classes in other agents' schemata.</p>
+<p>Package names are in &quot;reverse domain name&quot; form with levels of hierarchy separated by periods. For example, the Qpid messaging broker uses package &quot;org.apache.qpid.broker&quot; and the Access Control List plugin for the broker uses package &quot;org.apache.qpid.acl&quot;. In general, the package name should be the reverse of the internet domain name assigned to the organization that owns the agent software followed by identifiers to uniquely identify the agent.</p>
+<p>The XML document for a package's schema uses an enclosing &lt;schema&gt; tag. For example:</p>
+<pre><code>&lt;schema package=&quot;org.apache.qpid.broker&quot;&gt;
+
+&lt;/schema&gt;</code></pre>
+<h4 id="QpidManagementFramework-ObjectClasses"><span class="header-section-number">1.3.2.2</span> Object Classes</h4>
+<p><em>Object classes</em> define types for manageable objects. The agent may create and destroy objects which are instances of object classes in the schema. An object class is defined in the XML document using the &lt;class&gt; tag. An object class is composed of properties, statistics, and methods.</p>
+<pre><code>  &lt;class name=&quot;Exchange&quot;&gt;
+    &lt;property name=&quot;vhostRef&quot;   type=&quot;objId&quot; references=&quot;Vhost&quot; access=&quot;RC&quot; index=&quot;y&quot; parentRef=&quot;y&quot;/&gt;
+    &lt;property name=&quot;name&quot;       type=&quot;sstr&quot;  access=&quot;RC&quot; index=&quot;y&quot;/&gt;
+    &lt;property name=&quot;type&quot;       type=&quot;sstr&quot;  access=&quot;RO&quot;/&gt;
+    &lt;property name=&quot;durable&quot;    type=&quot;bool&quot;  access=&quot;RC&quot;/&gt;
+    &lt;property name=&quot;arguments&quot;  type=&quot;map&quot;   access=&quot;RO&quot; desc=&quot;Arguments supplied in exchange.declare&quot;/&gt;
+
+    &lt;statistic name=&quot;producerCount&quot; type=&quot;hilo32&quot;  desc=&quot;Current producers on exchange&quot;/&gt;
+    &lt;statistic name=&quot;bindingCount&quot;  type=&quot;hilo32&quot;  desc=&quot;Current bindings&quot;/&gt;
+    &lt;statistic name=&quot;msgReceives&quot;   type=&quot;count64&quot; desc=&quot;Total messages received&quot;/&gt;
+    &lt;statistic name=&quot;msgDrops&quot;      type=&quot;count64&quot; desc=&quot;Total messages dropped (no matching key)&quot;/&gt;
+    &lt;statistic name=&quot;msgRoutes&quot;     type=&quot;count64&quot; desc=&quot;Total routed messages&quot;/&gt;
+    &lt;statistic name=&quot;byteReceives&quot;  type=&quot;count64&quot; desc=&quot;Total bytes received&quot;/&gt;
+    &lt;statistic name=&quot;byteDrops&quot;     type=&quot;count64&quot; desc=&quot;Total bytes dropped (no matching key)&quot;/&gt;
+    &lt;statistic name=&quot;byteRoutes&quot;    type=&quot;count64&quot; desc=&quot;Total routed bytes&quot;/&gt;
+  &lt;/class&gt;</code></pre>
+<h4 id="QpidManagementFramework-PropertiesandStatistics"><span class="header-section-number">1.3.2.3</span> Properties and Statistics</h4>
+<p>&lt;property&gt; and &lt;statistic&gt; tags must be placed within &lt;schema&gt; and &lt;/schema&gt; tags.</p>
+<p>Properties, statistics, and methods are the building blocks of an object class. Properties and statistics are both object attributes, though they are treated differently. If an object attribute is defining, seldom or never changes, or is large in size, it should be defined as a <em>property</em>. If an attribute is rapidly changing or is used to instrument the object (counters, etc.), it should be defined as a <em>statistic</em>.</p>
+<p>The XML syntax for &lt;property&gt; and &lt;statistic&gt; have the following XML-attributes:</p>
+<table>
+<caption>XML Attributes for QMF Properties and Statistics</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Attribute</td>
+<td style="text-align: left;">&lt;property&gt;</td>
+<td style="text-align: left;">&lt;statistic&gt;</td>
+<td style="text-align: left;">Meaning</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">name</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">The name of the attribute</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">type</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">The data type of the attribute</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">unit</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Optional unit name - use the singular (i.e. MByte)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">desc</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">Description to annotate the attribute</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">references</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">If the type is &quot;objId&quot;, names the referenced class</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">access</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">Access rights (RC, RW, RO)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">index</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">&quot;y&quot; if this property is used to uniquely identify the object. There may be more than one index property in a class</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">parentRef</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">&quot;y&quot; if this property references an object in which this object is in a child-parent relationship.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">optional</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">&quot;y&quot; if this property is optional (i.e. may be NULL/not-present)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">min</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">Minimum value of a numeric attribute</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">max</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">Maximum value of a numeric attribute</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">maxLen</td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;">Maximum length of a string attribute</td>
+</tr>
+</tbody>
+</table>
+<h4 id="QpidManagementFramework-Methods"><span class="header-section-number">1.3.2.4</span> Methods</h4>
+<p>&lt;method&gt; tags must be placed within &lt;schema&gt; and &lt;/schema&gt; tags.</p>
+<p>A <em>method</em> is an invokable function to be performed on instances of the object class (i.e. a Remote Procedure Call). A &lt;method&gt; tag has a name, an optional description, and encloses zero or more arguments. Method arguments are defined by the &lt;arg&gt; tag and have a name, a type, a direction, and an optional description. The argument direction can be &quot;I&quot;, &quot;O&quot;, or &quot;IO&quot; indicating input, output, and input/output respectively. An example:</p>
+<pre><code>   &lt;method name=&quot;echo&quot; desc=&quot;Request a response to test the path to the management broker&quot;&gt;
+     &lt;arg name=&quot;sequence&quot; dir=&quot;IO&quot; type=&quot;uint32&quot;/&gt;
+     &lt;arg name=&quot;body&quot;     dir=&quot;IO&quot; type=&quot;lstr&quot;/&gt;
+   &lt;/method&gt;</code></pre>
+<h4 id="QpidManagementFramework-EventClasses"><span class="header-section-number">1.3.2.5</span> Event Classes</h4>
+<h4 id="QpidManagementFramework-DataTypes"><span class="header-section-number">1.3.2.6</span> Data Types</h4>
+<p>Object attributes, method arguments, and event arguments have data types. The data types are based on the rich data typing system provided by the AMQP messaging protocol. The following table describes the data types available for QMF:</p>
+<table>
+<caption>QMF Datatypes</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">QMF Type</td>
+<td style="text-align: left;">Description</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">REF</td>
+<td style="text-align: left;">QMF Object ID - Used to reference another QMF object.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">U8</td>
+<td style="text-align: left;">8-bit unsigned integer</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">U16</td>
+<td style="text-align: left;">16-bit unsigned integer</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">U32</td>
+<td style="text-align: left;">32-bit unsigned integer</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">U64</td>
+<td style="text-align: left;">64-bit unsigned integer</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">S8</td>
+<td style="text-align: left;">8-bit signed integer</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">S16</td>
+<td style="text-align: left;">16-bit signed integer</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">S32</td>
+<td style="text-align: left;">32-bit signed integer</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">S64</td>
+<td style="text-align: left;">64-bit signed integer</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BOOL</td>
+<td style="text-align: left;">Boolean - True or False</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">SSTR</td>
+<td style="text-align: left;">Short String - String of up to 255 bytes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LSTR</td>
+<td style="text-align: left;">Long String - String of up to 65535 bytes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ABSTIME</td>
+<td style="text-align: left;">Absolute time since the epoch in nanoseconds (64-bits)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DELTATIME</td>
+<td style="text-align: left;">Delta time in nanoseconds (64-bits)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FLOAT</td>
+<td style="text-align: left;">Single precision floating point number</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DOUBLE</td>
+<td style="text-align: left;">Double precision floating point number</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">UUID</td>
+<td style="text-align: left;">UUID - 128 bits</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FTABLE</td>
+<td style="text-align: left;">Field-table - std::map in C++, dictionary in Python</td>
+</tr>
+</tbody>
+</table>
+<p>In the XML schema definition, types go by different names and there are a number of special cases. This is because the XML schema is used in code-generation for the agent API. It provides options that control what kind of accessors are generated for attributes of different types. The following table enumerates the types available in the XML format, which QMF types they map to, and other special handling that occurs.</p>
+<table>
+<caption>XML Schema Mapping for QMF Types</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">XML Type</td>
+<td style="text-align: left;">QMF Type</td>
+<td style="text-align: left;">Accessor Style</td>
+<td style="text-align: left;">Special Characteristics</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">objId</td>
+<td style="text-align: left;">REF</td>
+<td style="text-align: left;">Direct (get, set)</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">uint8,16,32,64</td>
+<td style="text-align: left;">U8,16,32,64</td>
+<td style="text-align: left;">Direct (get, set)</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">int8,16,32,64</td>
+<td style="text-align: left;">S8,16,32,64</td>
+<td style="text-align: left;">Direct (get, set)</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">bool</td>
+<td style="text-align: left;">BOOL</td>
+<td style="text-align: left;">Direct (get, set)</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sstr</td>
+<td style="text-align: left;">SSTR</td>
+<td style="text-align: left;">Direct (get, set)</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lstr</td>
+<td style="text-align: left;">LSTR</td>
+<td style="text-align: left;">Direct (get, set)</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">absTime</td>
+<td style="text-align: left;">ABSTIME</td>
+<td style="text-align: left;">Direct (get, set)</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">deltaTime</td>
+<td style="text-align: left;">DELTATIME</td>
+<td style="text-align: left;">Direct (get, set)</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">float</td>
+<td style="text-align: left;">FLOAT</td>
+<td style="text-align: left;">Direct (get, set)</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">double</td>
+<td style="text-align: left;">DOUBLE</td>
+<td style="text-align: left;">Direct (get, set)</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">uuid</td>
+<td style="text-align: left;">UUID</td>
+<td style="text-align: left;">Direct (get, set)</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">map</td>
+<td style="text-align: left;">FTABLE</td>
+<td style="text-align: left;">Direct (get, set)</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">hilo8,16,32,64</td>
+<td style="text-align: left;">U8,16,32,64</td>
+<td style="text-align: left;">Counter (inc, dec)</td>
+<td style="text-align: left;">Generates value, valueMin, valueMax</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">count8,16,32,64</td>
+<td style="text-align: left;">U8,16,32,64</td>
+<td style="text-align: left;">Counter (inc, dec)</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">mma32,64</td>
+<td style="text-align: left;">U32,64</td>
+<td style="text-align: left;">Direct</td>
+<td style="text-align: left;">Generates valueMin, valueMax, valueAverage, valueSamples</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">mmaTime</td>
+<td style="text-align: left;">DELTATIME</td>
+<td style="text-align: left;">Direct</td>
+<td style="text-align: left;">Generates valueMin, valueMax, valueAverage, valueSamples</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note</strong></p>
+<p>When writing a schema using the XML format, types used in &lt;property&gt; or &lt;arg&gt; must be types that have <em>Direct</em> accessor style. Any type may be used in &lt;statistic&gt; tags.</p>
+</blockquote>
+<h3 id="QpidManagementFramework-ClassKeysandClassVersioning"><span class="header-section-number">1.3.3</span> Class Keys and Class Versioning</h3>
+<h2 id="QpidManagementFramework-TheQMFProtocol"><span class="header-section-number">1.4</span> The QMF Protocol</h2>
+<p>The QMF protocol defines the message formats and communication patterns used by the different QMF components to communicate with one another.</p>
+<p>A description of the current version of the QMF protocol can be found at ?.</p>
+<p>A proposal for an updated protocol based on map-messages is in progress and can be found at ?.</p>
+<h2 id="QpidManagementFramework-HowtoWriteaQMFConsole"><span class="header-section-number">1.5</span> How to Write a QMF Console</h2>
+<p>Please see the ? for information about using the console API with Python.</p>
+<h2 id="QpidManagementFramework-HowtoWriteaQMFAgent"><span class="header-section-number">1.6</span> How to Write a QMF Agent</h2>

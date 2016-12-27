@@ -1,0 +1,948 @@
+<h1 id="Java-Broker-Appendix-Operation-Logging"><span class="header-section-number">1</span> Operational Logging</h1>
+<p>The Broker will, by default, produce structured log messages in response to key events in the lives of objects within the Broker. These concise messages are designed to allow the user to understand the actions of the Broker in retrospect. This is valuable for problem diagnosis and provides a useful audit trail.</p>
+<p>Each log message includes details of the entity causing the action (e.g. a management user or messaging client connection), the entity receiving the action (e.g. a queue or connection) and a description of operation itself.</p>
+<p>The log messages have the following format:</p>
+<pre><code>    [Actor] {[Subject]} [Message Id] [Message Text]
+  </code></pre>
+<p>Where:</p>
+<ul>
+<li><p><code>Actor</code> is the entity within the Broker that is <em>performing</em> the action. There are actors corresponding to the Broker itself, Management, Connection, and Channels. Their format is described in the <a href="#Java-Broker-Appendix-Operation-Logging-Actor-Format">table</a> below.</p></li>
+<li><p><code>Subject</code> (optional) is the entity within the Broker that is <em>receiving</em> the action. There are subjects corresponding to the Connections, Channels, Queues, Exchanges, Subscriptions, and Message Stores. Their format is described in the <a href="#Java-Broker-Appendix-Operation-Logging-Subject-Format">table</a> below.</p>
+<p>Some actions are reflexive, in these cases the Actor and Subject will be equal.</p></li>
+<li><p><code>Message Id</code> is an identifier for the type of message. It has the form three alphas and four digits separated by a hyphen <code>AAA-9999</code>.</p></li>
+<li><p><code>Message Text</code> is a textual description</p></li>
+</ul>
+<p>To illustrate, let's look at two examples.</p>
+<p><code>CON-1001</code> is used when a messages client makes an AMQP connection. The connection actor (<code>con</code>) provides us with details of the peer's connection: the user id used by the client (myapp1), their IP, ephemeral port number and the name of the virtual host. The message text itself gives us further details about the connection: the client id, the protocol version in used, and details of the client's qpid library.</p>
+<pre><code>[con:8(myapp1@/127.0.0.1:52851/default)] CON-1001 : Open : Client ID : clientid :
+             Protocol Version : 0-10 : Client Version : QPIDCURRENTRELEASE : Client Product : qpid</code></pre>
+<p><code>QUE-1001</code> is used when a queue is created. The connection actor <code>con</code> tells us details of the connection performing the queue creation: the user id used by the client (myapp1), the IP, ephemeral port number and the name of the virtual host. The queue subject tells use the queue's name (myqueue) and the virtualhost. The message itself tells us more information about the queue that is being created.</p>
+<pre><code>[con:8(myapp1@/127.0.0.1:52851/default)/ch:0] [vh(/default)/qu(myqueue)] QUE-1001 : Create : Owner: clientid Transient</code></pre>
+<p>The first two tables that follow describe the actor and subject entities, then the later provide a complete catalogue of all supported messages.</p>
+<table>
+<caption>Actors Entities</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Actor Type</th>
+<th style="text-align: left;">Format and Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Broker</td>
+<td style="text-align: left;">[Broker]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Used during startup and shutdown</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Management</td>
+<td style="text-align: left;">[mng:userid(clientip:ephemeralport)]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Used for operations performed by the either the JMX or Web Management interfaces.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Connection</td>
+<td style="text-align: left;">[con:connectionnumber(userid@/clientip:ephemeralport/virtualhostname)]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Used for operations performed by a client connection. Note that connections are numbered by a sequence number that begins at 1.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Channel</td>
+<td style="text-align: left;">[con:connectionnumber(userid@/clientip:ephemeralport/virtualhostname/ch:channelnumber)]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Used for operations performed by a client's channel (corresponds to the JMS concept of Session). Note that channels are numbered by a sequence number that is scoped by the owning connection.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Group</td>
+<td style="text-align: left;">[grp(/groupname)/vhn(/virtualhostnode name)]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Used for HA. Used for operations performed by the system itself often as a result of actions performed on another node..</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Subject Entities</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Subject Type</th>
+<th style="text-align: left;">Format and Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Connection</td>
+<td style="text-align: left;">[con:connectionnumber(userid@/clientip:ephemeralport/virtualhostname)]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>A connection to the Broker.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Channel</td>
+<td style="text-align: left;">[con:connectionnumber(userid@/clientip:ephemeralport/virtualhostname/ch:channelnumber)]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>A client's channel within a connection.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Subscription</td>
+<td style="text-align: left;">[sub:subscriptionnumber(vh(/virtualhostname)/qu(queuename)]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>A subscription to a queue. This corresponds to the JMS concept of a Consumer.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Queue</td>
+<td style="text-align: left;">[vh(/virtualhostname)/qu(queuename)]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>A queue on a virtualhost</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Exchange</td>
+<td style="text-align: left;">[vh(/virtualhostname)/ex(exchangetype/exchangename)]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>An exchange on a virtualhost</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Binding</td>
+<td style="text-align: left;">[vh(/virtualhostname)/ex(exchangetype/exchangename)/qu(queuename)/rk(bindingkey)]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>A binding between a queue and exchange with the giving binding key.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Message Store</td>
+<td style="text-align: left;">[vh(/virtualhostname)/ms(messagestorename)]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>A virtualhost/message store on the Broker.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA Group</td>
+<td style="text-align: left;">[grp(/group name)]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>A HA group</p></td>
+</tr>
+</tbody>
+</table>
+<p>The following tables lists all the operation log messages that can be produced by the Broker, and the describes the circumstances under which each may be seen.</p>
+<table>
+<caption>Broker Log Messages</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Message Id</th>
+<th style="text-align: left;">Message Text / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BRK-1001</td>
+<td style="text-align: left;">Startup : Version: version Build: build</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the Broker is starting up</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BRK-1002</td>
+<td style="text-align: left;">Starting : Listening on transporttype port portnumber</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the Broker has begun listening on a port.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BRK-1003</td>
+<td style="text-align: left;">Shutting down : transporttype port portnumber</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the Broker has stopped listening on a port.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BRK-1004</td>
+<td style="text-align: left;">Qpid Broker Ready</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the Broker is ready for normal operations.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BRK-1005</td>
+<td style="text-align: left;">Stopped</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the Broker is stopped.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BRK-1006</td>
+<td style="text-align: left;">Using configuration : file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates the name of the configuration store in use by the Broker.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BRK-1007</td>
+<td style="text-align: left;">Using logging configuration : file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates the name of the log configuration file in use by the Broker.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BRK-1008</td>
+<td style="text-align: left;">delivered|received : size kB/s peak : size bytes total</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Statistic - bytes delivered or received by the Broker.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BRK-1009</td>
+<td style="text-align: left;">delivered|received : size msg/s peak : size msgs total</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Statistic - messages delivered or received by the Broker.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BRK-1014</td>
+<td style="text-align: left;">Message flow to disk active : Message memory use size of all messages exceeds threshold threshold size</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the heap memory space occupied by messages has exceeded the threshold so the flow to disk feature has been activated.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BRK-1015</td>
+<td style="text-align: left;">Message flow to disk inactive : Message memory use size of all messages within threshold threshold size</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the heap memory space occupied by messages has fallen below the threshold so the flow to disk feature has been deactivated.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BRK-1016</td>
+<td style="text-align: left;">Fatal error : root cause : See log file for more information</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that broker was shut down due to fatal error.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BRK-1017</td>
+<td style="text-align: left;">Process : PID process identifier</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Process identifier (PID) of the Broker process.</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Management Log Messages</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Message Id</th>
+<th style="text-align: left;">Message Text / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">MNG-1001</td>
+<td style="text-align: left;">type Management Startup</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a Management plugin is starting up. Currently supported management plugins are JMX and Web.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MNG-1002</td>
+<td style="text-align: left;">Starting : type : Listening on transporttype port port</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a Management plugin is listening on the given port.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MNG-1003</td>
+<td style="text-align: left;">Shutting down : type : port port</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a Management plugin is ceasing to listen on the given port.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MNG-1004</td>
+<td style="text-align: left;">type Management Ready</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a Management plugin is ready for work.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MNG-1005</td>
+<td style="text-align: left;">type Management Stopped</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a Management plugin is stopped.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MNG-1007</td>
+<td style="text-align: left;">Open : User username</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates the opening of a connection to Management has by the given username.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MNG-1008</td>
+<td style="text-align: left;">Close : User username</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates the closing of a connection to Management has by the given username.</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Virtual Host Log Messages</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Message Id</th>
+<th style="text-align: left;">Message Text / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">VHT-1001</td>
+<td style="text-align: left;">Created : virtualhostname</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a virtualhost has been created.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">VHT-1002</td>
+<td style="text-align: left;">Closed</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a virtualhost has been closed. This occurs on Broker shutdown.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">VHT-1003</td>
+<td style="text-align: left;">virtualhostname : delivered|received : size kB/s peak : size bytes total</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Statistic - bytes delivered or received by the virtualhost.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">VHT-1004</td>
+<td style="text-align: left;">virtualhostname : delivered|received : size msg/s peak : size msgs total</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Statistic - messages delivered or received by the virtualhost.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">VHT-1005</td>
+<td style="text-align: left;">Unexpected fatal error</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Virtualhost has suffered an unexpected fatal error, check the logs for more details.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">VHT-1006</td>
+<td style="text-align: left;">Filesystem is over size in % per cent full, enforcing flow control.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that virtual host flow control is activated when the usage of file system containing Virtualhost message store exceeded predefined limit.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">VHT-1007</td>
+<td style="text-align: left;">Filesystem is no longer over size in % per cent full.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that virtual host flow control is deactivated when the usage of file system containing Virtualhost message falls under predefined limit.</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Queue Log Messages</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Message Id</th>
+<th style="text-align: left;">Message Text / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">QUE-1001</td>
+<td style="text-align: left;">Create : Owner: owner AutoDelete [Durable] Transient Priority: numberofpriorities</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a queue has been created.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">QUE-1002</td>
+<td style="text-align: left;">Deleted</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a queue has been deleted.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">QUE-1003</td>
+<td style="text-align: left;">Overfull : Size : size bytes, Capacity : maximumsize</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a queue has exceeded its permitted capacity. See ? for details.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">QUE-1004</td>
+<td style="text-align: left;">Underfull : Size : size bytes, Resume Capacity : resumesize</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a queue has fallen to its resume capacity. See ? for details.</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Exchange Log Messages</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Message Id</th>
+<th style="text-align: left;">Message Text / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">EXH-1001</td>
+<td style="text-align: left;">Create : [Durable] Type: type Name: exchange name</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that an exchange has been created.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">EXH-1002</td>
+<td style="text-align: left;">Deleted</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that an exchange has been deleted.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">EXH-1003</td>
+<td style="text-align: left;">Discarded Message : Name: exchange name Routing Key: routing key</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that an exchange received a message that could not be routed to at least one queue. queue has exceeded its permitted capacity. See ? for details.</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Binding Log Messages</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Message Id</th>
+<th style="text-align: left;">Message Text / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BND-1001</td>
+<td style="text-align: left;">Create : Arguments : arguments</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a binding has been made between an exchange and a queue.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BND-1002</td>
+<td style="text-align: left;">Deleted</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a binding has been deleted</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Connection Log Messages</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Message Id</th>
+<th style="text-align: left;">Message Text / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">CON-1001</td>
+<td style="text-align: left;">Open : Client ID : clientid : Protocol Version : protocol version : Client Version : client version : Client Product :client product</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a connection has been opened. The Broker logs one of these message each time it learns more about the client as the connection is negotiated.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CON-1002</td>
+<td style="text-align: left;">Close</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a connection has been closed. This message is logged regardless of if the connection is closed normally, or if the connection is somehow lost e.g network error.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CON-1003</td>
+<td style="text-align: left;">Closed due to inactivity</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Used when heart beating is in-use. Indicates that the connection has not received a heartbeat for too long and is therefore closed as being inactive.</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Channel Log Messages</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Message Id</th>
+<th style="text-align: left;">Message Text / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">CHN-1001</td>
+<td style="text-align: left;">Create</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a channel (corresponds to the JMS concept of Session) has been created.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CHN-1002</td>
+<td style="text-align: left;">Flow Started</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates message flow to a session has begun.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CHN-1003</td>
+<td style="text-align: left;">Close</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a channel has been closed.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CHN-1004</td>
+<td style="text-align: left;">Prefetch Size (bytes) size : Count number of messages</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates the prefetch size in use by a channel.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CHN-1005</td>
+<td style="text-align: left;">Flow Control Enforced (Queue queue name)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that producer flow control has been imposed on a channel owning to excessive queue depth in the indicated queue. Produces using the channel will be requested to pause the sending of messages. See ? for more details.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CHN-1006</td>
+<td style="text-align: left;">Flow Control Removed</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that producer flow control has been removed from a channel. See ? for more details.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CHN-1007</td>
+<td style="text-align: left;">Open Transaction : time ms</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a producer transaction has been open for longer than that permitted. See ? for more details.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CHN-1008</td>
+<td style="text-align: left;">Idle Transaction : time ms</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a producer transaction has been idle for longer than that permitted. See ? for more details.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CHN-1009</td>
+<td style="text-align: left;">Discarded message : message number as no alternate exchange configured for queue : queue name{1} routing key : routing key</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a channel has discarded a message as the maximum delivery count has been exceeded but the queue defines no alternate exchange. See ? for more details. Note that message number is an internal message reference.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CHN-1010</td>
+<td style="text-align: left;">Discarded message : message number as no binding on alternate exchange : exchange name</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a channel has discarded a message as the maximum delivery count has been exceeded but the queue's alternate exchange has no binding to a queue. See ? for more details. Note that message number is an internal message reference.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CHN-1011</td>
+<td style="text-align: left;">Message : message number moved to dead letter queue : queue name</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a channel has moved a message to the named dead letter queue</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CHN-1012</td>
+<td style="text-align: left;">Flow Control Ignored. Channel will be closed.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a channel violating the imposed flow control has been closed</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CHN-1013</td>
+<td style="text-align: left;">Uncommitted transaction contains size bytes of incoming message data.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Warns about uncommitted transaction with large message(s)</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Subscription Log Messages</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Message Id</th>
+<th style="text-align: left;">Message Text / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">SUB-1001</td>
+<td style="text-align: left;">Create : [Durable] Arguments : arguments</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a subscription (corresponds to JMS concept of a MessageConsumer) has been created.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SUB-1002</td>
+<td style="text-align: left;">Close</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a subscription has been closed.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SUB-1003</td>
+<td style="text-align: left;">SUB-1003 : Suspended for time ms</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a subscription has been in a suspened state for an unusual length of time. This may be indicative of an consuming application that has stopped taking messages from the consumer (i.e. a JMS application is not calling receive() or its asynchronous message listener onMessage() is block in application code). It may also indicate a generally overloaded system.</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Message Store Log Messages</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Message Id</th>
+<th style="text-align: left;">Message Text / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">MST-1001</td>
+<td style="text-align: left;">Created</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a message store has been created. The message store is responsible for the storage of the messages themselves, including the message body and any headers.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MST-1002</td>
+<td style="text-align: left;">Store location : path</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the message store is using path for the location of the message store.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MST-1003</td>
+<td style="text-align: left;">Closed</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the message store has been closed.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MST-1004</td>
+<td style="text-align: left;">Recovery Start</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that message recovery has begun.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MST-1005</td>
+<td style="text-align: left;">Recovered number of messages messages.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that recovery recovered the given number of messages from the store.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MST-1006</td>
+<td style="text-align: left;">Recovered Complete</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the message recovery is concluded.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MST-1007</td>
+<td style="text-align: left;">Store Passivated</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>The store is entering a passive state where is it unavailable for normal operations. Currently this message is used by HA when the node is in replica state.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MST-1008</td>
+<td style="text-align: left;">Store overfull, flow control will be enforced</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>The store has breached is maximum configured size. See ? for details.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MST-1009</td>
+<td style="text-align: left;">Store overfull condition cleared</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>The store size has fallen beneath its resume capacity and therefore flow control has been rescinded. See ? for details.</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Transaction Store Log Messages</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Message Id</th>
+<th style="text-align: left;">Message Text / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">TXN-1001</td>
+<td style="text-align: left;">Created</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a transaction store has been created. The transaction store is responsible for the storage of messages instances, that is, the presence of a message on a queue.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TXN-1002</td>
+<td style="text-align: left;">Store location : path</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the transaction store is using path for the location of the store.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TXN-1003</td>
+<td style="text-align: left;">Closed</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the transaction store has been closed.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TXN-1004</td>
+<td style="text-align: left;">Recovery Start</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that transaction recovery has begun.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TXN-1005</td>
+<td style="text-align: left;">Recovered number messages for queue name.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that recovery recovered the given number of message instances for the given queue.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TXN-1006</td>
+<td style="text-align: left;">Recovered Complete</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the message recovery is concluded.</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Configuration Store Log Messages</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Message Id</th>
+<th style="text-align: left;">Message Text / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">CFG-1001</td>
+<td style="text-align: left;">Created</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a configuration store has been created. The configuration store is responsible for the storage of the definition of objects such as queues, exchanges, and bindings.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CFG-1002</td>
+<td style="text-align: left;">Store location : path</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the configuration store is using path for the location of the store.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CFG-1003</td>
+<td style="text-align: left;">Closed</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the configuration store has been closed.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CFG-1004</td>
+<td style="text-align: left;">Recovery Start</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that configuration recovery has begun.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CFG-1005</td>
+<td style="text-align: left;">Recovered Complete</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the configuration recovery is concluded.</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>HA Log Messages</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Message Id</th>
+<th style="text-align: left;">Message Text / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">HA-1001</td>
+<td style="text-align: left;">Created</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>This HA node has been created.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA-1002</td>
+<td style="text-align: left;">Deleted</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>This HA node has been deleted</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA-1003</td>
+<td style="text-align: left;">Added : Node : 'name' (host:port)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>A new node has been added to the group.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA-1004</td>
+<td style="text-align: left;">Removed : Node : 'name' (host:port)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>The node has been removed from the group. This removal is permanent.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA-1005</td>
+<td style="text-align: left;">Joined : Node : 'name' (host:port)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>The node has become reachable. This may be as a result of the node being restarted, or a network problem may have been resolved.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA-1006</td>
+<td style="text-align: left;">Left : Node : 'name' (host:port)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>The node is no longer reachable. This may be as a result of the node being stopped or a network partition may be preventing it from being connected. The node is still a member of the group.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA-1007</td>
+<td style="text-align: left;">HA-1007 : Master transfer requested : to 'name' (host:port)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that a master transfer operation has been requested.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA-1008</td>
+<td style="text-align: left;">HA-1008 : Intruder detected : Node 'name' (host:port)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that an unexpected node has joined the group. The virtualhost node will go into the ERROR state in response to the condition.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA-1009</td>
+<td style="text-align: left;">HA-1009 : Insufficient replicas contactable</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>This node (which was in the master role) no longer has sufficient replica in contact in order to complete transactions.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA-1010</td>
+<td style="text-align: left;">HA-1010 : Role change reported: Node : 'name' (host:port) : from role to role</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Indicates that the node has changed role within the group.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA-1011</td>
+<td style="text-align: left;">HA-1011 : Minimum group size : new group size</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>The quorum requirements from completing elections or transactions has been changed.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA-1012</td>
+<td style="text-align: left;">HA-1012 : Priority : priority</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>The priority of the object node has been changed. Zero indicates that the node cannot be elected master.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA-1013</td>
+<td style="text-align: left;">HA-1013 : Designated primary : true|false</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>This node has been designated primary and can now operate solo. Applies to two node groups only.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA-1014</td>
+<td style="text-align: left;">HA-1014 : Diverged transactions discarded</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>This node is in the process of rejoining the group but has discovered that some of its transactions differ from those of the current master. The node will automatically roll-back (i.e. discard) the diverging transactions in order to be allowed to rejoin the group. This situation can only usually occur as a result of use of the weak durability options. These allow the group to operate with fewer than quorum nodes and therefore allow the inconsistencies to develop.</p>
+<p>On encountering this condition, it is <em>strongly</em> recommendend to run an application level reconcilation to determine the data that has been lost.</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Port Log Messages</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Message Id</th>
+<th style="text-align: left;">Message Text / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">PRT-1001</td>
+<td style="text-align: left;">Create</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Port has been created.</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PRT-1002</td>
+<td style="text-align: left;">Open</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Port has been open</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PRT-1003</td>
+<td style="text-align: left;">Close</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Port has been closed</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PRT-1004</td>
+<td style="text-align: left;">Connection count number within warn limit % of maximum limit</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Warns that number of open connections approaches maximum allowed limit</p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PRT-1005</td>
+<td style="text-align: left;">Connection from host rejected</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><p>Connection from given host is rejected because of reaching the maximum allowed limit</p></td>
+</tr>
+</tbody>
+</table>

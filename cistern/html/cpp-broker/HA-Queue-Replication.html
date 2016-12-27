@@ -1,0 +1,37 @@
+<h1 id="ha-queue-replication"><span class="header-section-number">1</span> Replicating Queues with the HA module</h1>
+<p>As well as support for an active-passive cluster, the HA module allows you to replicate individual queues, even if the brokers are not in a cluster. The original queue is used as normal. The replica queue is updated automatically as messages are added to or removed from the original queue.</p>
+<blockquote>
+<p><strong>Warning</strong></p>
+<p>It is not safe to modify the replica queue other than via the automatic updates from the original. Adding or removing messages on the replica queue will make replication inconsistent and may cause message loss. The HA module does <em>not</em> enforce restricted access to the replica queue (as it does in the case of a cluster) so it is up to the application to ensure the replica is not used until it has been disconnected from the original.</p>
+</blockquote>
+<h2><span class="header-section-number">1.1</span> Replicating queues</h2>
+<p>To create a replica queue, the HA module must be loaded on both the original and replica brokers (it is loaded by default.) You also need to set the configuration option:</p>
+<pre><code>    ha-queue-replication=yes
+      </code></pre>
+<p>to enable this feature on a stand-alone broker. It is automatically enabled for brokers that are part of a cluster.</p>
+<p>Suppose that <code>myqueue</code> is a queue on <code>node1</code> and we want to create a replica of <code>myqueue</code> on <code>node2</code> (where both brokers are using the default AMQP port.) This is accomplished by the command:</p>
+<pre><code>    qpid-config --broker=node2 add queue --start-replica node1 myqueue
+      </code></pre>
+<p>If <code>myqueue</code> already exists on the replica broker you can start replication from the original queue like this:</p>
+<pre><code>    qpid-ha replicate -b node2 node1 myqueue
+      </code></pre>
+<h2><span class="header-section-number">1.2</span> Replicating queues between clusters</h2>
+<p>You can replicate queues between two standalone brokers, between a standalone broker and a cluster, or between two clusters (see ?.) For failover in a cluster there are two cases to consider.</p>
+<ol type="1">
+<li><p>When the <em>original</em> queue is on the active node of a cluster, failover is automatic. If the active node fails, the replication link will automatically reconnect and the replica will continue to be updated from the new primary.</p></li>
+<li><p>When the <em>replica</em> queue is on the active node of a cluster, there is no automatic failover. However you can use the following workaround.</p></li>
+</ol>
+<h3><span class="header-section-number">1.2.1</span> Work around for fail-over of replica queue in a cluster</h3>
+<p>When a primary broker fails the cluster resource manager calls a script to promote a backup broker to be the new primary. By default this script is <code>/etc/init.d/qpidd-primary</code> but you can modify that in your <code>cluster.conf</code> file (see ?.)</p>
+<p>You can modify this script (on each host in your cluster) by adding commands to create your replica queues just before the broker is promoted, as indicated in the following exceprt from the script:</p>
+<pre><code>start() {
+    service qpidd start
+    echo -n $&quot;Promoting qpid daemon to cluster primary: &quot;
+    ################################
+    #### Add your commands here ####
+    ################################
+    $QPID_HA -b localhost:$QPID_PORT promote
+    [ &quot;$?&quot; -eq 0 ] &amp;&amp; success || failure
+}
+    </code></pre>
+<p>Your commands will be run, and your replicas created, whenever the system fails over to a new primary.</p>

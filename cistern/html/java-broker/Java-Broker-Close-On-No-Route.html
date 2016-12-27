@@ -1,0 +1,15 @@
+<h1 id="Java-Broker-Close-Connection-When-No-Route"><span class="header-section-number">1</span> Closing client connections on unroutable mandatory messages</h1>
+<h2 id="Java-Broker-Close-Connection-When-No-Route-Summary"><span class="header-section-number">1.1</span> Summary</h2>
+<p>Due to asynchronous nature of AMQP 0-8/0-9/0-9-1 protocols sending a message with a routing key for which no queue binding exist results in either message being bounced back (if it is mandatory or immediate) or discarded on broker side otherwise.</p>
+<p>When a 'mandatory' message is returned back, the Qpid JMS client conveys this by delivering an <em>AMQNoRouteException</em> through the configured ExceptionListener on the Connection. This does not cause channel or connection closure, however it requires a special exception handling on client side in order to deal with <em>AMQNoRouteExceptions</em>. This could potentially be a problem when using various messaging frameworks (e.g. Mule) as they usually close the connection on receiving any JMSException.</p>
+<p>In order to simplify application handling of scenarios where 'mandatory' messages are being sent to queues which do not actually exist, the Java Broker can be configured such that it will respond to this situation by closing the connection rather than returning the unroutable message to the client as it normally should. From the application perspective, this will result in failure of synchronous operations in progress such as a session commit() call.</p>
+<blockquote>
+<p><strong>Note</strong></p>
+<p>This feature affects only transacted sessions.</p>
+<p>Qpid JMS client sends 'mandatory' messages when using Queue destinations and 'non-mandatory' messages when using Topic destinations.</p>
+</blockquote>
+<h2 id="Java-Broker-Close-Connection-When-No-Route-Configuration"><span class="header-section-number">1.2</span> Configuring <em>closeWhenNoRoute</em></h2>
+<p>The Broker attribute <em>closeWhenNoRoute</em> can be set to specify this feature on broker side. By default, it is turned on. Setting <em>closeWhenNoRoute</em> to <em>false</em> switches it off.</p>
+<p>Setting the <em>closeWhenNoRoute</em> in the JMS client connection URL can override the broker configuration on a connection specific basis, for example :</p>
+<pre><code>amqp://guest:guest@clientid/?brokerlist=&#39;tcp://localhost:5672&#39;&amp;closeWhenNoRoute=&#39;false&#39;</code></pre>
+<p>If no value is specified on the client the broker setting will be used. If client setting is specified then it will take precedence over the broker-wide configuration. If the client specifies and broker does not support this feature the warning will be logged.</p>
