@@ -1,0 +1,16 @@
+#!/usr/bin/python
+
+from plano import *
+
+set_message_threshold("warn")
+
+modules = "cpp", "dispatch", "interop_test", "java", "jms", "proton", "proton_j", "python"
+paths = find(".", "*.md", "*.html.in")
+
+for module in modules:
+    print module
+    
+    for path in paths:
+        call("sed -i 's/current_{}_release_link/qpid_{}_release/g' {}", module, module, path)
+        call("sed -i 's/current_{}_release_url/qpid_{}_release.url/g' {}", module, module, path)
+        call("sed -i 's/current_{}_release/qpid_{}_release.version/g' {}", module, module, path)
