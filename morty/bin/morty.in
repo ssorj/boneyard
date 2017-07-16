@@ -1,0 +1,5 @@
+#!/bin/sh
+
+export NODE_PATH=@morty_home@/node_modules
+
+exec node @morty_home@/lib/main.js "$@"
