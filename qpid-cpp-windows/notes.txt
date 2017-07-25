@@ -1,0 +1,16 @@
+C:\Users\jross\code\qpid-proton>rmdir /q /s bld
+rmdir /q /s bld
+
+C:\Users\jross\code\qpid-proton>mkdir bld
+mkdir bld
+
+C:\Users\jross\code\qpid-proton>cd bld
+cd bld
+
+C:\Users\jross\code\qpid-proton\bld>cmake .. -DCMAKE_INSTALL_PREFIX=C:\local\qpid-proton
+
+cmake --build . --target INSTALL
+
+%UserProfile%
+%AppData% HOME?
+%LocalAppData% <--

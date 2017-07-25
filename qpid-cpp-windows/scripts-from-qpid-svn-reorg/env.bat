@@ -1,0 +1,13 @@
+set TOP_DIR=%~dp0..
+
+set PYTHON_SOURCE_DIR=%TOP_DIR%\qpid\python
+set PYTHON_BUILD_DIR=%TOP_DIR%\build\python
+
+set CPP_SOURCE_DIR=%TOP_DIR%\qpid\cpp
+set CPP_BUILD_DIR=%TOP_DIR%\build\cpp
+
+set BOOST_ROOT=C:\boost-win-1.53-32bit-vs2012
+set BOOST_LIBRARYDIR=%BOOST_ROOT%\lib
+
+set PATH=%PYTHON_BUILD_DIR%\bin;%BOOST_LIBRARYDIR%;%PATH%
+set PYTHONPATH=%PYTHON_BUILD_DIR%\lib
