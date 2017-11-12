@@ -1,0 +1,30 @@
+include::includes/attributes.adoc[]
+
+:RouterName: Acme Router
+:RouterVersion: 0.16.0
+:UpstreamBookDir: {QpidDispatchUpstreamDir}/doc/book
+
+= Using {RouterName}
+
+include::overview.adoc[leveloffset=+1]
+
+include::installation.adoc[leveloffset=+1]
+
+include::{UpstreamBookDir}/getting-started.adoc[leveloffset=+1]
+
+include::{UpstreamBookDir}/understand-router-configuration.adoc[leveloffset=+1]
+
+include::{UpstreamBookDir}/configuration-connections.adoc[leveloffset=+1]
+
+include::{UpstreamBookDir}/configuration-security.adoc[leveloffset=+1]
+
+include::{UpstreamBookDir}/routing.adoc[leveloffset=+1]
+
+include::{UpstreamBookDir}/logging.adoc[leveloffset=+1]
+
+include::{UpstreamBookDir}/management.adoc[leveloffset=+1]
+
+include::{UpstreamBookDir}/reliability.adoc[leveloffset=+1]
+
+[appendix]
+include::{UpstreamBookDir}/configuration-reference.adoc[leveloffset=+1]

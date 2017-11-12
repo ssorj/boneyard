@@ -1,0 +1,9 @@
+:doctype: book
+
+:ProductName: Acme
+
+:ClientJms: {ProductName} JMS
+:Router: {ProductName} Router
+
+:ClientJmsBook: Using the {ClientJms} Client
+:RouterBook: Using {Router}

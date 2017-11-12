@@ -1,0 +1,6 @@
+include::../includes/attributes.adoc[]
+
+= Acme Books
+
+* link:client-jms/index.html[{ClientJmsBook}]
+* link:router/index.html[{RouterBook}]

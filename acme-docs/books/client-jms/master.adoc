@@ -1,0 +1,19 @@
+include::includes/attributes.adoc[]
+
+:ClientName: Acme JMS
+:ClientVersion: 1.0.0
+:UpstreamBookDir: {QpidJmsUpstreamDir}/qpid-jms-docs/book
+
+= Using the {ClientName} Client
+
+include::overview.adoc[leveloffset=+1]
+
+include::installation.adoc[leveloffset=+1]
+
+include::{UpstreamBookDir}/getting-started.adoc[leveloffset=+1]
+
+include::{UpstreamBookDir}/configuration.adoc[leveloffset=+1]
+
+include::{UpstreamBookDir}/examples.adoc[leveloffset=+1]
+
+include::{UpstreamBookDir}/interoperability.adoc[leveloffset=+1]

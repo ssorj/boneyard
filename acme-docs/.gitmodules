@@ -1,0 +1,12 @@
+[submodule "upstreams/activemq-books"]
+	path = upstreams/activemq-books
+	url = https://github.com/ssorj/activemq-books
+[submodule "upstreams/qpid-books"]
+	path = upstreams/qpid-books
+	url = https://github.com/ssorj/qpid-books
+[submodule "upstreams/qpid-jms"]
+	path = upstreams/qpid-jms
+	url = https://github.com/ssorj/qpid-jms
+[submodule "upstreams/qpid-dispatch"]
+	path = upstreams/qpid-dispatch
+	url = https://github.com/ssorj/qpid-dispatch
