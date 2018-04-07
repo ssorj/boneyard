@@ -1,4 +1,0 @@
-[[topic_6]]
-= Topic 6
-
-This is topic-6 with information about {ProductName}.
