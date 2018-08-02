@@ -1,0 +1,35 @@
+%global _user ssorj
+%global _commit @commit@
+%global _short_commit %(c=%{_commit}; echo ${c:0:7})
+%global _timestamp %(date +"%Y%m%d")
+
+Name:           transom
+Version:        0
+Release:        0.1.%{_timestamp}.%{_short_commit}%{?dist}
+Summary:        Render websites from markdown
+License:        ASL 2.0
+URL:            http://www.ssorj.net/projects/transom.html
+Source:         %{name}-SNAPSHOT.tar.gz
+BuildArch:      noarch
+Requires:       python
+BuildRequires:  make
+BuildRequires:  python
+
+%description
+Transom renders static website content from markdown source files.
+
+%prep
+%setup -qn %{name}-%{_commit}
+
+%build
+make build
+
+%install
+make install DESTDIR=%{buildroot} PREFIX=%{_prefix}
+
+%files
+%doc README.md LICENSE
+/usr/share/transom
+/usr/bin/transom
+
+%changelog

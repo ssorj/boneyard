@@ -1,0 +1,20 @@
+{
+    "name": "bluescout",
+    "version": "1.0.0",
+    "description": "Example programs that send and receive AMQP messages",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "express": "^4.16.0",
+        "rhea": "^0.2.5"
+    },
+    "repository": {
+        "type": "git",
+        "url" : "https://github.com/ssorj/bluescout.git"
+    },
+    "bin": {
+        "send": "./lib/send.js",
+        "receive": "./lib/receive.js",
+        "request": "./lib/request.js",
+        "respond": "./lib/respond.js"
+    }
+}

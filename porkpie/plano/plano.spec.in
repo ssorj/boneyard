@@ -1,0 +1,47 @@
+%global _user ssorj
+%global _commit @commit@
+%global _short_commit %(c=%{_commit}; echo ${c:0:8})
+%global _timestamp %(date +"%Y%m%d")
+
+%if 0%{?rhel} && 0%{?rhel} <= 6
+%{!?__python2: %global __python2 /usr/bin/python2}
+%{!?python2_sitelib: %global python2_sitelib %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+%{!?python2_sitearch: %global python2_sitearch %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
+%endif
+
+Name:           plano
+Version:        0
+Release:        0.1.%{_timestamp}.%{_short_commit}%{?dist}
+Summary:        Shell-like Python utility functions
+License:        ASL 2.0
+URL:            http://www.ssorj.net/projects/%{name}.html
+Source:         %{name}-SNAPSHOT.tar.gz
+BuildArch:      noarch
+BuildRequires:  python2-devel
+
+%description
+Python utility functions for controlling logging and writing
+shell-like scripts.
+
+%prep
+%setup -qn %{name}-%{_commit}
+
+%build
+%{__python2} setup.py build
+
+%install
+%{__python2} setup.py install --skip-build --root %{buildroot}
+
+%changelog
+
+%package -n python-plano
+Summary:        Shell-like Python utility functions
+
+%description -n python-plano
+Python utility functions for controlling logging and writing
+shell-like scripts.
+
+%files -n python-plano
+%doc README.md LICENSE
+%{python2_sitelib}/plano.py*
+%{python2_sitelib}/*.egg-info

@@ -1,0 +1,64 @@
+%global _user ssorj
+%global _commit @commit@
+%global _short_commit %(c=%{_commit}; echo ${c:0:8})
+%global _timestamp %(date +"%Y%m%d")
+
+Name:           rivet
+Version:        0
+Release:        0.1.%{_timestamp}.%{_short_commit}%{?dist}
+Summary:        A tool for testing and releasing Apache source modules
+License:        ASL 2.0
+URL:            http://www.ssorj.net/projects/%{name}.html
+Source:         %{name}-SNAPSHOT.tar.gz
+BuildArch:      noarch
+Requires:       boost-devel
+Requires:       cmake
+Requires:       coreutils
+Requires:       cyrus-sasl-devel
+Requires:       doxygen
+Requires:       gcc-c++
+Requires:       graphviz
+Requires:       java-devel
+Requires:       libaio-devel
+Requires:       libdb-cxx-devel
+Requires:       libibverbs-devel
+Requires:       librdmacm-devel
+Requires:       libuuid-devel
+Requires:       make
+Requires:       maven
+Requires:       openssl-devel
+Requires:       nspr-devel
+Requires:       nss-devel
+Requires:       perl-devel
+Requires:       pkgconfig
+Requires:       python-devel
+Requires:       ruby-devel
+Requires:       rubygem-minitest
+Requires:       rubygem-rspec
+Requires:       rubygem-simplecov
+Requires:       rubygem-test-unit
+Requires:       subversion
+Requires:       swig
+Requires:       tar
+Requires:       xerces-c-devel
+Requires:       xqilla-devel
+BuildRequires:  python
+
+%description
+Rivet is a tool for testing and releasing Apache source modules.
+
+%prep
+%setup -qn %{name}-%{_commit}
+
+%build
+make build
+
+%install
+make install DESTDIR=%{buildroot} PREFIX=%{_prefix}
+
+%files
+%doc README.md LICENSE.txt
+/usr/share/rivet
+/usr/bin/rivet
+
+%changelog

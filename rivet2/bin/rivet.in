@@ -1,0 +1,157 @@
+#!/usr/bin/env python
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+from __future__ import print_function
+
+import os
+import sys
+
+home = os.path.normpath("@rivet_home@")
+sys.path.insert(0, os.path.join(home, "python"))
+
+from argparse import ArgumentParser
+from argparse import RawDescriptionHelpFormatter, ArgumentDefaultsHelpFormatter
+
+from rivet_apache import *
+
+_description = "Rivet is a tool for installing and testing source modules."
+
+_epilog = """
+command arguments:
+  info               Get information about the modules
+  env                For modifying your shell environment
+  fetch              Download the module source code
+  build              Build the modules
+  install            Install the modules
+  release            Generate release artifacts
+  test               Run tests
+  clean              Remove module output
+
+typical developer usage:
+  % rivet install qpid-cpp qpid-dispatch@21fe0751
+  % source <(rivet env)
+  [Run the installed component]
+"""
+
+class _HelpFormatter(RawDescriptionHelpFormatter, ArgumentDefaultsHelpFormatter):
+    pass
+
+def main():
+    parser = ArgumentParser()
+    parser.description = _description.lstrip()
+    parser.epilog = _epilog.lstrip()
+    parser.formatter_class = _HelpFormatter
+
+    output = join(home_dir(), ".cache", "rivet")
+    prefix = join(output, "install")
+
+    parser.add_argument("command", default="info", metavar="COMMAND",
+                        help="Run COMMAND; see 'command arguments' below")
+    parser.add_argument("module", nargs="*", metavar="MODULE",
+                        help="Run command on MODULE")
+    parser.add_argument("--output", default=output, metavar="DIR",
+                        help="Send output to DIR")
+    parser.add_argument("--prefix", default=prefix, metavar="DIR",
+                        help="Use install prefix DIR")
+    parser.add_argument("--release-tag", metavar="TAG",
+                        help="Label each release artifact with TAG")
+    parser.add_argument("--init-only", action="store_true",
+                        help="Initialize then exit")
+
+    args = parser.parse_args()
+
+    app = Rivet(home)
+
+    ApacheProject(app)
+
+    app.load()
+    app.init()
+
+    try:
+        command = app.commands_by_name[args.command]
+    except KeyError:
+        sys.exit("Command '{}' is unknown".format(args.command))
+
+    request = Request(args.output)
+    request.install_dir = args.prefix
+    request.release_tag = args.release_tag
+
+    project = app.projects_by_name["apache"]
+
+    if command.name == "env":
+        if not args.init_only:
+            command(request)
+
+        sys.exit()
+
+    if len(args.module) == 1 and args.module[0] == "all":
+        request.all_modules = True
+        request.modules = project.modules
+    else:
+        for module_name in args.module:
+            source_revision = None
+
+            if "@" in module_name:
+                module_name, source_revision = module_name.split("@", 1)
+
+                if source_revision == "":
+                    sys.exit("Illegal value for source revision")
+
+            try:
+                module = project.modules_by_name[module_name]
+            except KeyError:
+                sys.exit("Module '{}' is unknown".format(module_name))
+
+            request.modules.append(module)
+            request.source_revisions_by_module[module] = source_revision
+
+        if len(request.modules) == 0:
+            sys.exit("I need at least one module name or 'all'")
+
+    if args.init_only:
+        sys.exit()
+
+    command(request)
+
+    if request.failed_tasks:
+        print("Task failures:")
+
+        for task_name in request.failed_tasks:
+            task_error = request.failed_tasks[task_name]
+            message = task_error.message
+
+            if message == "":
+                if isinstance(task_error, CalledProcessError):
+                    message = "Command '{}' exited with code {}".format \
+                              (task_error.cmd, task_error.returncode)
+                else:
+                    message = task_error.__class__.__name__
+
+            print("  {:24}  {}".format(task_name, message))
+
+        sys.exit("FAILED")
+    else:
+        print("PASSED")
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
