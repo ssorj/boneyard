@@ -1,0 +1,2 @@
+export LINTEL_HOME=$PWD
+export PYTHONPATH=$LINTEL_HOME/python

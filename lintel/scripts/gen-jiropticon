@@ -1,0 +1,177 @@
+#!/usr/bin/python
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+#   http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+from plano import *
+from lintel import *
+
+page_template = \
+"""
+# Jiropticon
+
+{projects}
+"""
+
+project_template = \
+"""
+---
+
+## {name}
+
+### Issues by version
+
+{versions}
+
+### Issues by assignee
+
+{assignees}
+
+### Issues by component
+
+{components}
+
+### Queries
+
+<div class="four-column" markdown="1">
+{queries}
+</div>
+
+### Operations
+
+<div class="four-column" markdown="1">
+{operations}
+</div>
+"""
+
+def gen_jiropticon(output_path, base_url, project_keys):
+    model = Model(base_url, project_keys)
+    model.load()
+
+    projects = list()
+
+    for project in model.projects:
+        projects.append(render_project(project))
+
+    projects = "\n\n".join(projects)
+
+    output = page_template.format(**locals())
+    
+    write(output_path, output)
+
+def render_project(project):
+    versions = render_versions(project)
+    assignees = render_assignees(project)
+    components = render_components(project)
+        
+    queries = list()
+    operations = list()
+
+    for query in project.queries:
+        queries.append("- [{}]({})".format(query.name, query.get_url()))
+
+    for operation in project.operations:
+        operations.append("- [{}]({})".format(operation.name, operation.get_url()))
+
+    queries = "\n".join(queries)
+    operations = "\n".join(operations)
+
+    name = project.name
+    jira_url = project.get_jira_url()
+
+    output = project_template.format(**locals())
+
+    return output
+
+def render_versions(project):
+    headings = list()
+    rows = list()
+
+    headings.append("Version")
+
+    for query in project.queries:
+        headings.append(query.name)
+    
+    rows.append(headings)
+    
+    for version in project.versions:
+        row = list()
+
+        row.append(html_a(version.name, version.get_jira_url()))
+        
+        for query in version.queries:
+            row.append(html_a(query.name, query.get_url()))
+
+        rows.append(row)
+
+    return html_table(rows)
+
+def render_assignees(project):
+    headings = list()
+    rows = list()
+
+    headings.append("Assignee")
+
+    for query in project.queries:
+        headings.append(query.name)
+    
+    rows.append(headings)
+    
+    for assignee in project.assignees:
+        row = list()
+
+        row.append(html_a(assignee.name, assignee.get_jira_url()))
+        
+        for query in assignee.queries:
+            row.append(html_a(query.name, query.get_url()))
+
+        rows.append(row)
+
+    return html_table(rows)
+
+def render_components(project):
+    headings = list()
+    rows = list()
+
+    headings.append("Component")
+
+    for query in project.queries:
+        headings.append(query.name)
+    
+    rows.append(headings)
+    
+    for component in project.components:
+        row = list()
+
+        row.append(html_a(component.name, component.get_jira_url()))
+        
+        for query in component.queries:
+            row.append(html_a(query.name, query.get_url()))
+
+        rows.append(row)
+
+    return html_table(rows)
+                       
+if len(ARGS) < 4:
+    exit("Usage: script OUTPUT-PATH BASE-URL PROJECT-KEYS...")
+
+output_path = ARGS[1]
+base_url = ARGS[2]
+project_keys = ARGS[3:]
+
+gen_jiropticon(output_path, base_url, project_keys)

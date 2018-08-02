@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+#   http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+from __future__ import print_function
+
+import os
+import random
+import sys
+import time
+
+home = os.path.normpath("@qpid_management_home@")
+sys.path.insert(0, os.path.join(home, "python"))
+
+from tests import *
+from tool import *
+
+class Tool(ToolMain):
+    def __init__(self, parser):
+        super(Tool, self).__init__(parser)
+
+        self.server_thread = None
+
+    def do_run(self, args, session):
+        if args.self:
+            session.host = "localhost"
+            session.port = random.randint(49152, 65535)
+            session._dynamic_response_node_enabled = False
+
+            self.server_thread = TestServerThread(session.host, session.port)
+            self.server_thread.server.debug = session.debug
+            self.server_thread.start()
+
+            time.sleep(0.1) # XXX how to test port readiness?
+
+        client = TestClient()
+
+        try:
+            with session:
+                client.run(session)
+        finally:
+            if self.server_thread is not None:
+                self.server_thread.stop()
+                self.server_thread.join()
+
+description = "Test standard AMQP Management capabilities"
+parser = ToolArgumentParser(description=description)
+
+help = "run the tests against a mock AMQP server"
+parser.add_argument("--self", action="store_true", help=help)
+
+tool = Tool(parser)
+
+if __name__ == "__main__":
+    try:
+        tool.main()
+    except KeyboardInterrupt:
+        pass

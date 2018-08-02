@@ -1,0 +1,110 @@
+#!/usr/bin/env python
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+#   http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+from __future__ import print_function
+
+import os
+import sys
+
+home = os.path.normpath("@qpid_management_home@")
+sys.path.insert(0, os.path.join(home, "python"))
+
+from tool import *
+
+class Tool(ToolMain):
+    commands = "types", "attributes", "operations", "other-nodes"
+
+    def do_check(self, args, session):
+        if args.command not in self.commands:
+            msg = "Command '{}' is unknown".format(args.command)
+            raise ToolError(msg)
+
+    def do_run(self, args, session):
+        command_name = args.command.replace("-", "_")
+        command = getattr(self, command_name)
+        node = Node(args.node)
+
+        try:
+            with session:
+                command(node, session)
+        except RequestError, e:
+            raise ToolError(str(e))
+
+    def types(self, node, session):
+        types = node.get_types(session)
+
+        for name in types:
+            print("Type '{}'".format(name))
+
+            values = types[name]
+
+            for value in values:
+                print("  Implements '{}'".format(value))
+
+    def attributes(self, node, session):
+        attrs = node.get_attributes(session)
+
+        for name in attrs:
+            print("Type '{}'".format(name))
+
+            values = attrs[name]
+
+            for value in values:
+                print("  Attribute '{}'".format(value))
+
+    def operations(self, node, session):
+        ops = node.get_operations(session)
+
+        for name in ops:
+            print("Type '{}'".format(name))
+
+            values = ops[name]
+
+            for value in values:
+                print("  Operation '{}'".format(value))
+
+    def other_nodes(self, node, session):
+        nodes = node.get_other_nodes(session)
+
+        for name in nodes:
+            print("Node '{}'".format(name))
+
+description = "Interrogate AMQP Management nodes"
+epilog = """commands:
+  types           list the manageable types
+  attributes      list attributes by type
+  operations      list operations by type
+  other-nodes     list other management nodes
+"""
+parser = NodeArgumentParser(description=description, epilog=epilog)
+
+#help = "constrain results to those that implement TYPE"
+#parser.add_argument("--type", metavar="TYPE", help=help)
+
+help = "the particular request; see 'commands' below"
+parser.add_argument("command", metavar="COMMAND", help=help)
+
+tool = Tool(parser)
+
+if __name__ == "__main__":
+    try:
+        tool.main()
+    except KeyboardInterrupt:
+        pass

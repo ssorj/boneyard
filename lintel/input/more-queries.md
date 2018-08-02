@@ -1,0 +1,9 @@
+- ENTMQCL unresolved: <https://issues.jboss.org/issues/?jql=resolution%20is%20EMPTY%20and%20project%20%3D%20%22ENTMQCL%22>
+- Proton 0.12.0 unresolved: <https://issues.apache.org/jira/issues/?jql=resolution%20is%20EMPTY%20and%20fixVersion%20%3D%20%220.12.0%22%20and%20project%20%3D%20%22PROTON%22>
+- Proton unresolved: <https://issues.apache.org/jira/issues/?jql=resolution%20is%20EMPTY%20AND%20project%20%3D%20PROTON%20AND%20fixVersion%20is%20EMPTY%20ORDER%20BY%20priority%20DESC>
+- C++ broker and client qpid-cpp-next unresolved: <https://issues.apache.org/jira/issues/?jql=resolution%20is%20EMPTY%20and%20fixVersion%20%3D%20%22qpid-cpp-next%22%20and%20project%20%3D%20%22QPID%22>
+- C++ broker unresolved: <https://issues.apache.org/jira/issues/?jql=resolution%20is%20EMPTY%20AND%20component%20%3D%20%22C%2B%2B%20Broker%22%20AND%20project%20%3D%20QPID%20AND%20fixVersion%20is%20EMPTY%20ORDER%20BY%20priority%20DESC>
+- C++ client unresolved: <https://issues.apache.org/jira/issues/?jql=resolution%20is%20EMPTY%20AND%20component%20%3D%20%22C%2B%2B%20Client%22%20AND%20project%20%3D%20QPID%20AND%20fixVersion%20is%20EMPTY%20ORDER%20BY%20priority%20DESC>
+- Python client qpid-python-next unresolved: <https://issues.apache.org/jira/issues/?jql=resolution%20is%20EMPTY%20and%20fixVersion%20%3D%20%22qpid-python-next%22%20and%20project%20%3D%20%22QPID%22>
+- Python client unresolved: <https://issues.apache.org/jira/issues/?jql=resolution%20is%20EMPTY%20AND%20component%20%3D%20%22Python%20Client%22%20AND%20project%20%3D%20QPID%20AND%20fixVersion%20is%20EMPTY%20ORDER%20BY%20priority%20DESC>
+- Qpid unresolved with attachments that may be patches: <https://issues.apache.org/jira/issues/?jql=project%20%20in%20(QPID%2C%20%22Qpid%20Proton%22%2C%20%22Qpid%20Dispatch%22)%20AND%20resolution%20%3D%20Unresolved%20AND%20attachments%20is%20not%20EMPTY%20ORDER%20BY%20priority%20DESC>
