@@ -1,0 +1,35 @@
+#!/usr/bin/python3
+
+from plano import *
+
+ENV["MESSAGING_SERVICE_PORT"] = "5672"
+
+enable_logging(level="debug")
+
+worker = None
+frontend = None
+
+try:
+    with working_dir("worker"):
+        worker = start_process("HTTP_PORT=8081 mvn vertx:run", shell=True)
+
+    with working_dir("frontend"):
+        frontend = start_process("mvn vertx:run")
+
+    sleep(3)
+
+    request_id = call_for_stdout("curl \"http://localhost:8080/api/send-request\" --header \"Content-Type: application/json\" --data '{{\"text\": \"abc\", \"uppercase\": true, \"reverse\": true}}' --verbose")
+
+    request_id = request_id.decode("utf-8")
+    print(111, request_id)
+    
+    sleep(1)
+
+    call_for_stdout("curl --get \"http://localhost:8080/api/receive-response\" --data-urlencode request=\"{}\" --verbose", request_id)
+
+    notice("SUCCESS")
+except KeyboardInterrupt:
+    pass
+except CalledProcessError:
+    terminate_process(worker)
+    terminate_process(frontend)

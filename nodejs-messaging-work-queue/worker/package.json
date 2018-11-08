@@ -1,0 +1,15 @@
+{
+    "name": "messaging-work-queue-worker",
+    "version": "1.0.0",
+    "description": "A sample Node.js app that processes requests",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "express": "^4.16.0",
+        "kube-probe": "^0.3.1",
+        "rhea": "^0.2.13"
+    },
+    "repository": {
+        "type": "git",
+        "url" : "https://github.com/ssorj/nodejs-messaging-work-queue.git"
+    }
+}

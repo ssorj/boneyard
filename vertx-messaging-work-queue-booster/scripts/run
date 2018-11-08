@@ -1,0 +1,24 @@
+#!/usr/bin/python3
+
+from plano import *
+
+ENV["MESSAGING_SERVICE_PORT"] = "5672"
+
+enable_logging(level="debug")
+
+worker_1 = None
+worker_2 = None
+
+try:
+    with working_dir("worker"):
+        worker_1 = start_process("HTTP_PORT=8081 mvn vertx:run", shell=True)
+        worker_2 = start_process("HTTP_PORT=8082 mvn vertx:run", shell=True)
+
+    with working_dir("frontend"):
+        #call("PN_TRACE_FRM=1 mvn vertx:run", shell=True)
+        call("mvn vertx:run")
+except KeyboardInterrupt:
+    pass
+except CalledProcessError:
+    terminate_process(worker_1)
+    terminate_process(worker_2)

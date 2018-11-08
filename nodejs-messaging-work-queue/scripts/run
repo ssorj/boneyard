@@ -1,0 +1,23 @@
+#!/usr/bin/python3
+
+from plano import *
+
+ENV["MESSAGING_SERVICE_PORT"] = "5672"
+
+enable_logging(level="debug")
+
+worker_1 = None
+worker_2 = None
+
+try:
+    with working_dir("worker"):
+        worker_1 = start_process("PORT=8081 npm start", shell=True)
+        worker_2 = start_process("PORT=8082 npm start", shell=True)
+
+    with working_dir("frontend"):
+        call("npm start")
+except KeyboardInterrupt:
+    pass
+except CalledProcessError:
+    terminate_process(worker_1)
+    terminate_process(worker_2)
