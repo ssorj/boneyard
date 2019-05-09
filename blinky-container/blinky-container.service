@@ -1,0 +1,16 @@
+# Requires:
+#
+#  - docker rm blinky
+#  - docker run -d --name blinky -p 56720:56720 blinky
+
+[Unit]
+Description=Blinky container
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker start -a blinky
+ExecStop=/usr/bin/docker stop -t 2 blinky
+
+[Install]
+WantedBy=local.target

@@ -1,0 +1,16 @@
+# Requires:
+#
+#  - docker rm stagger
+#  - docker run -d --name stagger -p 56721:56721 stagger
+
+[Unit]
+Description=Stagger container
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker start -a stagger
+ExecStop=/usr/bin/docker stop -t 2 stagger
+
+[Install]
+WantedBy=local.target
