@@ -8,5 +8,3 @@ run: clean
 .PHONY: clean
 clean:
 	rm -rf test
-
-# cat setup.json |  docker run -i  ubuntu /bin/bash -c 'cat'
