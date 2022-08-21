@@ -1,0 +1,29 @@
+values:
+  AT-MOST-ONCE:
+    description: |
+      Unreliable delivery.  The sender settles the message as
+      soon as it sends it.  If the connection is lost before the
+      message is received, the message will not be delivered.
+  AT-LEAST-ONCE:
+    description: |
+      Reliable delivery.  The receiver accepts and settles the
+      message on receipt.  If the connection is lost before the
+      sender is informed of the settlement, then the delivery is
+      considered in-doubt and will be retried.  This will ensure
+      it eventually gets delivered, provided the connection and
+      link can be reestablished.  It may, however, be delivered
+      multiple times.
+  EXACTLY-ONCE:
+    description: |
+      Reliable delivery with no duplicates.  The receiver
+      accepts the message but doesn't settle it.  The sender
+      settles once it is aware that the receiver accepted it.
+      In this way the receiver retains knowledge of an accepted
+      message until it is sure the sender knows it has been
+      accepted.  If the connection is lost before settlement,
+      the receiver informs the sender of all the unsettled
+      deliveries it knows about, and from this the sender can
+      deduce which need to be redelivered. The sender likewise
+      informs the receiver which deliveries it knows about, from
+      which the receiver can deduce which have already been
+      settled.

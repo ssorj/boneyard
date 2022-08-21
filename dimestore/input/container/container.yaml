@@ -1,0 +1,188 @@
+description: |
+  A top-level container of connections, sessions, senders, and
+  receivers.
+
+  A container gives a unique identity to each communicating
+  peer.  It is often a process-level object.
+
+  It serves as an entry point to the API, allowing connections
+  and links to be established.  It can be supplied with an event
+  handler in order to intercept important events, such as newly
+  received messages or newly issued link credit for sending
+  messages.
+properties:
+  id:
+    type: /types/string
+    value: "*generated*"
+    description: |
+      A globally unique container identifier.  It is used to
+      identify this container in any connections it establishes.
+  auto-stop:
+    type: /types/boolean
+    value: true
+    mutable: true
+    description: |
+      Stop when all active connections and listeners are closed.
+methods:
+  create:
+    description: |
+      Create a new container.
+    inputs:
+      messaging-handler:
+        type: /container/messaging-handler
+        value: "*instance*"
+        optional: true
+        description: |
+          The main event handler for this container.
+      id:
+        type: /types/string
+        value: "*generated*"
+        optional: true
+        description: |
+          Identifiers should be unique.  By default a UUID will be
+          used.
+    outputs:
+      container:
+        type: /container/container
+        value: "*instance*"
+  run:
+    description: |
+      Start processing events.  It returns when all connections
+      and listeners are closed or the container is stopped.
+  stop:
+    description: |
+      Shutdown open connections and stop processing events.
+
+      The operation is complete when on-stop fires.
+    inputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"
+        optional: true
+  send:
+    description: |
+      Send a message.
+    unsettled: true
+    inputs:
+      message:
+        type: /container/message
+        value: "*instance*"
+      address-url:
+        type: /types/string
+        value: "*instance*"
+    outputs:
+      tracker:
+        type: /container/tracker
+        value: "*instance*"
+  send-request:
+    description: |
+      Send a request message.  The message reply-to property is
+      set automatically.
+    unsettled: true
+    inputs:
+      message:
+        type: /container/message
+        value: "*instance*"
+      address-url:
+        type: /types/string
+        value: "*instance*"
+    outputs:
+      tracker:
+        type: /container/tracker
+        value: "*instance*"
+  send-response:
+    description: |
+      Send a response message.  The message to and
+      correlation-id properties are set automatically.
+    unsettled: true
+    inputs:
+      message:
+        type: /container/message
+        value: "*instance*"
+      request:
+        type: /container/message
+        value: "*instance*"
+    outputs:
+      tracker:
+        type: /container/tracker
+        value: "*instance*"
+  connect:
+    description: |
+      Create and open an outbound connection.
+
+      The operation is complete when on-connection-open fires.
+    inputs:
+      connection-url:
+        type: /types/string
+        value: "*instance*"
+      options:
+        type: /container/connection-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      connection:
+        type: /container/connection
+        value: "*instance*"
+  listen:
+    description: |
+      Listen for incoming connections.
+    inputs:
+      listen-info:
+        type: /types/string
+        value: "*instance*"
+      handler:
+        type: /container/listen-handler
+        value: "*instance*"
+        optional: true
+      options:
+        type: /container/connection-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      listener:
+        type: /container/listener
+        value: "*instance*"
+  open-receiver:
+    description: |
+      Create and open a receiving link.
+
+      The operation is complete when on-receiver-open fires.
+    inputs:
+      address-url:
+        type: /types/string
+        value: "*instance*"
+      receiver-options:
+        type: /container/receiver-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      receiver:
+        type: /container/receiver
+        value: "*instance*"
+  open-sender:
+    description: |
+      Create and open a sending link.
+
+      The operation is complete when on-sender-open fires.
+    inputs:
+      address-url:
+        type: /types/string
+        value: "*instance*"
+      sender-options:
+        type: /container/sender-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      sender:
+        type: /container/sender
+        value: "*instance*"
+  schedule:
+    description: |
+      Schedule a function call.
+    inputs:
+      delay:
+        type: /types/duration
+        value: "*instance*"
+      function:
+        type: /types/function
+        value: "*instance*"

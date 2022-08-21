@@ -1,0 +1,54 @@
+type: /client/link
+description: |
+  A channel for sending messages.  A sender contains an ordered
+  sequence of deliveries.
+properties:
+  address:
+    type: /types/string
+    value: null
+    nullable: true
+    description: |
+      The target address of the sender.
+methods:
+  send:
+    description: |
+      Send a message on the link.
+      
+      **Blocking**
+      
+      Blocks until there is credit for sending.
+    inputs:
+      message:
+        type: /container/message
+        value: "*instance*"
+      timeout:
+        type: /types/duration
+        value: "*instance*"
+        optional: true
+    outputs:
+      tracker:
+        type: /client/tracker
+        value: "*instance*"
+  try-send:
+    description: |
+      Send a message on the link or return null if there is no credit.
+    inputs:
+      message:
+        type: /container/message
+        value: "*instance*"
+    outputs:
+      tracker:
+        type: /client/tracker
+        value: "*instance*"
+  (async) send:
+    description: |
+      Send a message on the link.
+    inputs:
+      message:
+        type: /container/message
+        value: "*instance*"
+    outputs:
+      task:
+        type: /types/task
+        item-type: tracker
+        value: "*instance*"

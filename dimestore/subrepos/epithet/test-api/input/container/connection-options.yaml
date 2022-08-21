@@ -1,0 +1,93 @@
+description: |
+  Options for new connections.
+properties:
+  container-id:
+    type: /types/string
+    value: "*generated*"
+    mutable: true
+    description: |
+      The connection container identifier.
+  virtual-host:
+    type: /types/string
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The virtual host name.
+      
+      This value is also the host name used to match the server's SSL
+      certificate if you are using SSL with `VERIFY_PEER_NAME`.
+  user:
+    type: /types/string
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The identity of the user associated with the connection.
+  password:
+    type: /types/string
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The user authentication secret.
+  sasl-enabled:
+    type: /types/boolean
+    value: true
+    mutable: true
+    description: |
+      Enable or disable the SASL security layer.
+  allowed-sasl-mechanisms:
+    type: /types/array
+    item-type: string
+    value: null
+    nullable: true
+    description: |
+      The SASL mechanisms the local peer permits.
+  tls-enabled:
+    type: /types/boolean
+    value: true
+    mutable: true
+    description: |
+      Enable or disable TLS.
+  idle-timeout:
+    type: /types/duration
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Expire the connection after a period of inactivity.
+  max-sessions:
+    type: /types/ushort
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Limit the number of active sessions.
+  max-frame-size:
+    type: /types/uint
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Limit the size of AMQP frames.
+methods:
+  create:
+    description: |
+      Create a new connection-options instance.
+    inputs:
+      connection:
+        type: /container/connection
+        value: "*instance*"
+        optional: true
+    outputs:
+      connection-options:
+        type: /container/connection-options
+        value: "*instance*"
+  add-allowed-sasl-mechanism:
+    description: |
+      Add a mechanism to the set of allowed SASL mechanisms.
+    inputs:
+      string:
+        type: /types/string
+        value: "*instance*"

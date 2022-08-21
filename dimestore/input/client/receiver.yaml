@@ -1,0 +1,77 @@
+type: /client/link
+description: |
+  A channel for receiving messages.  A receiver contains an ordered
+  sequence of deliveries.
+properties:
+  address:
+    type: /types/string
+    value: null
+    nullable: true
+    description: |
+      The source address of the receiver.
+      
+      **Blocking**
+      
+      If the receiver is dynamic and the source address is not set,
+      this method blocks until it is set.
+methods:
+  receive:
+    description: |
+      Receive a delivery on the link.
+      
+      **Blocking**
+      
+      Blocks until a delivery is available.
+    inputs:
+      timeout:
+        type: /types/duration
+        value: "*instance*"
+        optional: true
+    outputs:
+      delivery:
+        type: /client/delivery
+        value: "*instance*"
+  try-receive:
+    description: |
+      Receive a delivery on the link or return null if none is
+      available.
+    outputs:
+      delivery:
+        type: /client/delivery
+        value: "*instance*"
+  (async) receive:
+    description: |
+      Receive a delivery on the link.
+    outputs:
+      task:
+        type: /types/task
+        item-type: delivery
+        value: "*instance*"
+  add-credit:
+    description: |
+      Issue credit to the sending end.  This increases the credit
+      issued to the remote sender by the specified number of messages.
+    inputs:
+      count:
+        type: /types/uint
+        value: "*instance*"
+  drain:
+    description: |
+      Request any messages available at the sending end.  This tells
+      the sender to use all existing credit immediately to send
+      deliveries and then discard any excess credit.
+    outputs:
+      future:
+        type: /types/future
+        item-type: receiver
+        value: "*instance*"
+  (async) drain:
+    description: |
+      Request any messages available at the sending end.  This tells
+      the sender to use all existing credit immediately to send
+      deliveries and then discard any excess credit.
+    outputs:
+      task:
+        type: /types/task
+        item-type: receiver
+        value: "*instance*"

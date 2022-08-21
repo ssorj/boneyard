@@ -1,0 +1,45 @@
+type: /container/endpoint-options
+description: |
+  Options for new sessions.
+properties:
+  incoming-capacity:
+    type: /types/int
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Control the number of incoming bytes the session will buffer.
+  max-links:
+    type: /types/uint
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Limit the number of links on this session.
+  incoming-window:
+    type: /types/uint
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Limit the number of incoming transfer frames.
+  outgoing-window:
+    type: /types/uint
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Limit the number of outgoing transfer frames.
+methods:
+  create:
+    description: |
+      Create a new session-options instance.
+    inputs:
+      session:
+        type: /container/session
+        value: "*instance*"
+        optional: true
+    outputs:
+      session-options:
+        type: /container/session-options
+        value: "*instance*"

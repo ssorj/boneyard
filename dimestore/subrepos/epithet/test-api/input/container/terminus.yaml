@@ -1,0 +1,45 @@
+description: |
+  The base class for source and target.
+internal: true
+properties:
+  address:
+    type: /types/string
+    value: "*discovered*"
+    nullable: true
+    description: |
+      The address of the source or target.
+  durability-mode:
+    type: /container/durability-mode
+    value: "*discovered*"
+    description: |
+      The persistence mode of the source or target.
+  dynamic:
+    type: /types/boolean
+    value: "*discovered*"
+    description: |
+      On-demand creation of a source or target node.
+  node-properties:
+    type: /types/map
+    key-type: symbol
+    item-type: object
+    value: "*discovered*"
+    nullable: true
+    description: |
+      The properties of a dynamic source or target node.
+  timeout:
+    type: /types/duration
+    value: "*discovered*"
+    nullable: true
+    description: |
+      The period after which the source or target is discarded.
+  expiry-policy:
+    type: /container/expiry-policy
+    value: "*discovered*"
+    description: |
+      When expiration of the source or target begins.
+  capabilities:
+    type: /types/array
+    item-type: symbol
+    value: "*discovered*"
+    description: |
+      Extensions supported or desired.

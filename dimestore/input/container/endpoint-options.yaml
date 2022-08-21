@@ -1,0 +1,37 @@
+description: |
+  The base class for connection-options, session-options, and
+  link-options.
+internal: true
+properties:
+  properties:
+    type: /types/map
+    key-type: symbol
+    item-type: object
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Application-defined properties.
+  offered-capabilities:
+    type: /types/array
+    item-type: symbol
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Extensions the endpoint supports.
+  desired-capabilities:
+    type: /types/array
+    item-type: symbol
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Extensions the endpoint can use.
+  handler:
+    type: /container/messaging-handler
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The event handler for the endpoint.

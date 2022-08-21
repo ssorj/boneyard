@@ -1,0 +1,19 @@
+values:
+  ACCEPTED:
+    description: |
+      XXX
+  REJECTED:
+    description: |
+      XXX
+  MODIFIED:
+    description: |
+      XXX
+  RELEASED:
+    description: |
+      XXX
+  RECEIVED:
+    description: |
+      XXX
+  TRANSACTIONAL:
+    description: |
+      XXX

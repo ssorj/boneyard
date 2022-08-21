@@ -1,0 +1,85 @@
+type: /client/endpoint
+description: |
+  A container of senders and receivers.
+properties:
+  connection:
+    type: /client/connection
+    value: "*instance*"
+    description: |
+      The containing connection.
+methods:
+  open-sender:
+    description: |
+      Create and open a sending link.
+    inputs:
+      address:
+        type: /types/string
+        value: "*instance*"
+      sender-options:
+        type: /container/sender-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      sender:
+        type: /client/sender
+        value: "*instance*"
+  open-anonymous-sender:
+    description: |
+      Create and open a sender with no target address.
+    inputs:
+      sender-options:
+        type: /container/sender-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      sender:
+        type: /client/sender
+        value: "*instance*"
+  open-receiver:
+    description: |
+      Create and open a receiving link.
+    inputs:
+      address:
+        type: /types/string
+        value: "*instance*"
+      receiver-options:
+        type: /container/receiver-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      receiver:
+        type: /client/receiver
+        value: "*instance*"
+  open-dynamic-receiver:
+    description: |
+      Create and open a dynamic receiver.
+      
+      **Blocking**
+      
+      This method blocks until the open operation is complete.
+    inputs:
+      receiver-options:
+        type: /container/receiver-options
+        value: "*instance*"
+        optional: true
+      timeout:
+        type: /types/duration
+        value: "*instance*"
+        optional: true
+    outputs:
+      receiver:
+        type: /client/receiver
+        value: "*instance*"
+  (async) open-dynamic-receiver:
+    description: |
+      Create and open a dynamic receiver.
+    inputs:
+      receiver-options:
+        type: /container/receiver-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      task:
+        type: /types/task
+        item-type: receiver
+        value: "*instance*"

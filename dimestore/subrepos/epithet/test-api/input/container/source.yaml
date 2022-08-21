@@ -1,0 +1,17 @@
+type: /container/terminus
+description: |
+  A named point of origin for messages.
+properties:
+  distribution-mode:
+    type: /container/distribution-mode
+    value: "*discovered*"
+    description: |
+      The message distribution mode at the remote peer.
+  filters:
+    type: /types/map
+    key-type: symbol
+    item-type: string
+    value: "*discovered*"
+    nullable: true
+    description: |
+      Filters set by the remote peer.

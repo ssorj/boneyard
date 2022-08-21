@@ -1,0 +1,6 @@
+description: |
+  A context for accepting inbound connections.
+methods:
+  stop:
+    description: |
+      Stop listening.

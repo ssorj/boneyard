@@ -1,0 +1,6 @@
+description: |
+  Events for incoming connections.
+methods:
+  on-accept:
+  on-error:
+  on-close:

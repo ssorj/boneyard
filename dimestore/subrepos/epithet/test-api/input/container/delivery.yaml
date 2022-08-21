@@ -1,0 +1,31 @@
+type: /container/transfer
+description: |
+  A received message.
+  
+  A delivery attempt can fail.  As a result, a particular
+  message may correspond to multiple deliveries.
+properties:
+  receiver:
+    type: /container/receiver
+    value: "*instance*"
+    description: |
+      The receiver on which the delivery was received.
+methods:
+  accept:
+    description: |
+      Change the delivery state to ACCEPTED.
+      
+      If the receiver.delivery-mode is AT-MOST-ONCE or AT-LEAST-ONCE,
+      this call will also settle the delivery.
+  reject:
+    description: |
+      Change the delivery state to REJECTED.
+      
+      If the receiver.delivery-mode is AT-MOST-ONCE or AT-LEAST-ONCE,
+      this call will also settle the delivery.
+  release:
+    description: |
+      Change the delivery state to RELEASED.
+      
+      If the receiver.delivery-mode is AT-MOST-ONCE or AT-LEAST-ONCE,
+      this call will also settle the delivery.

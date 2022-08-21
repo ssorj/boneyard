@@ -1,0 +1,59 @@
+type: /container/link
+description: |
+  A channel for receiving messages.  A receiver contains an ordered
+  sequence of deliveries.
+properties:
+  deliveries:
+    type: /types/iterator
+    item-type: delivery
+    value: "*instance*"
+    description: |
+      The deliveries contained in this receiver.
+methods:
+  open:
+    description: |
+      Open the receiver.
+    inputs:
+      options:
+        type: /container/receiver-options
+        value: "*instance*"
+        optional: true
+  close:
+    description: |
+      Close the receiver.
+      
+      The operation is complete when on-receiver-close fires.
+    inputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"
+        optional: true
+  detach:
+    description: |
+      Detach the receiver without closing it.  For durable
+      subscriptions this means the subscription is inactive but not
+      canceled.
+      
+      The operation is complete when on-receiver-detach fires.
+    inputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"
+        optional: true
+  add-credit:
+    description: |
+      Issue credit to the sending end.  This increases the credit
+      issued to the remote sender by the specified number of messages.
+    inputs:
+      count:
+        type: /types/uint
+        value: "*instance*"
+  drain:
+    description: |
+      Request any messages available at the sending end.  This tells
+      the sender to use all existing credit immediately to send
+      deliveries and then discard any excess credit.
+      
+      The sending end is notified of the drain request by the
+      *on-sender-drain-start* event.  The operation is complete when
+      *on-receiver-drain-finish* fires.

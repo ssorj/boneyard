@@ -1,0 +1,53 @@
+description: |
+  The base class for connection, session, and link.
+
+  Every AMQP endpoint starts out in an uninitialized state and
+  then proceeds linearly to an active and then closed state.
+  This lifecycle occurs at both endpoints involved, and so the
+  state model for an endpoint includes not only the known local
+  state but also the last known state of the remote endpoint.
+
+  The local and remote peers each maintain a set of
+  corresponding local and remote endpoints.  Each peer evaluates
+  and reconciles remote endpoint state changes as they are
+  communicated over the wire.
+internal: true
+properties:
+  container:
+    type: /container/container
+    value: "*instance*"
+    description: |
+      The container holding this endpoint object.
+  state:
+    type: /container/endpoint-state
+    value: "*discovered*"
+    description: |
+      The remote endpoint state.
+  error:
+    type: /container/error-condition
+    value: "*discovered*"
+    nullable: true
+    description: |
+      The remote endpoint error condition.
+  properties:
+    type: /types/map
+    key-type: symbol
+    item-type: object
+    value: "*discovered*"
+    nullable: true
+    description: |
+      Application-defined properties.
+  offered-capabilities:
+    type: /types/array
+    item-type: symbol
+    value: "*discovered*"
+    nullable: true
+    description: |
+      Extensions the endpoint supports.
+  desired-capabilities:
+    type: /types/array
+    item-type: symbol
+    value: "*discovered*"
+    nullable: true
+    description: |
+      Extensions the endpoint can use.

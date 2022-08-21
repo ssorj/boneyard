@@ -1,0 +1,74 @@
+description: |
+  A top-level container of connections, sessions, senders, and
+  receivers.  It serves as an entry point to the API, allowing
+  connections to be established.
+properties:
+  id:
+    type: /types/string
+    value: "*generated*"
+    description: |
+      A globally unique client identifier.  It is used to
+      identify this client in any connections it establishes.
+methods:
+  create:
+    description: |
+      Create a new client.
+    inputs:
+      client-options:
+        type: /client/client-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      client:
+        type: /client/client
+        value: "*instance*"
+  close:
+    description: |
+      Close all currently open connections. Once closed, a client
+      object cannnot be used again to open connections.
+    inputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"
+        optional: true
+    outputs:
+      future:
+        type: /types/future
+        item-type: client
+        value: "*instance*"
+  (await) close:
+    description: |
+      Close all currently open connections. Once closed, a client
+      object cannnot be used again to open connections.
+    inputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"
+        optional: true
+    outputs:
+      task:
+        type: /types/task
+        item-type: client
+        value: "*instance*"
+  connect:
+    description: |
+      Create and open an outbound connection.
+      
+      Use connection `wait` to block until the remote peer confirms
+      the open.
+    inputs:
+      host:
+        type: /types/string
+        value: "*instance*"
+      port:
+        type: /types/int
+        value: "*discovered*"
+        optional: true
+      connection-options:
+        type: /container/connection-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      connection:
+        type: /client/connection
+        value: "*instance*"

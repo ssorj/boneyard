@@ -1,0 +1,87 @@
+internal: true
+properties:
+  client:
+    type: /client/client
+    value: "*instance*"
+    description: |
+      The client holding this endpoint object.
+  state:
+    type: /container/endpoint-state
+    value: "*discovered*"
+    description: |
+      The remote endpoint state.
+  error:
+    type: /container/error-condition
+    value: "*discovered*"
+    nullable: true
+    description: |
+      The remote endpoint error condition.
+  properties:
+    type: /types/map
+    key-type: symbol
+    item-type: object
+    value: "*discovered*"
+    nullable: true
+    description: |
+      Application-defined properties.
+  offered-capabilities:
+    type: /types/array
+    item-type: symbol
+    value: "*discovered*"
+    nullable: true
+    description: |
+      Extensions the endpoint supports.
+  desired-capabilities:
+    type: /types/array
+    item-type: symbol
+    value: "*discovered*"
+    nullable: true
+    description: |
+      Extensions the endpoint can use.
+methods:
+  wait:
+    description: |
+      Block until the remote peer confirms the open operation.
+    inputs:
+      timeout:
+        type: /types/duration
+        value: "*instance*"
+        optional: true
+    outputs:
+      endpoint:
+        type: /client/endpoint
+        value: "*instance*"
+  (async) wait:
+    description: |
+      Wait until the remote peer confirms the open operation.
+    outputs:
+      task:
+        type: /types/task
+        item-type: endpoint
+        value: "*instance*"
+  close:
+    description: |
+      Start closing the endpoint.
+    inputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"
+        optional: true
+    outputs:
+      future:
+        type: /types/future
+        item-type: endpoint
+        value: "*instance*"
+  (async) close:
+    description: |
+      Start closing the endpoint.
+    inputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"
+        optional: true
+    outputs:
+      task:
+        type: /types/task
+        item-type: endpoint
+        value: "*instance*"

@@ -1,0 +1,63 @@
+type: /container/link
+description: |
+  A channel for sending messages.  A sender contains an ordered
+  sequence of deliveries.
+properties:
+  trackers:
+    type: /types/iterator
+    item-type: tracker
+    value: "*instance*"
+    description: |
+      The trackers contained in this sender.
+  draining:
+    type: /types/boolean
+    value: "*discovered*"
+    description: |
+      The sender is being drained.
+    unsettled: true
+  sendable:
+    type: /types/boolean
+    value: "*discovered*"
+    description: |
+      A message can be sent.
+    unsettled: true
+methods:
+  open:
+    description: |
+      Open the sender.
+    inputs:
+      sender-options:
+        type: /container/sender-options
+        value: "*instance*"
+        optional: true
+  close:
+    description: |
+      Close the sender.
+      
+      The operation is complete when on-sender-close fires.
+    inputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"
+        optional: true
+  detach:
+    description: |
+      Detach the sender without closing it.
+      
+      The operation is complete when on-sender-detach fires.
+    inputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"
+        optional: true
+  send:
+    description: |
+      Send a message on the link.
+    inputs:
+      message:
+        type: /container/message
+        value: "*instance*"
+    outputs:
+      tracker:
+        type: /container/tracker
+        value: "*instance*"

@@ -1,0 +1,137 @@
+type: /container/endpoint
+description: |
+  A container of senders and receivers.
+properties:
+  connection:
+    type: /container/connection
+    value: "*instance*"
+    description: |
+      The containing connection.
+  senders:
+    type: /types/iterator
+    item-type: sender
+    value: "*instance*"
+    description: |
+      The senders contained in this session.
+  receivers:
+    type: /types/iterator
+    item-type: receiver
+    value: "*instance*"
+    description: |
+      The receivers contained in this session.
+  incoming-bytes:
+    type: /types/uint
+    value: "*discovered*"
+    description: |
+      The number of incoming bytes currently buffered.
+  outgoing-bytes:
+    type: /types/uint
+    value: "*discovered*"
+    description: |
+      The number of outgoing bytes currently buffered.
+  incoming-window:
+    type: /types/uint
+    value: "*discovered*"
+    description: |
+      The maximum incoming transfer frames.
+  outgoing-window:
+    type: /types/uint
+    value: "*discovered*"
+    description: |
+      The maximum outgoing transfer frames.
+methods:
+  open:
+    description: |
+      Open the session.
+      
+      The operation is complete when on-session-open fires.
+    inputs:
+      session-options:
+        type: /container/session-options
+        value: "*instance*"
+        optional: true
+  close:
+    description: |
+      Close the session.
+      
+      The operation is complete when on-session-close fires.
+    inputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"
+        optional: true
+  send:
+    description: |
+      Send a message on a link with the given address.
+    unsettled: true
+    inputs:
+      message:
+        type: /container/message
+        value: "*instance*"
+    outputs:
+      tracker:
+        type: /container/tracker
+        value: "*instance*"
+  send-request:
+    description: |
+      Send a request message.  The message.reply-to property is
+      set automatically.
+    unsettled: true
+    inputs:
+      message:
+        type: /container/message
+        value: "*instance*"
+    outputs:
+      tracker:
+        type: /container/tracker
+        value: "*instance*"
+  send-response:
+    description: |
+      Send a response message.  The message.to property is set
+      automatically.
+    unsettled: true
+    inputs:
+      response-message:
+        type: /container/message
+        value: "*instance*"
+      request-message:
+        type: /container/message
+        value: "*instance*"
+    outputs:
+      tracker:
+        type: /container/tracker
+        value: "*instance*"
+  open-sender:
+    description: |
+      Create and open a sending link.
+      
+      The operation is complete when on-sender-open fires.
+    inputs:
+      address:
+        type: /types/string
+        value: "*instance*"
+      sender-options:
+        type: /container/sender-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      sender:
+        type: /container/sender
+        value: "*instance*"
+  open-receiver:
+    description: |
+      Create and open a receiving link.
+      
+      The operation is complete when on-receiver-open fires.
+    inputs:
+      address:
+        type: /types/string
+        value: "*instance*"
+      receiver-options:
+        type: /container/receiver-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      receiver:
+        type: /container/receiver
+        value: "*instance*"

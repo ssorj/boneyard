@@ -1,0 +1,137 @@
+type: /container/endpoint
+description: |
+  A channel for communication between two peers on a network.
+  
+  In current implementations, a connection corresponds to a TCP
+  connection, represented by a transport.
+  
+  A connection object contains zero or more session objects, which in
+  turn contain zero or more senders and zero or more receivers.
+properties:
+  transport:
+    type: /container/transport
+    value: "*instance*"
+    description: |
+      The associated network transport.
+  sessions:
+    type: /types/iterator
+    item-type: session
+    value: "*instance*"
+    description: |
+      The sessions contained in this connection.
+  default-session:
+    type: /container/session
+    value: "*instance*"
+    description: |
+      The session used by open-sender and open-receiver.
+  container-id:
+    type: /types/string
+    value: "*discovered*"
+    description: |
+      The unique identity of the container.
+  virtual-host:
+    type: /types/string
+    value: "*discovered*"
+    description: |
+      The virtual host name.
+      
+      This value is also the host name used to match the server's SSL
+      certificate if you are using SSL with `VERIFY_PEER_NAME`.
+  user:
+    type: /types/string
+    value: "*discovered*"
+    description: |
+      The identity of the user associated with the connection.
+  idle-timeout:
+    type: /types/duration
+    value: "*discovered*"
+    description: |
+      The time after which an idle connection expires.
+  max-sessions:
+    type: /types/ushort
+    value: "*discovered*"
+    description: |
+      The maximum active sessions allowed.
+  max-frame-size:
+    type: /types/uint
+    value: "*discovered*"
+    description: |
+      The maximum frame size allowed.
+methods:
+  open:
+    description: |
+      Open the connection.
+      
+      The operation is complete when on-connection-open fires.
+    inputs:
+      connection-options:
+        type: /container/connection-options
+        value: "*instance*"
+        optional: true
+  close:
+    description: |
+      Close the connection.
+      
+      The operation is complete when on-connection-close fires.
+    inputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"
+        optional: true
+  send:
+    description: |
+      Send a message on the default session using an anonymous sender.
+    inputs:
+      message:
+        type: /container/message
+        value: "*instance*"
+    outputs:
+      tracker:
+        type: /container/tracker
+        value: "*instance*"
+  open-sender:
+    description: |
+      Create and open a sender using the default session.
+      
+      The operation is complete when on-sender-open fires.
+    inputs:
+      address:
+        type: /types/string
+        value: "*instance*"
+      sender-options:
+        type: /container/sender-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      sender:
+        type: /container/sender
+        value: "*instance*"
+  open-receiver:
+    description: |
+      Create and open a receiver using the default session.
+      
+      The operation is complete when on-receiver-open fires.
+    inputs:
+      address:
+        type: /types/string
+        value: "*instance*"
+      receiver-options:
+        type: /container/receiver-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      receiver:
+        type: /container/receiver
+        value: "*instance*"
+  open-session:
+    description: |
+      Create and open a session.
+    inputs:
+      session-options:
+        type: /container/session-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      session:
+        type: /container/session
+        value: "*instance*"

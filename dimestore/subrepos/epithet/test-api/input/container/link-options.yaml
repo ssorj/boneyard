@@ -1,0 +1,40 @@
+type: /container/endpoint-options
+description: |
+  Options for new links.
+internal: true
+properties:
+  source:
+    type: /container/source-options
+    value: "*instance*"
+    description: |
+      Options for the link source.
+  target:
+    type: /container/target-options
+    value: "*instance*"
+    description: |
+      Options for the link target.
+  name:
+    type: /types/string
+    value: "*generated*"
+    mutable: true
+    description: |
+      The name of the link.
+  auto-settle:
+    type: /types/boolean
+    value: true
+    mutable: true
+    description: |
+      Automatically settle deliveries.
+  delivery-mode:
+    type: /container/delivery-mode
+    value: AT-LEAST-ONCE
+    mutable: true
+    description: |
+      Control the message delivery guarantee.
+  max-message-size:
+    type: /types/ulong
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Limit the size of messages on the link.

@@ -1,0 +1,34 @@
+description: |
+  The base class for delivery and tracker.
+internal: true
+properties:
+  id:
+    type: /types/binary
+    value: "*generated*"
+    description: |
+      The delivery identifier.
+  state:
+    type: /container/delivery-state
+    value: "*discovered*"
+    description: |
+      The current delivery state.
+  remote-state:
+    type: /container/delivery-state
+    value: "*discovered*"
+    description: |
+      The current delivery state at the remote peer.
+  settled:
+    type: /types/boolean
+    value: "*discovered*"
+    description: |
+      True if the delivery is settled.
+  remote-settled:
+    type: /types/boolean
+    value: "*discovered*"
+    description: |
+      True if the delivery is settled at the remote peer.
+methods:
+  settle:
+    description: |
+      Mark the delivery settled.  A settled delivery can never
+      be used again.

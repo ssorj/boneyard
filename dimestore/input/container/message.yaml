@@ -1,0 +1,217 @@
+description: |
+  A mutable holder of application content.
+properties:
+  id:
+    type: /types/message-id
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      A unique message identifier.
+  user:
+    type: /types/string
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The identity of the user producing the message.
+  to:
+    type: /types/string
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The destination address.
+  reply-to:
+    type: /types/string
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The address for replies.
+  correlation-id:
+    type: /types/message-id
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      An identifier for matching related messages.
+  subject:
+    type: /types/string
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Summary information.
+  body:
+    type: /types/object
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The main message content.
+  content-type:
+    type: /types/symbol
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The MIME type of the body.
+  content-encoding:
+    type: /types/string
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The encoding of the body.
+    internal: true
+  expiry-time:
+    type: /types/timestamp
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The absolute time past which the message should be discarded.
+  creation-time:
+    type: /types/timestamp
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The absolute time of message creation.
+  inferred:
+    type: /types/boolean
+    value: false
+    nullable: true
+    mutable: true
+    description: |
+      Determine the AMQP section type from the body type.
+  durable:
+    type: /types/boolean
+    value: false
+    mutable: true
+    description: |
+      Durability requirement.  The durable property indicates
+      that the message should be held durably by any
+      intermediaries taking responsibility for the message.  A
+      durable message is saved even if the intermediary is
+      unexpectedly terminated and restarted.
+  priority:
+    type: /types/ubyte
+    value: 4
+    nullable: true
+    mutable: true
+    description: |
+      Relative message priority.  Higher numbers indicate higher
+      priority.
+  ttl:
+    type: /types/duration
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The time to live.  The message must be discarded after
+      'ttl' milliseconds.
+  first-acquirer:
+    type: /types/boolean
+    value: true
+    mutable: true
+    description: |
+      The recipient is first to acquire the message.
+  delivery-count:
+    type: /types/uint
+    value: 0
+    mutable: true
+    description: |
+      The number of prior unsuccessful delivery attempts.
+  group-id:
+    type: /types/string
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The identifier of the group the message belongs to.
+  group-sequence:
+    type: /types/uint
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The relative position of this message within its group.
+  reply-to-group-id:
+    type: /types/string
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The group a reply message belongs to.
+  properties:
+    type: /types/map
+    key-type: string
+    item-type: object
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Application-defined message attributes.  Values must be scalar
+      types, not map or list or array.
+  delivery-annotations:
+    type: /types/map
+    key-type: symbol
+    item-type: object
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Delivery-specific transport attributes.
+  message-annotations:
+    type: /types/map
+    key-type: symbol
+    item-type: object
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Message-specific transport attributes.
+  footer:
+    type: /types/map
+    key-type: symbol
+    item-type: object
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Transport attributes that can only be evaluated after the
+      whole message has been seen.
+    internal: true
+methods:
+  create:
+    description: |
+      Create a new message.
+    inputs:
+      body:
+        type: /types/object
+        value: "*instance*"
+        optional: true
+    outputs:
+      message:
+        type: /container/message
+        value: "*instance*"
+  clear:
+    description: |
+      Delete the content of the message.  All fields are reset to
+      their default values.
+  encode:
+    description: |
+      Encode the message to bytes.
+    outputs:
+      bytes:
+        type: /types/binary
+        value: "*instance*"
+  decode:
+    description: |
+      Decode the message from bytes.
+    inputs:
+      bytes:
+        type: /types/binary
+        value: "*instance*"

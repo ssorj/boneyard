@@ -1,0 +1,20 @@
+type: /container/terminus-options
+description: |
+  Options for new sources.
+properties:
+  distribution-mode:
+    type: /container/distribution-mode
+    value: MOVE
+    mutable: true
+    description: |
+      Control whether messages are browsed or consumed.
+  filters:
+    type: /types/map
+    key-type: symbol
+    item-type: string
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Select messages by criteria.
+    unsettled: true

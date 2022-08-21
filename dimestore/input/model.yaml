@@ -1,0 +1,158 @@
+name: proton
+namespaces:
+  client:
+    description: |
+      An imperative client API.
+      
+      **Synchronous waiting (blocking) in languages with futures but not coroutines**
+      
+      The endpoint lifecycle methods `connect`, `open-session`,
+      `open-sender`, and `open-receiver` start their respective operations
+      but do not complete them.
+      
+      Under normal circumstances, you won't need to wait for these to
+      complete because subsequent operations will internally wait as
+      needed.  If you do need to wait explicitly, you can use the endpoint
+      `wait` method (or `get`, depending on the language) to block until
+      the connect or open operation completes.
+      
+      All endpoints have a `close` method that returns a waitable future
+      resolving to the endpoint object itself.
+      
+      The sender `send` method blocks until there is credit for sending.
+      It then sends the message and returns a `tracker` object.  Use the
+      tracker `wait` method to block until delivery at the remote peer is
+      acknowledged.  `try-send` is a variant that returns null instead of
+      blocking if there is no credit.
+      
+      The receiver `receive` method blocks until a delivery is available
+      to return.  `try-receive` is a variant that instead returns null
+      if no deliveries have been received.
+      
+      Blocking operations take optional timeout arguments.  If the timeout
+      is exceeded, they raise a timeout error.
+      
+      **Asynchronous waiting in languages with coroutines**
+      
+      As described above, a language without coroutines has blocking of
+      two kinds: first, the blocking the library performs inside some API
+      calls, and second, the blocking the API user performs when using
+      `wait` methods or futures offered by the API.  For example, `send`
+      blocks internally for credit and then exposes a `wait` method which
+      the API user can use to block until delivery is confirmed.
+      
+      For languages that do support coroutines, this somewhat tactical
+      division is not desirable.  Here we outline the differences we would
+      expect to see in a rendering of this API in a language with
+      coroutines.
+      
+      In general, any operation that blocks or returns a future instead
+      returns an awaitable task.  This applies to the endpoint `wait`
+      and `close` operations.
+      
+      The sender `send` method does not block the API thread for credit.
+      Instead, it returns an awaitable task that itself waits
+      asynchronously for both credit and confirmation of delivery.  There
+      is no `try-send` variant.
+      
+      The receiver `receive` method does not block the API thread until
+      a delivery arrives.  Instead, it returns an awaitable task that gets
+      the next delivery.  There is no `try-receive` variant.
+      
+      Alternative method definitions for languages with coroutines are
+      prefixed with `(async)` in the API reference.  In an implementation,
+      the prefixes would be omitted.
+    types:
+      client: !include client/client.yaml
+      client-options: !include client/client-options.yaml
+      endpoint: !include client/endpoint.yaml
+      connection: !include client/connection.yaml
+      session: !include client/session.yaml
+      link: !include client/link.yaml
+      sender: !include client/sender.yaml
+      receiver: !include client/receiver.yaml
+      transfer: !include client/transfer.yaml
+      tracker: !include client/tracker.yaml
+      delivery: !include client/delivery.yaml
+    enumerations:
+  container:
+    description: |
+      The API entry point.
+      
+      Many applications will import only this module.
+    types:
+      container: !include container/container.yaml
+      endpoint: !include container/endpoint.yaml
+      connection: !include container/connection.yaml
+      session: !include container/session.yaml
+      link: !include container/link.yaml
+      sender: !include container/sender.yaml
+      receiver: !include container/receiver.yaml
+      terminus: !include container/terminus.yaml
+      source: !include container/source.yaml
+      target: !include container/target.yaml
+      message: !include container/message.yaml
+      transfer: !include container/transfer.yaml
+      delivery: !include container/delivery.yaml
+      tracker: !include container/tracker.yaml
+      error-condition: !include container/error-condition.yaml
+      messaging-handler: !include container/messaging-handler.yaml
+      listen-handler: !include container/listen-handler.yaml
+      endpoint-options: !include container/endpoint-options.yaml
+      connection-options: !include container/connection-options.yaml
+      session-options: !include container/session-options.yaml
+      link-options: !include container/link-options.yaml
+      sender-options: !include container/sender-options.yaml
+      receiver-options: !include container/receiver-options.yaml
+      terminus-options: !include container/terminus-options.yaml
+      source-options: !include container/source-options.yaml
+      target-options: !include container/target-options.yaml
+      transport: !include container/transport.yaml
+      listener: !include container/listener.yaml
+      sasl: !include container/sasl.yaml
+      proton-error: !include container/proton-error.yaml
+      timeout-error: !include container/timeout-error.yaml
+      conversion-error: !include container/conversion-error.yaml
+    enumerations:
+      endpoint-state: !include container/endpoint-state.yaml
+      delivery-mode: !include container/delivery-mode.yaml
+      distribution-mode: !include container/distribution-mode.yaml
+      durability-mode: !include container/durability-mode.yaml
+      expiry-policy: !include container/expiry-policy.yaml
+      delivery-state: !include container/delivery-state.yaml
+  types:
+    description: |
+      Data types.
+    types:
+      "null": !include types/null.yaml
+      boolean: !include types/boolean.yaml
+      char: !include types/char.yaml
+      string: !include types/string.yaml
+      binary: !include types/binary.yaml
+      float: !include types/float.yaml
+      double: !include types/double.yaml
+      byte: !include types/byte.yaml
+      short: !include types/short.yaml
+      int: !include types/int.yaml
+      long: !include types/long.yaml
+      ubyte: !include types/ubyte.yaml
+      ushort: !include types/ushort.yaml
+      uint: !include types/uint.yaml
+      ulong: !include types/ulong.yaml
+      array: !include types/array.yaml
+      list: !include types/list.yaml
+      map: !include types/map.yaml
+      symbol: !include types/symbol.yaml
+      timestamp: !include types/timestamp.yaml
+      uuid: !include types/uuid.yaml
+      message-id: !include types/message-id.yaml
+      decimal32: !include types/decimal32.yaml
+      decimal64: !include types/decimal64.yaml
+      decimal128: !include types/decimal128.yaml
+      duration: !include types/duration.yaml
+      iterator: !include types/iterator.yaml
+      object: !include types/object.yaml
+      function: !include types/function.yaml
+      future: !include types/future.yaml
+      task: !include types/task.yaml
+    enumerations:

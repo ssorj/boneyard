@@ -1,0 +1,147 @@
+type: /client/endpoint
+description: |
+  A channel for communication between two peers on a network.
+  
+  In current implementations, a connection corresponds to a TCP
+  connection, represented by a transport.
+  
+  A connection object contains zero or more session objects, which in
+  turn contain zero or more senders and zero or more receivers.
+properties:
+  default-session:
+    type: /client/session
+    value: "*instance*"
+    description: |
+      The session used by `open-sender` and `open-receiver`.
+  default-sender:
+    type: /client/session
+    value: "*instance*"
+    description: |
+      The sender used by `connection.send`.
+methods:
+  open-sender:
+    description: |
+      Create and open a sender using the default session.
+      
+      Use `wait` to block until the remote peer confirms the open.
+    inputs:
+      address:
+        type: /types/string
+        value: "*instance*"
+      sender-options:
+        type: /container/sender-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      sender:
+        type: /client/sender
+        value: "*instance*"
+  open-anonymous-sender:
+    description: |
+      Create and open a sender with no target address using the default session.
+      
+      Use `wait` to block until the remote peer confirms the open.
+    inputs:
+      sender-options:
+        type: /container/sender-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      sender:
+        type: /client/sender
+        value: "*instance*"
+  open-receiver:
+    description: |
+      Create and open a receiver using the default session.
+      
+      Use `wait` to block until the remote peer confirms the open.
+    inputs:
+      address:
+        type: /types/string
+        value: "*instance*"
+      receiver-options:
+        type: /container/receiver-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      receiver:
+        type: /client/receiver
+        value: "*instance*"
+  open-dynamic-receiver:
+    description: |
+      Create and open a dynamic receiver using the default session.
+      
+      Use `wait` to block until the remote peer confirms the open.
+    inputs:
+      dynamic-node-properties:
+        type: /types/map
+        value: "*instance*"
+        optional: true
+      receiver-options:
+        type: /container/receiver-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      receiver:
+        type: /client/receiver
+        value: "*instance*"
+  (async) open-dynamic-receiver:
+    description: |
+      Create and open a dynamic receiver using the default session.
+    inputs:
+      dynamic-node-properties:
+        type: /types/map
+        value: "*instance*"
+        optional: true
+      receiver-options:
+        type: /container/receiver-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      task:
+        type: /types/task
+        item-type: receiver
+        value: "*instance*"
+  open-session:
+    description: |
+      Create and open a session.
+      
+      Use `wait` to block until the remote peer confirms the open.
+    inputs:
+      session-options:
+        type: /container/session-options
+        value: "*instance*"
+        optional: true
+    outputs:
+      session:
+        type: /client/session
+        value: "*instance*"
+  send:
+    description: |
+      Send a message using the default session and default sender.
+      The message 'to' field must be set.
+    inputs:
+      message:
+        type: /container/message
+        value: "*instance*"
+    outputs:
+      tracker:
+        type: /client/tracker
+        value: "*instance*"
+  (async) send:
+    description: |
+      Send a message using the default session and default sender.
+      The message 'to' field must be set.
+    inputs:
+      message:
+        type: /container/message
+        value: "*instance*"
+      timeout:
+        type: /types/duration
+        value: "*instance*"
+        optional: true
+    outputs:
+      task:
+        type: /types/task
+        item-type: tracker
+        value: "*instance*"

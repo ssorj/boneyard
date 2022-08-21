@@ -1,0 +1,69 @@
+type: /client/endpoint
+description: |
+  The base class for sender and receiver.
+internal: true
+properties:
+  session:
+    type: /client/session
+    value: "*instance*"
+    description: |
+      The containing session.
+  source:
+    type: /container/source
+    value: "*instance*"
+    description: |
+      The source end of the link.
+  target:
+    type: /container/target
+    value: "*instance*"
+    description: |
+      The target end of the link.
+  detached:
+    type: /types/boolean
+    value: "*discovered*"
+    description: |
+      True if the link was detached, not permanently closed.
+  delivery-mode:
+    type: /container/delivery-mode
+    value: "*discovered*"
+    description: |
+      The message delivery guarantee.
+  max-message-size:
+    type: /types/ulong
+    value: "*discovered*"
+    nullable: true
+    description: |
+      The maximum message size.
+methods:
+  detach:
+    description: |
+      Detach the link without permanently closing it.
+      
+      For durable subscriptions this means the subscription is
+      inactive but not canceled.
+    inputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"
+        optional: true
+    outputs:
+      future:
+        type: /types/future
+        item-type: link
+        value: "*instance*"
+  (async) detach:
+    description: |
+      Detach the link without permanently closing it.
+      
+      For durable subscriptions this means the subscription is
+      inactive but not canceled.
+    inputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"
+        optional: true
+    outputs:
+      task:
+        type: /types/task
+        item-type: link
+        value: "*instance*"

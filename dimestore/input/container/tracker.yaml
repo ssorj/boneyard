@@ -1,0 +1,13 @@
+type: /container/transfer
+description: |
+  A tracker for a sent message.  Every tracker exists within
+  the context of a sender.
+  
+  A delivery attempt can fail.  As a result, a particular
+  message may correspond to multiple trackers.
+properties:
+  sender:
+    type: /container/sender
+    value: "*instance*"
+    description: |
+      The sender on which the delivery was sent.

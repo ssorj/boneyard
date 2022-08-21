@@ -1,0 +1,47 @@
+description: |
+  An endpoint error state.
+properties:
+  name:
+    type: /types/symbol
+    value: "*instance*"
+    mutable: true
+    description: |
+      The AMQP condition name.
+  description:
+    type: /types/string
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      A message describing the condition.
+  properties:
+    type: /types/map
+    key-type: symbol
+    item-type: object
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Extra properties of the condition.
+methods:
+  create:
+    description: |
+      Create a new condition.
+    inputs:
+      name:
+        type: /types/symbol
+        value: "*instance*"
+      description:
+        type: /types/string
+        value: "*instance*"
+        optional: true
+      properties:
+        type: /types/map
+        key-type: symbol
+        item-type: object
+        value: "*instance*"
+        optional: true
+    outputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"

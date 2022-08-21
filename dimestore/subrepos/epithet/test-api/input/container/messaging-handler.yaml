@@ -1,0 +1,244 @@
+description: |
+  The primary messaging event handler.  It allows users to intercept
+  and change Proton behaviors.
+methods:
+  on-container-start:
+    description: |
+      The container event loop is started.
+    inputs:
+      container:
+        type: /container/container
+        value: "*instance*"
+  on-container-stop:
+    description: |
+      The container event loop is stopped.
+    inputs:
+      container:
+        type: /container/container
+        value: "*instance*"
+  on-message:
+    description: |
+      A message is received.
+    inputs:
+      delivery:
+        type: /container/delivery
+        value: "*instance*"
+      message:
+        type: /container/message
+        value: "*instance*"
+  on-sendable:
+    description: |
+      A message can be sent.
+      
+      The sender has credit and messages can therefore be
+      transferred.
+    inputs:
+      sender:
+        type: /container/sender
+        value: "*instance*"
+  on-connection-open:
+    description: |
+      The remote peer opened the connection.
+    inputs:
+      connection:
+        type: /container/connection
+        value: "*instance*"
+  on-connection-close:
+    description: |
+      The remote peer closed the connection.
+    inputs:
+      connection:
+        type: /container/connection
+        value: "*instance*"
+  on-connection-error:
+    description: |
+      The remote peer closed the connection with an error
+      condition.
+    inputs:
+      connection:
+        type: /container/connection
+        value: "*instance*"
+  on-session-open:
+    description: |
+      The remote peer opened the session.
+    inputs:
+      session:
+        type: /container/session
+        value: "*instance*"
+  on-session-close:
+    description: |
+      The remote peer closed the session.
+    inputs:
+      session:
+        type: /container/session
+        value: "*instance*"
+  on-session-error:
+    description: |
+      The remote peer closed the session with an error
+      condition.
+    inputs:
+      session:
+        type: /container/session
+        value: "*instance*"
+  on-sender-open:
+    description: |
+      The remote peer opened the sender.
+    inputs:
+      sender:
+        type: /container/sender
+        value: "*instance*"
+  on-sender-detach:
+    description: |
+      The remote peer detached the sender.
+    inputs:
+      sender:
+        type: /container/sender
+        value: "*instance*"
+  on-sender-close:
+    description: |
+      The remote peer closed the sender.
+    inputs:
+      sender:
+        type: /container/sender
+        value: "*instance*"
+  on-sender-error:
+    description: |
+      The remote peer closed the sender with an error condition.
+    inputs:
+      sender:
+        type: /container/sender
+        value: "*instance*"
+  on-receiver-open:
+    description: |
+      The remote peer opened the receiver.
+    inputs:
+      receiver:
+        type: /container/receiver
+        value: "*instance*"
+  on-receiver-detach:
+    description: |
+      The remote peer detached the receiver.
+    inputs:
+      receiver:
+        type: /container/receiver
+        value: "*instance*"
+  on-receiver-close:
+    description: |
+      The remote peer closed the receiver.
+    inputs:
+      receiver:
+        type: /container/receiver
+        value: "*instance*"
+  on-receiver-error:
+    description: |
+      The remote peer closed the receiver with an error condition.
+    inputs:
+      receiver:
+        type: /container/receiver
+        value: "*instance*"
+  on-delivery:
+    description: |
+      The sending end delivered a message.
+    internal: true
+    inputs:
+      delivery:
+        type: /container/delivery
+        value: "*instance*"
+  on-tracker-accept:
+    description: |
+      The receiving end accepted a delivery.
+      
+      "Accepted" means the delivery was successfully processed by the
+      receiving application.
+    inputs:
+      tracker:
+        type: /container/tracker
+        value: "*instance*"
+  on-tracker-reject:
+    description: |
+      The receiving end rejected a delivery.
+      
+      "Rejected" means the receiving application considered the
+      delivery invalid.
+    inputs:
+      tracker:
+        type: /container/tracker
+        value: "*instance*"
+  on-tracker-release:
+    description: |
+      The receiving end released a delivery.
+      
+      "Released" means the delivery was returned to the sender.
+    inputs:
+      tracker:
+        type: /container/tracker
+        value: "*instance*"
+  on-tracker-modify:
+    description: |
+      The receiving end modified a delivery.
+      
+      "Modified" means the delivery was returned to the sender for
+      annotation before further delivery attempts.
+    inputs:
+      tracker:
+        type: /container/tracker
+        value: "*instance*"
+  on-tracker-settle:
+    description: |
+      The receiving end settled a delivery.
+    inputs:
+      tracker:
+        type: /container/tracker
+        value: "*instance*"
+  on-delivery-settle:
+    description: |
+      The sending end settled a delivery.
+    inputs:
+      delivery:
+        type: /container/delivery
+        value: "*instance*"
+  on-sender-drain-start:
+    description: |
+      The remote end of the sender requested draining.
+    inputs:
+      sender:
+        type: /container/sender
+        value: "*instance*"
+  on-receiver-drain-finish:
+    description: |
+      The remote end of the receiver completed draining.
+    inputs:
+      receiver:
+        type: /container/receiver
+        value: "*instance*"
+  on-error:
+    description: |
+      The fallback error handler.
+      
+      Called if a more specific error handler is not overriden.
+    inputs:
+      error-condition:
+        type: /container/error-condition
+        value: "*instance*"
+  on-transport-open:
+    description: |
+      The underlying network channel opened.
+    inputs:
+      transport:
+        type: /container/transport
+        value: "*instance*"
+  on-transport-close:
+    description: |
+      The underlying network channel closed.
+    inputs:
+      transport:
+        type: /container/transport
+        value: "*instance*"
+  on-transport-error:
+    description: |
+      The underlying network channel closed with an error
+      condition.
+    inputs:
+      transport:
+        type: /container/transport
+        value: "*instance*"

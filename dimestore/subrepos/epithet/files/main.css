@@ -1,0 +1,262 @@
+/*
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&family=Roboto+Mono:wght@100..900&display=swap');
+
+@font-face {
+    font-family: "Roboto";
+    src: url("file:/home/jross/code/epithet/static/Roboto[ital,wdth,wght].ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url("file:/home/jross/code/epithet/static/Roboto[ital,wdth,wght].ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: italic;
+}
+
+* {
+    margin: 1em 0;
+    padding: 0;
+    box-sizing: border-box;
+    border-style: none;
+}
+
+*:first-child {
+    margin-top: 0;
+}
+
+*:last-child {
+    margin-bottom: 0;
+}
+
+html,
+body,
+div,
+a,
+br {
+    margin: 0;
+}
+
+body {
+    font: 11pt/18pt "Roboto", sans-serif;
+    font-weight: 375;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+h1,
+h2,
+h3 {
+    font-weight: 500;
+}
+
+h1 {
+    font-family: "Roboto Slab";
+    font-weight: 300;
+}
+
+h2 {
+    font-size: 1.2em;
+}
+
+h3 {
+    font-size: 1em;
+}
+
+a {
+    text-decoration: none;
+    color: rgba(15, 63, 127, 0.8);
+}
+
+ol,
+ul,
+dd {
+    padding-left: 1.2em;
+}
+
+li,
+li > ul,
+li > ol,
+dd > dl {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+li > p:last-child,
+dd > p:last-child {
+    margin-bottom: 1em;
+}
+
+td,
+th {
+    padding: 0.3em 0.5em 0.3em 0;
+    vertical-align: top;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    font-weight: 200;
+    font-style: normal;
+}
+
+hr {
+    border-bottom: 1px solid #ddd;
+}
+
+code,
+pre {
+    font-family: "Roboto Mono", monospace;
+    font-size: 0.9em;
+    background-color: rgb(247, 247, 247);
+}
+
+pre {
+    overflow: auto;
+    padding: 1em;
+}
+
+blockquote {
+    margin-left: 2em;
+}
+
+table {
+    border-collapse: collapse;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+/* -- */
+
+header, section, footer {
+    margin: 0;
+}
+
+header {
+    padding: 1em 2em;
+    border-bottom: 1px solid #ddd;
+}
+
+section {
+    padding: 2em;
+}
+
+footer {
+    border-top: 1px solid #ddd;
+    padding: 1em 2em;
+}
+
+header > div,
+section > div,
+footer > div {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+header > div {
+    font-size: 0.9em;
+}
+
+footer > div {
+    font-size: 0.8em;
+}
+
+/* -- */
+
+table.epithet {
+    width: 100%;
+    table-layout: fixed;
+}
+
+table.epithet span.special {
+    font-style: italic;
+}
+
+table.epithet th {
+    font-size: 0.9em;
+}
+
+table.epithet th,
+table.epithet td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+table.epithet.children th:nth-child(1) {
+    width: 30%;
+}
+
+table.epithet.properties th:nth-child(1) {
+    width: 20%;
+}
+
+table.epithet.properties th:nth-child(3) {
+    width: 16.5%;
+}
+
+table.epithet.properties th:nth-child(4) {
+    width: 11%;
+}
+
+table.epithet.properties th:nth-child(5),
+table.epithet.properties th:nth-child(6) {
+    width: 7.5%;
+}
+
+table.epithet.methods th:nth-child(1) {
+    width: 20%;
+}
+
+table.epithet.methods th:nth-child(3) {
+    width: 27.5%;
+}
+
+table.epithet.methods th:nth-child(4) {
+    width: 15%;
+}
+
+/* -- */
+
+span.path-separator {
+    margin: 0 0.4em;
+}
+
+/* -- */
+
+span.object-name {
+    font-weight: 475;
+}
+
+/* -- */
+
+nav {
+    font-size: 0.9em;
+}
+
+/* -- */
+
+span.optional-input {
+    font-style: italic;
+    color: #999;
+}

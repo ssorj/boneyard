@@ -1,0 +1,53 @@
+description: |
+  The base class for source-options and target-options.
+internal: true
+properties:
+  address:
+    type: /types/string
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The address of the message source or target.
+  durability-mode:
+    type: /container/durability-mode
+    value: NONE
+    mutable: true
+    description: |
+      Control the persistence of source or target state.
+  dynamic:
+    type: /types/boolean
+    value: false
+    mutable: true
+    description: |
+      Request on-demand creation of a node at the remote peer.
+  node-properties:
+    type: /types/map
+    key-type: symbol
+    item-type: object
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Control the properties of nodes created on demand.
+  timeout:
+    type: /types/duration
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      The period after which the source or target is discarded.
+  expiry-policy:
+    type: /container/expiry-policy
+    value: SESSION-CLOSE
+    mutable: true
+    description: |
+      Control when the clock for expiration begins.
+  capabilities:
+    type: /types/array
+    item-type: symbol
+    value: null
+    nullable: true
+    mutable: true
+    description: |
+      Extensions supported or desired.

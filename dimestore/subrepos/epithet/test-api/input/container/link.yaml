@@ -1,0 +1,43 @@
+type: /container/endpoint
+description: |
+  The base class for sender and receiver.
+internal: true
+properties:
+  session:
+    type: /container/session
+    value: "*instance*"
+    description: |
+      The containing session.
+  source:
+    type: /container/source
+    value: "*instance*"
+    description: |
+      The source end of the link.
+  target:
+    type: /container/target
+    value: "*instance*"
+    description: |
+      The target end of the link.
+  name:
+    type: /types/string
+    value: "*discovered*"
+    description: |
+      The link name.
+  delivery-mode:
+    type: /container/delivery-mode
+    value: "*discovered*"
+    description: |
+      The message delivery guarantee.
+  credit:
+    type: /types/long
+    value: "*discovered*"
+    description: |
+      The number of messages the receiving end can accept.
+      
+      Each whole integer of credit permits one message transfer.
+  max-message-size:
+    type: /types/ulong
+    value: "*discovered*"
+    nullable: true
+    description: |
+      The maximum message size.

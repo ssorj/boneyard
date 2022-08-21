@@ -1,0 +1,8 @@
+description: |
+  A network channel supporting an AMQP connection.
+properties:
+  sasl:
+    type: /container/sasl
+    value: "*instance*"
+    description: |
+      Get SASL connection information.

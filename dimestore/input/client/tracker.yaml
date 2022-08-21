@@ -1,0 +1,34 @@
+type: /client/transfer
+description: |
+  A tracker for a sent message.  Every tracker exists within
+  the context of a sender.
+  
+  A delivery attempt can fail.  As a result, a particular
+  message may correspond to multiple trackers.
+properties:
+  sender:
+    type: /client/sender
+    value: "*instance*"
+    description: |
+      The sender on which the delivery was sent.
+methods:
+  wait:
+    description: |
+      Block until the remote peer acknowledges delivery.
+    inputs:
+      timeout:
+        type: /types/duration
+        value: "*instance*"
+        optional: true
+    outputs:
+      tracker:
+        type: /client/tracker
+        value: "*instance*"
+  (async) wait:
+    description: |
+      Wait until the remote peer acknowledges delivery.
+    outputs:
+      task:
+        type: /types/task
+        item-type: tracker
+        value: "*instance*"

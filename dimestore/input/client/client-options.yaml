@@ -1,0 +1,25 @@
+description: |
+  Options for new clients.
+properties:
+  id:
+    type: /types/string
+    value: "*generated*"
+    mutable: true
+    description: |
+      A globally unique client identifier.  It is used to
+      identify this client in any connections it establishes.
+      
+      By default a UUID is used.
+methods:
+  create:
+    description: |
+      Create a new client-options instance.
+    inputs:
+      client:
+        type: /client/client
+        value: "*instance*"
+        optional: true
+    outputs:
+      client-options:
+        type: /client/client-options
+        value: "*instance*"

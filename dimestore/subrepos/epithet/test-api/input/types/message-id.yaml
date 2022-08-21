@@ -1,0 +1,3 @@
+description: |
+  A message identifier.  Legal types are ulong, uuid, binary, and
+  string.

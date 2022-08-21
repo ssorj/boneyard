@@ -1,0 +1,16 @@
+type: /container/link-options
+description: |
+  Options for new senders.
+methods:
+  create:
+    description: |
+      Create a new sender-options instance.
+    inputs:
+      sender:
+        type: /container/sender
+        value: "*instance*"
+        optional: true
+    outputs:
+      sender-options:
+        type: /container/sender-options
+        value: "*instance*"
