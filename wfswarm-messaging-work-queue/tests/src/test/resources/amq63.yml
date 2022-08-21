@@ -1,0 +1,99 @@
+---
+kind: Service
+apiVersion: v1
+spec:
+  ports:
+  - port: 5672
+    targetPort: 5672
+  selector:
+    deploymentConfig: "work-queue-broker"
+metadata:
+  name: "work-queue-broker-amq-amqp"
+  labels:
+    application: "work-queue"
+  annotations:
+    description: The broker's AMQP port.
+---
+kind: DeploymentConfig
+apiVersion: v1
+metadata:
+  name: "work-queue-broker"
+  labels:
+    application: "work-queue"
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      maxSurge: 0
+  triggers:
+  - type: ImageChange
+    imageChangeParams:
+      automatic: true
+      containerNames:
+      - "work-queue-broker"
+      from:
+        kind: ImageStreamTag
+        name: jboss-amq-63:1.3
+  - type: ConfigChange
+  replicas: 1
+  selector:
+    deploymentConfig: "work-queue-broker"
+  template:
+    metadata:
+      name: "work-queue-broker"
+      labels:
+        deploymentConfig: "work-queue-broker"
+        application: "work-queue"
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: "work-queue-broker"
+        image: jboss-amq-63
+        imagePullPolicy: Always
+        readinessProbe:
+          exec:
+            command:
+            - "/bin/bash"
+            - "-c"
+            - "/opt/amq/bin/readinessProbe.sh"
+        ports:
+        - name: jolokia
+          containerPort: 8778
+          protocol: TCP
+        - name: amqp
+          containerPort: 5672
+          protocol: TCP
+        - name: mqtt
+          containerPort: 1883
+          protocol: TCP
+        - name: stomp
+          containerPort: 61613
+          protocol: TCP
+        - name: tcp
+          containerPort: 61616
+          protocol: TCP
+        env:
+        - name: AMQ_USER
+          value: "work-queue"
+        - name: AMQ_PASSWORD
+          value: "work-queue"
+        - name: AMQ_TRANSPORTS
+          value: "amqp"
+        - name: AMQ_QUEUES
+          value: "requests,responses,worker-status"
+        - name: AMQ_TOPICS
+          value: ""
+        - name: MQ_SERIALIZABLE_PACKAGES
+          value: ""
+        - name: AMQ_MESH_DISCOVERY_TYPE
+          value: "dns"
+        - name: AMQ_MESH_SERVICE_NAME
+          value: "work-queue-broker-mesh"
+        - name: AMQ_MESH_SERVICE_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: AMQ_STORAGE_USAGE_LIMIT
+          value: "100 gb"
+        - name: AMQ_QUEUE_MEMORY_LIMIT
+          value: ""
