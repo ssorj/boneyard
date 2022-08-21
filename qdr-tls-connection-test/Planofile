@@ -1,0 +1,57 @@
+# -*- mode: python -*-
+
+router_config = """
+router {{
+    mode: interior
+    id: jamlit
+    saslConfigDir: {sasl_config_dir}
+}}
+
+listener {{
+    host: localhost
+    port: 45672
+    authenticatePeer: yes
+    sslProfile: jamlit-tls
+    saslMechanisms: PLAIN
+}}
+
+policy {{
+    enableVhostPolicy: true
+    enableVhostNamePatterns: true
+    policyDir: policy
+}}
+
+sslProfile {{
+    name: jamlit-tls
+    certFile: tls/server-cert.pem
+    privateKeyFile: tls/server-key.pem
+}}
+"""
+
+sasl_config = """
+sasldb_path: {sasldb_file}
+mech_list: PLAIN
+"""
+
+@command
+def run_(app):
+    config_dir = make_temp_dir()
+    router_config_file = join(config_dir, "qdrouterd.conf")
+    sasl_config_dir = join(config_dir, "sasl")
+    sasl_config_file = join(sasl_config_dir, "qdrouterd.conf")
+    sasldb_file = join(sasl_config_dir, "qdrouterd.sasldb")
+
+    config = sasl_config.format(sasldb_file=sasldb_file)
+    write(sasl_config_file, config)
+
+    with working_dir(join(config_dir, "sasl")):
+        run("echo secret | saslpasswd2 -p -c -f qdrouterd.sasldb -u example.net alice", shell=True)
+        run("sasldblistusers2 -f qdrouterd.sasldb")
+
+    config = router_config.format(sasl_config_dir=sasl_config_dir)
+    write(router_config_file, config)
+
+    with start(f"qdrouterd --config {router_config_file}") as router:
+        await_port(45672)
+
+        run("node client.js")

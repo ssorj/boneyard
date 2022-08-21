@@ -1,0 +1,12 @@
+[
+    ["vhost", {
+        "hostname": "jamlit",
+        "aliases": "localhost",
+        "groups": {
+            "alice@example.net": {
+                "remoteHosts": "*",
+                "users": "alice@example.net"
+            }
+        }
+    }]
+]
