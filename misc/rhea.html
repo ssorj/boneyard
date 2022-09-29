@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="rhea.js"></script>
+</head>
+<body>
+  <script>
+    const rhea = require("rhea");
+    const container = rhea.create_container();
+
+    container.on("message", (event) => {
+        console.log(event.message.body);
+    });
+
+    const ws = container.websocket_connect(WebSocket);
+    const details = ws("ws://example.net:5673", ["binary", "AMQPWSB10", "amqp"])
+
+    const conn = container.connect({"connection_details": details});
+    conn.open_receiver("notifications");
+  </script>
+</body>
