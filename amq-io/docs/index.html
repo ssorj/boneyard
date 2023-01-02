@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300italic,400,400italic,600,600italic|Ubuntu+Mono:400" type="text/css"/>
+    <link rel="stylesheet" href="https://www.ssorj.net/amq-io/main.css" type="text/css"/>
+    <link rel="icon" href="" type="image/png"/>
+    <script type="text/javascript" src="https://www.ssorj.net/amq-io/main.js" defer="defer"></script>
+
+
+
+  </head>
+  <body>
+
+<header>
+  <div>
+    <div id="-top-left-nav">
+      <svg height="20" width="20" style="position: relative; top: 4; margin-right: 3;">
+        <circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="2" fill="none"/>
+      </svg>
+      AMQ
+    </div>
+    <div id="-top-right-nav">
+      Red Hat
+    </div>
+  </div>
+</header>
+
+<section id="-intro-section">
+  <div>
+    <h1>Messaging for modern applications</h1>
+
+    <p><a id="-product-link"
+      href="https://access.redhat.com/products/red-hat-amq">AMQ</a> is
+      powered by open source messaging.  Learn how you can use its
+      components to build modern applications with an event-driven
+      architecture.</p>
+  </div>
+</section>
+
+<section id="-component-toc-section">
+  <div>
+    <div id="-component-toc">
+      <div id="-component-toc-services">
+        <h2>Messaging services</h2>
+
+        <nav>
+          <a href="#broker">Brokered messaging</a>
+          <a href="#streaming">Message streaming</a>
+          <a href="#router">Wide-area message routing</a>
+          <a href="#self-service">Self-service messaging</a>
+        </nav>
+      </div>
+      <div id="-component-toc-apis">
+        <h2>Messaging APIs</h2>
+
+        <nav>
+          <a href="#cpp">C++</a>
+          <a href="#java">Java (JMS)</a>
+          <a href="#javascript">JavaScript</a>
+          <a href="#dotnet">.NET</a>
+          <a href="#python">Python</a>
+          <a href="#ruby">Ruby</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="-example-app-section">
+  <div>
+    <div id="-example-app-items">
+      <div>
+        <h2>Hello World</h2>
+
+        <p>Get started sending and receiving messages.</p>
+      </div>
+      <div>
+        <h2>Work Queue</h2>
+
+        <p>Distribute tasks to multiple workers and gather the
+        results.</p>
+      </div>
+      <div>
+        <h2>Data Collector</h2>
+
+        <p>Consume updates from many points and create a single
+        stream of data.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="broker" class="component">
+  <div>
+    <h1>Brokered messaging with <a href="https://activemq.apache.org/artemis/">ActiveMQ Artemis</a></h1>
+    <div class="columns">
+      <div>
+        <p>
+          A pure-Java multiprotocol message broker, built on an
+          efficient, asynchronous core.
+        </p>
+        <p>
+          <a href="https://activemq.apache.org/artemis/" class="nav">Learn more</a>
+        </p>
+      </div>
+      <div>
+        <ul class="bullets">
+          <li>AMQP 1.0, MQTT, OpenWire, and STOMP</li>
+          <li>Rich queuing and pub-sub capabilities</li>
+          <li>Optimized persistence</li>
+          <li>High availability</li>
+        </ul>
+      </div>
+      <div>
+        <nav class="links">
+          <a href="">Get started with Docker</a>
+          <a href="https://github.com/amq-io/hello-world-jms-openshift">Get started with Kubernetes</a>
+          <a href="https://activemq.apache.org/artemis/download.html">Download</a>
+<!--          <a href="https://access.redhat.com/products/red-hat-amq#broker">Red Hat support</a> -->
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="streaming" class="component">
+  <div>
+    <h1>Message streaming with <a href="http://strimzi.io/">Kafka and Strimzi</a></h1>
+    <div class="columns">
+      <div>
+        <p>
+          The Kafka message streaming platform adapted to run on Kubernetes.
+        </p>
+        <p>
+          <a href="https://strimzi.io/" class="nav">Learn more</a>
+        </p>
+      </div>
+      <div>
+        <ul class="bullets">
+          <li>Highly scalable pub-sub messaging</li>
+          <li>Long-term message storage</li>
+          <li>Replayable message streams</li>
+          <li>Topic partitioning for horizontal scale</li>
+        </ul>
+      </div>
+      <div>
+        <nav class="links">
+          <a href="">Get started with Docker</a>
+          <a href="https://strimzi.io/quickstarts/minikube/">Get started with Kubernetes</a>
+          <a href="https://strimzi.io/downloads">Download</a>
+<!--          <a href="https://access.redhat.com/products/red-hat-amq#streams">Red Hat support</a> -->
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="router" class="component">
+  <div>
+    <h1>Wide-area message routing with <a href="http://qpid.apache.org/components/dispatch-router/index.html">Qpid Dispatch</a></h1>
+    <div class="columns">
+      <div>
+        <p>
+          A lightweight AMQP 1.0 message router for building
+          fault-tolerant, wide-area messaging networks.
+        </p>
+        <p>
+          <a href="http://qpid.apache.org/components/dispatch-router/index.html" class="nav">Learn more</a>
+        </p>
+      </div>
+      <div>
+        <ul class="bullets">
+          <li>Scales to very large networks</li>
+          <li>Advanced routing capabilities</li>
+          <li>Low latency</li>
+          <li>Connects clients, brokers, and cloud services</li>
+        </ul>
+      </div>
+      <div>
+        <nav class="links">
+          <a href="">Get started with Docker</a>
+          <a href="">Get started with Kubernetes</a>
+          <a href="http://qpid.apache.org/packages.html">Linux packages</a>
+          <a href="http://qpid.apache.org/download.html#messaging-servers">Download</a>
+<!--          <a href="https://access.redhat.com/products/red-hat-amq#interconnect">Red Hat support</a> -->
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="self-service" class="component">
+  <div>
+    <h1>Self-service messaging with <a href="http://enmasse.io/">EnMasse</a></h1>
+    <div class="columns">
+      <div>
+        <p>
+          Managed, multitenant self-service messaging.
+        </p>
+        <p>
+          <a href="http://enmasse.io/" class="nav">Learn more</a>
+        </p>
+      </div>
+      <div>
+        <ul class="bullets">
+          <li>Built-in authentication and identity management</li>
+          <li>Operators run the infrastructure and users focus on configuring the messaging resources they require</li>
+        </ul>
+      </div>
+      <div>
+        <nav class="links">
+          <a href="">Get started with Kubernetes</a>
+          <a href="http://enmasse.io/downloads">Download</a>
+<!--          <a href="https://access.redhat.com/products/red-hat-amq#online">Red Hat support</a> -->
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="-api-section" class="component">
+  <div>
+    <h1>Clients that speak your language</h1>
+
+    <div class="columns">
+      <div id="cpp">
+        <h3><a href="">C++</a></h3>
+
+        <p>A fast, native event-driven API.</p>
+
+        <nav class="links">
+          <a href="">Learn more</a>
+          <a href="">Get started</a>
+          <a href="">Linux packages</a>
+          <a href="">Windows SDK</a>
+        </nav>
+      </div>
+      <div id="java">
+        <h3><a href="http://qpid.apache.org/components/jms/index.html">Java (JMS)</a></h3>
+
+        <p>A pure-Java JMS 2.0 implementation.</p>
+
+        <nav class="links">
+          <a href="http://qpid.apache.org/components/jms/index.html">Learn more</a>
+          <a href="">Get started</a>
+          <a href="">Maven artifact</a>
+        </nav>
+      </div>
+      <div id="javascript">
+        <h3><a href="https://github.com/amqp/rhea/blob/master/README.md">JavaScript</a></h3>
+
+        <p>Runs on Node.js and in the browser.</p>
+
+        <nav class="links">
+          <a href="https://github.com/amqp/rhea/blob/master/README.md">Learn more</a>
+          <a href="https://github.com/amqp/rhea/blob/master/README.md#hello-world">Get started</a>
+          <a href="https://www.npmjs.com/package/rhea">NPM package</a>
+        </nav>
+      </div>
+    </div>
+    <p/>
+    <div class="columns">
+      <div id="dotnet">
+        <h3><a href="https://github.com/Azure/amqpnetlite/blob/master/README.md">.NET</a></h3>
+
+        <p>A lightweight, asynchronous .NET API.</p>
+
+        <nav class="links">
+          <a href="https://github.com/Azure/amqpnetlite/blob/master/README.md">Learn more</a>
+          <a href="http://azure.github.io/amqpnetlite/articles/hello_amqp.html">Get started</a>
+          <a href="https://www.nuget.org/packages/amqpnetlite">NuGet package</a>
+        </nav>
+      </div>
+      <div id="python">
+        <h3><a href="">Python</a></h3>
+
+        <p>Supports Python 2 and 3.</p>
+
+        <nav class="links">
+          <a href="">Learn more</a>
+          <a href="">Get started</a>
+          <a href="">Linux packages</a>
+          <a href="https://pypi.org/project/python-qpid-proton/">Python package</a>
+        </nav>
+      </div>
+      <div id="ruby">
+        <h3><a href="">Ruby</a></h3>
+
+        <p>An event-driven Ruby API.</p>
+
+        <nav class="links">
+          <a href="">Learn more</a>
+          <a href="">Get started</a>
+          <a href="">Linux packages</a>
+          <a href="https://rubygems.org/gems/qpid_proton">Ruby gem</a>
+        </nav>
+      </div>
+    </div>
+
+    <!--
+    <nav class="links">
+      <a href="https://access.redhat.com/products/red-hat-amq#clients">Red Hat support</a>
+    </nav>
+    -->
+</div>
+</section>
+
+<footer>
+  <div>
+  </div>
+</footer>
+
+
+
+
+  </body>
+</html>

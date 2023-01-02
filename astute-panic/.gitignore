@@ -1,0 +1,4 @@
+/qpid-proton-build
+/arrow
+/perf.*
+/flamegraph.svg

@@ -1,0 +1,54 @@
+@command
+def build(app):
+    with working_dir("qpid-proton-build"):
+        run("cmake ../qpid-proton -DCMAKE_C_FLAGS='-Winline -fno-omit-frame-pointer -O2'")
+        run("make -j 8")
+
+    run("gcc -O2 "
+        f"-I{get_current_dir()}/qpid-proton-build/c/include "
+        f"-L{get_current_dir()}/qpid-proton-build/c "
+        "arrow.c -o arrow -lqpid-proton-core -lqpid-proton-proactor "
+        f"-Wl,-rpath={get_current_dir()}/qpid-proton-build/c")
+
+    # run("gcc "
+    #     f"-I/usr/local/include "
+    #     f"-L/usr/local/lib64 "
+    #     "arrow.c -o arrow -lqpid-proton-core -lqpid-proton-proactor "
+    #     f"-Wl,-rpath=/usr/local/lib64")
+
+@command
+def test(app):
+    count = 1000 * 1000 * 10
+
+    with start(f"perf record -F 9997 -g -o receiver.data -- ./arrow connection-mode=server channel-mode=passive operation=receive id=r1 host=localhost port=56720 path=q1 duration=0 count={count} body-size=100 credit-window=2000 transaction-size=0 durable=0"):
+        sleep(1)
+        run(f"perf record -F 9997 -g -o sender.data -- ./arrow connection-mode=client channel-mode=active operation=send id=s1 host=localhost port=56720 path=q1 duration=0 count={count} body-size=100 credit-window=2000 transaction-size=0 durable=0")
+
+    sleep(1)
+
+    copy("receiver.svg", "receiver-prev.svg")
+    copy("sender.svg", "sender-prev.svg")
+
+    # flamegraph-stackcollapse-perf-1.0-6.20200729.a258e78.fc33.noarch
+    run("perf script -i receiver.data | stackcollapse-perf.pl | tee receiver.stacks | flamegraph.pl > receiver.svg", shell=True)
+    run("perf script -i sender.data | stackcollapse-perf.pl | tee sender.stacks | flamegraph.pl > sender.svg", shell=True)
+    # run("perf script -i receiver.data | stackcollapse-perf.pl | fgrep _data | flamegraph.pl > receiver.svg", shell=True)
+    # run("perf script -i sender.data | stackcollapse-perf.pl | fgrep _data | flamegraph.pl > sender.svg", shell=True)
+
+# sort -k2n sender.stacks
+# sort -k2n receiver.stacks
+
+
+#sudo perf record -g -o perf_with_stack.data my_process
+#sudo perf script -i perf_with_stack.data | stackcollapse-perf.pl | flamegraph.pl > flamegraph.png
+
+# perf record -F 1000 --call-graph=dwarf --per-thread -s --tid=$tid --output=qdr_perf_${QDRPID}_${tid}.pdata &
+# flamegraph.pl  --hash --title "${title}" --height 48 --width 1600 $TMPFILE > ./qdr_perf_${TYPE}_${QDRPID}_${tid}.svg
+
+# echo -1 > /proc/sys/kernel/perf_event_paranoid
+
+# /usr/share/bcc/tools/offcputime -df -p `pgrep -nx mysqld` 30
+
+@command
+def clean(app):
+    remove("qpid-proton-build")

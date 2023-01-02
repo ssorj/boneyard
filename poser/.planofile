@@ -1,0 +1,4 @@
+@command
+def test(app):
+    run("perf record -F 9997 -g -o map.data -- ./map")
+    run("perf script -i map.data | stackcollapse-perf.pl | tee map.stacks | flamegraph.pl > map.svg", shell=True)

@@ -1,0 +1,70 @@
+## pompom.yaml (client configuration)
+
+  server: pompom.internal.redhat.com
+  properties:
+    # org.apache.qpid:qpid-jms-client:1.0.0.redhat-00003
+    qpid-jms-version:
+      group: org.apache.qpid
+      artifact: qpid-jms-client
+      version:
+        major: x == 1
+        build: x >= 3
+    # org.jboss.genericjms:generic-jms-ra-jar:2.1.0.redhat-00001 ("stable" tag)
+    generic-jms-ra-version:
+      group: org.jboss.genericjms
+      artifact: generic-jms-ra-jar
+      version:
+        major: x == 2
+        minor: x >= 1
+        qualifier: .Final
+        tag: stable
+
+
+
+
+
+
+
+## Pompom client
+
+$ cd amqp-10-resource-adapter/
+
+$ ls
+pompom.yaml    pom.xml    resource-adapter/    wildfly-example/
+
+$ pompom update
+
+$ git diff
+diff --git a/pom.xml b/pom.xml
+index 4f67139..c842580 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -47,8 +47,8 @@
+   <properties>
+-    <qpid-jms-version>1.0.0</qpid-jms-version>
+-    <generic-jms-ra-version>2.0.9.Final</generic-jms-ra-version>
++    <qpid-jms-version>1.1.0.redhat-00005</qpid-jms-version>
++    <generic-jms-ra-version>2.2.0.Final</generic-jms-ra-version>
+
+
+
+
+
+
+
+
+## Pompom server
+
+GET /api/artifacts/<group>/<artifact>
+
+-> [
+  {major: 1, minor: 1, patch: 10, build: 1, tag: "stable"},
+  {major: 1, minor: 1, patch: 11, build: 1, tag: "stable"},
+  {major: 1, minor: 1, patch: 12, build: 1, tag: "stable"},
+  {major: 1, minor: 1, patch: 12, build: 2, tag: "stable"},
+  {major: 1, minor: 2, patch: 12, build: 2, tag: "stable"},
+  {major: 2, minor: 0, patch: 0, qualifier: ".Alpha", build: 1, tag: "dev"},
+]
+
+- Can backend to multiple repos
+- Can factor in tags from RH build systems

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Flin</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="/main.css" type="text/css"/>
+    <link rel="icon" href="" type="image/png" sizes="32x32"/>
+    <script src="/rhea.js"></script>
+    <script src="/main.js"></script>
+  </head>
+  <body>
+    <h1>Flin</h1>
+
+    <script>
+      let sent = 0;
+
+      container.on("sendable", (event) => {
+          if (sent == 10) return;
+
+          event.sender.send("hi!");
+          sent++;
+      });
+
+      container.on("message", (event) => {
+          document.write(event.message.body);
+          document.write("<br/>");
+      });
+
+      const url = "ws://localhost:5673";
+      const ws = rhea.websocket_connect(WebSocket);
+
+      const conn = container.connect({connection_details: ws(url, ['binary', 'AMQPWSB10', 'amqp']), reconnect: true});
+
+      conn.open_receiver("hello");
+      conn.open_sender("hello");
+    </script>
+  </body>
+</html>
